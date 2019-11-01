@@ -1,0 +1,12 @@
+# Syntax Coloring Map for microical
+#  `format: https://github.com/arduino/Arduino/wiki/Arduino-IDE-1.5:-Library-specification#keywords
+
+# Datatypes (KEYWORD1)
+Test	KEYWORD1
+
+# Methods and Functions (KEYWORD2)
+doSomething	KEYWORD2
+
+# Instances (KEYWORD2)
+
+# Constants (LITERAL1)

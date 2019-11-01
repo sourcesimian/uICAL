@@ -1,3 +1,10 @@
+build/
+virtualenv/
+**/.DS_Store
+
+**/__pycache__
+
+
 # Prerequisites
 *.d
 
@@ -30,3 +37,4 @@
 *.exe
 *.out
 *.app
+
