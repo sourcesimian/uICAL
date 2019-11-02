@@ -1,6 +1,6 @@
 {
   "name": "uICAL",
-  "keywords": "ICAL, RRULE, scheduling, calendar",
+  "keywords": "ICAL, RRULE, scheduling, calendar Python, MicroPython, cmodule",
   "description": "Library for reading ICAL calendar format",
   "repository":
   {

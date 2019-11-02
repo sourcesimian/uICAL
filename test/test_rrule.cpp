@@ -166,17 +166,9 @@ void test_2() {
 
 }
 
-// void test_debug_1() {
-//     std::string rrule("");
-    
-//     uICAL::RRule::ptr occ = uICAL::RRule::init(lrrule->value, start);
 
-// }
-
-
-void test_reccurrence() {
-    run_tests("test/data/recurrence.dat", test_basic);
+void test_rrule() {
+    run_tests("test/data/rrule.dat", test_basic);
     //test_2();
-    // test_debug_1();
 }
 

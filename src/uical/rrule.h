@@ -30,8 +30,11 @@ namespace uICAL {
             void setupCounters(DateStamp base);
             bool initCounters(DateStamp base, DateStamp from);
             bool nextDate();
+            bool nextExclude();
+            bool nextNow();
+            void setCurrentNow();
             bool resetCascade(counters_t::iterator it, sync_f sync);
-            bool expired(DateStamp current) const;
+            bool expired(DateTime current) const;
         
             const RRuleParser::ptr p;
             const DateTime dtstart;
@@ -43,6 +46,8 @@ namespace uICAL {
 
             counters_t counters;
             int count;
+
+            DateTime current_now;
     };
 }
 #endif

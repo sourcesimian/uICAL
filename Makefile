@@ -5,11 +5,21 @@ BIN		:= build/bin
 SRC		:= src
 INCLUDE	:= src
 
+virtualenv:
+	./new_virtualenv3.sh ./virtualenv
+	{ \
+		. ./virtualenv/bin/activate; \
+		pip3 install pytest; \
+	}
 
-test-python:
-	python3 ./setup.py build install
-	pytest ./test/test_*.py
-
+test-python: virtualenv
+	{ \
+		if ! declare -f deactivate >/dev/null; then \
+			. ./virtualenv/bin/activate; \
+		fi; \
+		python3 ./setup.py build install && \
+		pytest ./test/test_*.py; \
+	}
 
 
 test-cpp: $(BIN)/test

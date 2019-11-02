@@ -35,22 +35,29 @@ namespace uICAL {
     }
 
     void DateStamp::validate() const {
-        if (this->year < 1970)
-            throw ValueError(std::string("Invalid year: ") + std::to_string(year));
-        if (this->month < 1 || this->month > 12)
-            throw ValueError(std::string("Invalid month: ") + std::to_string(month));
-        if (this->day < 1 || this->day > 31)
-            throw ValueError(std::string("Invalid day: ") + std::to_string(day));
-        if (this->hour > 23)
-            throw ValueError(std::string("Invalid hour: ") + std::to_string(hour));
-        if (this->minute > 59)
-            throw ValueError(std::string("Invalid minute: ") + std::to_string(minute));
-        if (this->second > 59)
-            throw ValueError(std::string("Invalid second: ") + std::to_string(second));
+        std::stringstream m;
+        if (this->year < 1970) {
+            m << "Invalid year: " << year; throw ValueError(m.str());
+        }
+        if (this->month < 1 || this->month > 12) {
+            m << "Invalid month: " << month; throw ValueError(m.str());
+        }
+        if (this->day < 1 || this->day > 31) {
+            m << "Invalid day: " << day; throw ValueError(m.str());
+        }
+        if (this->hour > 23) {
+            m << "Invalid hour: " << hour; throw ValueError(m.str());
+        }
+        if (this->minute > 59) {
+            m << "Invalid minute: " << minute; throw ValueError(m.str());
+        }
+        if (this->second > 59) {
+            m << "Invalid second: " << second; throw ValueError(m.str());
+        }
     }
 
-    bool DateStamp::empty() const {
-        return !(this->year + this->month + this->day + this->hour + this->minute + this->second);
+    bool DateStamp::valid() const {
+        return (this->year + this->month + this->day + this->hour + this->minute + this->second);
     }
 
     DateStamp& DateStamp::operator= (const DateStamp &ds) {

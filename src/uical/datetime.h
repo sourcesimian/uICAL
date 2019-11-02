@@ -18,7 +18,7 @@ namespace uICAL {
             void str(std::ostream& out) const;
             std::string str() const;
 
-            bool empty() const;
+            bool valid() const;
             
             DateStamp datestamp() const;
             DateStamp datestamp(const TZ::ptr tz) const;

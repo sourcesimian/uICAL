@@ -3,10 +3,10 @@
 #include "uICAL/epochtime.h"
 
 namespace uICAL {
-    const EpochTime::epoch_t EpochTime::invalid = (unsigned)-1;
+    const EpochTime::epoch_t EpochTime::NaN = (unsigned)-1;
 
     EpochTime::EpochTime() {
-        this->epochSeconds = invalid;
+        this->epochSeconds = NaN;
     }
     
     EpochTime::EpochTime(unsigned year, unsigned month, unsigned day, unsigned hour, unsigned minute, unsigned second, const TZ::ptr& tz) {
@@ -15,8 +15,8 @@ namespace uICAL {
         this->epochSeconds = this->toSeconds(epochDays, hour, minute, second);
     }
 
-    bool EpochTime::empty() const {
-        return this->epochSeconds == invalid;
+    bool EpochTime::valid() const {
+        return this->epochSeconds != NaN;
     }
     
     EpochTime::dhms_t EpochTime::dhms(const TZ::ptr tz) const {

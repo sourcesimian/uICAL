@@ -33,11 +33,11 @@ namespace uICAL {
     }
 
     bool RRule::init() {
-        if (!this->range_end.empty() && this->dtstart > this->range_end)  {
+        if (this->range_end.valid() && this->dtstart > this->range_end)  {
             return false;
         }
 
-        if (!this->range_begin.empty() && !this->until.empty() && this->until < this->range_begin) {
+        if (this->range_begin.valid() && this->until.valid() && this->until < this->range_begin) {
             return false;
         }
 
@@ -59,8 +59,9 @@ namespace uICAL {
             return false;
         }
         this->count = this->p->count;
+        this->setCurrentNow();
 
-        if (!this->range_begin.empty()) {
+        if (this->range_begin.valid()) {
             while (this->now() < this->range_begin) {
                 if (!this->next()) {
                     return false;
@@ -72,8 +73,10 @@ namespace uICAL {
 
     DateTime RRule::now() const {
         if (this->count != 0) {
-            DateStamp now = this->counters.front()->value();
-            return DateTime(now, this->dtstart.tz);
+            if (!this->current_now.valid()) {
+                throw ImplementationError("Now is invalid");
+            }
+            return this->current_now;
         }
         if (this->counters.size() == 0) {
             throw RecurrenceError("Not yet initialised, call next() first");
@@ -94,24 +97,16 @@ namespace uICAL {
             return false;
         }
 
-        if(!this->nextDate()) {
-            return false;
-        }
-
-        if (this->excludes.size()) {
-            for (;;) {
-                DateTime now = this->now();
-                auto it = std::find(this->excludes.begin(), this->excludes.end(), now);
-                if (it == this->excludes.end()) {
-                    break;
-                }
-                if (!this->nextDate()) {
-                    return false;
-                }
+        for (;;) {
+            if (!this->nextExclude()) {
+                return false;
+            }
+            if (this->now().valid()) {
+                break;
             }
         }
 
-        if (this->expired(this->counters.front()->value())) {
+        if (this->expired(this->now())) {
             this->count = 0;
             return false;
         }
@@ -119,15 +114,48 @@ namespace uICAL {
         return true;
     }
 
-    bool RRule::expired(DateStamp current) const {
-        
-        if (!this->until.empty() && DateTime(current, this->dtstart.tz) > this->until) {
+    bool RRule::expired(DateTime current) const {
+        if (this->until.valid() && current > this->until) {
             return true;
         }
-        if (!this->range_end.empty() && DateTime(current, this->dtstart.tz) > this->range_end) {
+        if (this->range_end.valid() && current > this->range_end) {
             return true;
         }
         return false;
+    }
+
+
+    bool RRule::nextExclude() {
+        if (!this->nextNow()) {
+            return false;
+        }
+
+        if (this->excludes.size()) {
+            for (;;) {
+                auto it = std::find(this->excludes.begin(), this->excludes.end(), this->now());
+                if (it == this->excludes.end()) {
+                    break;
+                }
+                if (!this->nextNow()) {
+                    return false;
+                }
+            }
+        }
+
+        return true;
+    }
+
+    bool RRule::nextNow() {
+        if (!this->nextDate()) {
+            return false;
+        }
+        this->setCurrentNow();
+        return true;
+    }
+
+    void RRule::setCurrentNow() {
+        DateStamp now = this->counters.front()->value();
+        this->current_now = DateTime(now, this->dtstart.tz);
     }
 
     void RRule::setupCounters(DateStamp base) {
@@ -313,9 +341,9 @@ namespace uICAL {
             if (it == this->counters.begin())
                 break;
             base = (*it)->value();
-            if (this->expired(base)) {
-                return false;
-            }
+            // if (this->expired(base)) {
+            //     return false;
+            // }
         } 
         return true;
     }

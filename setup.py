@@ -26,7 +26,7 @@ uical = Extension(
     include_dirs = ['./src'],
     # libraries = ['tcl83'],
     # library_dirs = ['/usr/local/lib'],
-    sources = glob.glob('./python/*.cpp') + glob.glob('./src/*.cpp'),
+    sources = glob.glob('./python-module/*.cpp') + glob.glob('./src/*.cpp'),
     extra_compile_args = extra_compile_args,
 )
 

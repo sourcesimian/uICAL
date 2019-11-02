@@ -203,7 +203,7 @@ namespace uICAL {
             values.next();
         }
 
-        if (!this->until.empty()) {
+        if (this->until.valid()) {
             values.out() << "UNTIL=" << this->until;
             values.next();
         }

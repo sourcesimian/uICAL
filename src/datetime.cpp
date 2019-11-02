@@ -34,8 +34,8 @@ namespace uICAL {
         this->tz = tz;
     }
 
-    bool DateTime::empty() const {
-        return this->epochtime.empty();
+    bool DateTime::valid() const {
+        return this->epochtime.valid();
     }
 
     DateStamp DateTime::datestamp() const {

@@ -1,5 +1,5 @@
 int main() {
-    void test_reccurrence();
+    void test_rrule();
  
-    test_reccurrence();
+    test_rrule();
 }

@@ -20,7 +20,7 @@ namespace uICAL {
             unsigned minute;
             unsigned second;
 
-            bool empty() const;
+            bool valid() const;
 
             DateTime::Day dayOfWeek() const;
             unsigned weekNo() const;

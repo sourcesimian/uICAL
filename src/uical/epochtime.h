@@ -14,7 +14,7 @@ namespace uICAL {
             using dhms_t = std::tuple<unsigned, unsigned, unsigned, unsigned>;
             using ymdhms_t = std::tuple<unsigned, unsigned, unsigned, unsigned, unsigned, unsigned>;
 
-            bool empty() const;
+            bool valid() const;
             
             ymd_t ymd(const TZ::ptr tz) const;
             dhms_t dhms(const TZ::ptr tz) const;
@@ -34,7 +34,7 @@ namespace uICAL {
 
         protected:
             epoch_t toSeconds(unsigned day, unsigned hour, unsigned minute, unsigned second);
-            static const epoch_t invalid;
+            static const epoch_t NaN;
     };
 
     std::ostream & operator << (std::ostream &out, const EpochTime& et);
