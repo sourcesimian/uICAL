@@ -19,9 +19,13 @@ STATIC MP_DEFINE_CONST_FUN_OBJ_2(uical_add_ints_obj, uical_add_ints);
 // and the MicroPython object reference.
 // All identifiers and strings are written as MP_QSTR_xxx and will be
 // optimized to word-sized integers by the build system (interned strings).
+extern const mp_obj_type_t rrule_type;
+
 STATIC const mp_rom_map_elem_t uical_module_globals_table[] = {
-    { MP_ROM_QSTR(MP_QSTR___name__), MP_ROM_QSTR(MP_QSTR_uical) },
+    { MP_ROM_QSTR(MP_QSTR___name__), MP_ROM_QSTR(MP_QSTR_uICAL) },
     { MP_ROM_QSTR(MP_QSTR_add_ints), MP_ROM_PTR(&uical_add_ints_obj) },
+    { MP_ROM_QSTR(MP_QSTR_RRule), MP_ROM_PTR(&rrule_type) },
+
 };
 STATIC MP_DEFINE_CONST_DICT(uical_module_globals, uical_module_globals_table);
 
@@ -32,4 +36,4 @@ const mp_obj_module_t uical_user_cmodule = {
 };
 
 // Register the module to make it available in Python
-MP_REGISTER_MODULE(MP_QSTR_uical, uical_user_cmodule, MODULE_UICAL_ENABLED);
+MP_REGISTER_MODULE(MP_QSTR_uICAL, uical_user_cmodule, MODULE_UICAL_ENABLED);

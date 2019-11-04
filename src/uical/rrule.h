@@ -10,6 +10,7 @@ namespace uICAL {
             using ptr = std::shared_ptr<RRule>;
 
             static RRule::ptr init(const std::string rrule, const DateTime dtstart);
+            RRule(const RRuleParser::ptr parser, const DateTime dtstart);
 
             void begin(const DateTime begin);
             void end(const DateTime end);
@@ -21,8 +22,6 @@ namespace uICAL {
             void str(std::ostream& out) const;
 
         protected:
-            RRule(const RRuleParser::ptr parser, const DateTime dtstart);
-
             using counters_t = std::vector<Counter::ptr>;
             using sync_f = std::function<void(counters_t::iterator it)>;
 

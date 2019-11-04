@@ -1,5 +1,5 @@
-#ifndef python_rruleiter_h
-#define python_rruleiter_h
+#ifndef python_rrule_h
+#define python_rrule_h
 
 namespace uical_python {
     typedef struct {

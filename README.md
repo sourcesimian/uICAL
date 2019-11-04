@@ -59,6 +59,7 @@ Checkout uICAL to a `modules` directory e.g.:
 Then build with:
 ```
 cd micropython/ports/esp32
+make USER_C_MODULES=../../../modules all
 make USER_C_MODULES=../../../usermod CFLAGS_EXTRA=-DMODULE_UICAL_ENABLED=1 all
 ```
 
