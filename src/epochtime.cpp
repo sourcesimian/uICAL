@@ -3,16 +3,15 @@
 #include "uICAL/epochtime.h"
 
 namespace uICAL {
-    const EpochTime::epoch_t EpochTime::NaN = (unsigned)-1;
+    const timestamp_t EpochTime::NaN = (unsigned)-1;
 
     EpochTime::EpochTime() {
         this->epochSeconds = NaN;
     }
     
     EpochTime::EpochTime(unsigned year, unsigned month, unsigned day, unsigned hour, unsigned minute, unsigned second, const TZ::ptr& tz) {
-        std::ignore = tz;
         auto epochDays = days_from_civil(year, month, day);
-        this->epochSeconds = this->toSeconds(epochDays, hour, minute, second);
+        this->epochSeconds = tz->toUTC(this->toSeconds(epochDays, hour, minute, second));
     }
 
     bool EpochTime::valid() const {
@@ -20,8 +19,7 @@ namespace uICAL {
     }
     
     EpochTime::dhms_t EpochTime::dhms(const TZ::ptr tz) const {
-        std::ignore = tz;
-        epoch_t seconds = this->epochSeconds;
+        timestamp_t seconds = tz->fromUTC(this->epochSeconds);
         unsigned hour, minute, second;
 
         second = seconds % 60;
@@ -37,8 +35,7 @@ namespace uICAL {
     }
 
     EpochTime::ymd_t EpochTime::ymd(const TZ::ptr tz) const {
-        std::ignore = tz;
-        unsigned seconds = this->epochSeconds;
+        unsigned seconds = tz->fromUTC(this->epochSeconds);
         auto ymd = civil_from_days(seconds / (24 * 60 * 60));
 
         return ymd_t(std::get<0>(ymd), std::get<1>(ymd), std::get<2>(ymd));
@@ -54,8 +51,8 @@ namespace uICAL {
         );
     }
 
-    EpochTime::epoch_t EpochTime::toSeconds(unsigned day, unsigned hour, unsigned minute, unsigned second) {
-        return (epoch_t)day * 60 * 60 * 24 + hour * 60 * 60 + minute * 60 + second;
+    timestamp_t EpochTime::toSeconds(unsigned day, unsigned hour, unsigned minute, unsigned second) {
+        return (timestamp_t)day * 60 * 60 * 24 + hour * 60 * 60 + minute * 60 + second;
     }
 
     bool EpochTime::operator > (const EpochTime& other) const {

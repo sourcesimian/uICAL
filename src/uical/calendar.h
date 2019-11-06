@@ -6,12 +6,18 @@ namespace uICAL {
     class Calendar {
         public:
             using ptr = std::shared_ptr<Calendar>;
-            static ptr init(const std::string ical);
-            Calendar(const std::string ical);
+            static ptr init(std::istream& ical);
+            Calendar(std::istream& ical);
 
+            
+            bool next();
+            
+            
             void str(std::ostream& out) const;
 
         protected:
+            
+
     };
 
     std::ostream & operator << (std::ostream &out, const Calendar::ptr &c);

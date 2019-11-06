@@ -78,7 +78,7 @@ namespace uICAL {
         return ret;
     }
 
-    VLineReaderStream::VLineReaderStream(std::istringstream& ical)
+    VLineReaderStream::VLineReaderStream(std::istream& ical)
     : ical(ical)
     {
         this->current.clear();

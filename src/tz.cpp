@@ -1,5 +1,6 @@
 #include "uICAL/cppstl.h"
 #include "uICAL/tz.h"
+#include "uICAL/epochtime.h"
 #include "uICAL/datestamp.h"
 
 namespace uICAL {
@@ -9,17 +10,29 @@ namespace uICAL {
         return NONE;
     }
 
+    TZ::ptr TZ::init(int offsetMins) {
+        return ptr(new TZ(offsetMins));
+    }
+
     TZ::ptr TZ::init(const std::string tz) {
         return ptr(new TZ(tz));
     }
 
     TZ::TZ() {
-        this->offset = -1;
+        this->offsetMins = -1;
+    }
+
+    TZ::TZ(int offsetMins) {
+        this->offsetMins = offsetMins;
     }
 
     TZ::TZ(const std::string tz) {
+        this->offsetMins = TZ::parseOffset(tz);
+    }
+
+    int TZ::parseOffset(const std::string tz) {
         if (tz == "Z") {
-            this->offset = 0;
+            return 0;
         }
         int offset = -1;
         if (tz.length() == 5) {
@@ -34,34 +47,50 @@ namespace uICAL {
                 offset *= -1;
             }
         }
-        this->offset = offset;
+        return offset;
     }
 
-    void TZ::str(std::ostream& out) const {
-        if (this->offset != -1) {
-            if (this->offset == 0) {
+    void TZ::offsetAsString(std::ostream& out, int offsetMins) {
+        if (offsetMins != -1) {
+            if (offsetMins == 0) {
                 out << "Z";
             }
             else
             {
-                int offset = this->offset;
-                if (offset < 0) {
+                if (offsetMins < 0) {
                     out << "-";
-                    offset *= -1;
+                    offsetMins *= -1;
                 }
                 else
                 {
                     out << "+";
                 }
-                out << std::setfill('0') << std::setw(2) << offset / 60;
-                out << std::setfill('0') << std::setw(2) << offset % 60;
+                out << std::setfill('0') << std::setw(2) << offsetMins / 60;
+                out << std::setfill('0') << std::setw(2) << offsetMins % 60;
             }
         }
     }
 
-    TZ& TZ::operator= (const TZ &tz) {
-        this->offset = tz.offset;
-        return *this;
+    timestamp_t TZ::toUTC(timestamp_t timestamp) const {
+        if (this->offsetMins == -1)
+            return timestamp;
+        return timestamp - (this->offsetMins * 60);
     }
+
+    timestamp_t TZ::fromUTC(timestamp_t timestamp) const {
+        if (this->offsetMins == -1)
+            return timestamp;
+        return timestamp + (this->offsetMins * 60);
+    }
+
+    void TZ::str(std::ostream& out) const {
+        TZ::offsetAsString(out, this->offsetMins);
+    }
+
+    // TZ& TZ::operator= (const TZ &tz) {
+    //     this->offset = tz.offset;
+    //     return *this;
+    // }
+
 
 }

@@ -2,7 +2,7 @@
 #define uical_event_h
 
 #include "uICAL/datetime.h"
-#include "uICAL/timezone.h"
+#include "uICAL/tzidmap.h"
 #include "uICAL/rruleparser.h"
 
 namespace uICAL {
@@ -11,7 +11,10 @@ namespace uICAL {
     class Event {
         public:
             using ptr = std::shared_ptr<Event>;
-            Event(VComponent& event, Timezones& timezones);
+
+            static ptr init(VComponent& event, const TZIdMap::ptr& tzidmap);
+
+            Event(VComponent& event, const TZIdMap::ptr& tzidmap);
             void str(std::ostream &) const;
             std::string str() const;
 

@@ -3,7 +3,7 @@
 
 #include "uICAL/datetime.h"
 #include "uICAL/datestamp.h"
-#include "uICAL/timezone.h"
+#include "uICAL/tz.h"
 
 namespace uICAL {
     class RRuleParser {

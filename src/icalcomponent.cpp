@@ -21,13 +21,13 @@ namespace uICAL {
         this->children.push_back(component);
     }
 
-    VComponent::ptr VComponent::parse(const std::string ical) {
-        std::istringstream icals(ical);
-        VComponent::ptr comp = VComponent::parse(icals);
-        return comp;
-    }
+    // VComponent::ptr VComponent::parse(const std::string ical) {
+    //     std::istringstream icals(ical);
+    //     VComponent::ptr comp = VComponent::parse(icals);
+    //     return comp;
+    // }
 
-    VComponent::ptr VComponent::parse(std::istringstream& ical) {
+    VComponent::ptr VComponent::parse(std::istream& ical) {
         VLineReader::ptr lines = std::make_shared<VLineReaderStream>(ical);
         VComponent::ptr comp = VComponent::parse(lines);
         return comp;

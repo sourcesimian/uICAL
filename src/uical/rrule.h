@@ -10,7 +10,7 @@ namespace uICAL {
             using ptr = std::shared_ptr<RRule>;
 
             static RRule::ptr init(const std::string rrule, const DateTime dtstart);
-            RRule(const RRuleParser::ptr parser, const DateTime dtstart);
+            RRule(const std::string rrule, const DateTime dtstart);
 
             void begin(const DateTime begin);
             void end(const DateTime end);

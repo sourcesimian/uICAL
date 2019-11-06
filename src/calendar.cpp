@@ -4,35 +4,34 @@
 #include "uICAL/event.h"
 #include "uICAL/icalcomponent.h"
 #include "uICAL/icalline.h"
-#include "uICAL/timezone.h"
+#include "uICAL/tzidmap.h"
 
 namespace uICAL {
-    Calendar::ptr Calendar::init(const std::string ical) {
+    Calendar::ptr Calendar::init(std::istream& ical) {
         return Calendar::ptr(new Calendar(ical));
     }
 
-    Calendar::Calendar(const std::string ical)
+    Calendar::Calendar(std::istream& ical)
     {
         auto vcalendar = uICAL::VComponent::parse(ical);
 
-        //std::cout << *(vcalendar.get()) << std::endl;
-        //std::cout << "---" << std::endl;
+        auto tzidmap = TZIdMap::init(*vcalendar.get());
+
+        std::cout << "TZ ID Map:" << std::endl;
+        tzidmap->str(std::cout);
+        std::cout << std::endl;
 
         auto events = vcalendar->listComponents("VEVENT");
-
-        auto tz = Timezones(*vcalendar.get());
 
         std::cout << "Events: " << events.size() << std::endl;
         for (auto it = events.begin(); it != events.end(); ++it) {
             std::cout << " - " << std::endl;
             std::cout << (*it) << std::endl;
 
-            auto e = Event(*(it->get()), tz);
+            auto e = Event(*(it->get()), tzidmap);
             std::cout << e << std::endl;
             //std::cout << " - - " << std::endl;
             //std::cout << e << std::endl;
-
-
         }
         std::cout << "---" << std::endl;
     }

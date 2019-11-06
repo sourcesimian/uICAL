@@ -27,14 +27,14 @@ namespace uICAL {
             bool operator != (const EpochTime& other) const;
             // operator bool() const { return this->epochSeconds != (unsigned)-1; }
 
+            // EpochTime offset(int seconds) const;
             void str(std::ostream& out) const;
 
-            using epoch_t = unsigned long long int;
-            epoch_t epochSeconds;
+            timestamp_t epochSeconds;
 
         protected:
-            epoch_t toSeconds(unsigned day, unsigned hour, unsigned minute, unsigned second);
-            static const epoch_t NaN;
+            timestamp_t toSeconds(unsigned day, unsigned hour, unsigned minute, unsigned second);
+            static const timestamp_t NaN;
     };
 
     std::ostream & operator << (std::ostream &out, const EpochTime& et);

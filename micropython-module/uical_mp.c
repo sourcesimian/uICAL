@@ -2,6 +2,7 @@
 #include "py/runtime.h"
 #include "py/builtin.h"
 
+
 // This is the function which will be called from Python as example.add_ints(a, b).
 STATIC mp_obj_t uical_add_ints(mp_obj_t a_obj, mp_obj_t b_obj) {
     // Extract the ints from the micropython input objects
@@ -14,11 +15,9 @@ STATIC mp_obj_t uical_add_ints(mp_obj_t a_obj, mp_obj_t b_obj) {
 // Define a Python reference to the function above
 STATIC MP_DEFINE_CONST_FUN_OBJ_2(uical_add_ints_obj, uical_add_ints);
 
-// Define all properties of the example module.
+// Define all properties of the module.
 // Table entries are key/value pairs of the attribute name (a string)
 // and the MicroPython object reference.
-// All identifiers and strings are written as MP_QSTR_xxx and will be
-// optimized to word-sized integers by the build system (interned strings).
 extern const mp_obj_type_t rrule_type;
 
 STATIC const mp_rom_map_elem_t uical_module_globals_table[] = {

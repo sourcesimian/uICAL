@@ -40,12 +40,12 @@ namespace uICAL {
 
     class VLineReaderStream : public VLineReader {
         public:
-            VLineReaderStream(std::istringstream& ical); // TODO
+            VLineReaderStream(std::istream& ical); // TODO
             virtual ~VLineReaderStream() {};
             const VLine::ptr peek();
             void pop();
         protected:
-            std::istringstream& ical;
+            std::istream& ical;
             std::string current;
     };
 

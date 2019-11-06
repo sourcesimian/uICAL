@@ -10,11 +10,11 @@
 
 namespace uICAL {
     RRule::ptr RRule::init(const std::string rrule, const DateTime dtstart) {
-        return RRule::ptr(new RRule(RRuleParser::init(rrule), dtstart));
+        return RRule::ptr(new RRule(rrule, dtstart));
     }
 
-    RRule::RRule(const RRuleParser::ptr parser, const DateTime dtstart)
-    : p(parser)
+    RRule::RRule(const std::string rrule, const DateTime dtstart)
+    : p(RRuleParser::init(rrule))
     , dtstart(dtstart)
     {
         this->count = 0;
