@@ -90,7 +90,7 @@ namespace uICAL {
         return this->index() != ds.index();
     }
 
-    timestamp_t DateStamp::index() const {
+    seconds_t DateStamp::index() const {
         return EpochTime(this->year, this->month, this->day, this->hour, this->minute, this->second, TZ::none()).epochSeconds;
     }
 

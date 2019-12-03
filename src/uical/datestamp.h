@@ -50,7 +50,7 @@ namespace uICAL {
             bool operator != (const DateStamp& ds) const;
 
         protected:
-            timestamp_t index() const;
+            seconds_t index() const;
             void validate() const;
             DateTime::Day getWeekDay(unsigned days) const;
     };

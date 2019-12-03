@@ -28,7 +28,7 @@ namespace uICAL {
         protected:
             RRuleParser(const std::string rrule);
 
-            void parseRrule(const std::string rrule);
+            void parseRRule(const std::string rrule);
 
             Day_vector parseByDay(const std::string name) const;
             int parseInt(const std::string name) const;

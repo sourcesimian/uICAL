@@ -20,6 +20,8 @@ namespace uICAL {
             dhms_t dhms(const TZ::ptr tz) const;
             ymdhms_t ymdhms(const TZ::ptr tz) const;
 
+            seconds_t operator - (const EpochTime& other) const;
+
             bool operator > (const EpochTime& other) const;
             bool operator < (const EpochTime& other) const;
             bool operator <= (const EpochTime& other) const;
@@ -30,11 +32,11 @@ namespace uICAL {
             // EpochTime offset(int seconds) const;
             void str(std::ostream& out) const;
 
-            timestamp_t epochSeconds;
+            seconds_t epochSeconds;
 
         protected:
-            timestamp_t toSeconds(unsigned day, unsigned hour, unsigned minute, unsigned second);
-            static const timestamp_t NaN;
+            seconds_t toSeconds(unsigned day, unsigned hour, unsigned minute, unsigned second);
+            static const seconds_t NaN;
     };
 
     std::ostream & operator << (std::ostream &out, const EpochTime& et);

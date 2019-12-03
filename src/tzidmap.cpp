@@ -26,7 +26,11 @@ namespace uICAL {
     }
 
     int TZIdMap::getOffset(const std::string tzId) {
-        return this->id_attrib_map[tzId].offset; // TODO: handle KeyError
+        return this->id_attrib_map[tzId].offset;
+    }
+
+    std::string TZIdMap::getName(const std::string tzId) {
+        return this->id_attrib_map[tzId].name;
     }
 
     void TZIdMap::str(std::ostream& out) const {

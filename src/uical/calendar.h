@@ -1,6 +1,7 @@
 #ifndef uical_calendar_h
 #define uical_calendar_h
 
+#include "uICAL/icalevent.h"
 
 namespace uICAL {
     class Calendar {
@@ -9,15 +10,14 @@ namespace uICAL {
             static ptr init(std::istream& ical);
             Calendar(std::istream& ical);
 
-            
-            bool next();
-            
+            bool next_entry();
+            Entry current_entry() const;
             
             void str(std::ostream& out) const;
 
         protected:
-            
-
+            using events_t = std::vector<ICalEvent::ptr>;
+            events_t events;
     };
 
     std::ostream & operator << (std::ostream &out, const Calendar::ptr &c);

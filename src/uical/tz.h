@@ -3,7 +3,7 @@
 
 
 namespace uICAL {
-    using timestamp_t = unsigned long long int;
+    using seconds_t = long long int;
     
     class DateStamp;
 
@@ -14,25 +14,24 @@ namespace uICAL {
             static ptr none();
             static ptr init(int offsetMins);
             static ptr init(const std::string tz);
-            
             TZ();
             TZ(int offsetMins);
             TZ(const std::string tz);
 
             virtual ~TZ() {}
 
-            timestamp_t toUTC(timestamp_t timestamp) const;
-            timestamp_t fromUTC(timestamp_t timestamp) const;
+            virtual seconds_t toUTC(seconds_t timestamp) const;
+            virtual seconds_t fromUTC(seconds_t timestamp) const;
 
-            //TZ& operator= (const TZ &tz);
-
-            void str(std::ostream& out) const;
+            virtual void str(std::ostream& out) const;
 
             static int parseOffset(const std::string offset);
             static void offsetAsString(std::ostream& out, int offsetMins);
         
-        protected:
+        private:
             int offsetMins;
     };
+    
+    std::ostream & operator << (std::ostream &out, const TZ::ptr& tz);
 }
 #endif

@@ -1,4 +1,6 @@
 #include "uICAL/cppstl.h"
+#include "uICAL/util.h"
+
 #include "uICAL/calendar.h"
 
 #include <iostream>

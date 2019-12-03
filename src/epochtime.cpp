@@ -3,7 +3,7 @@
 #include "uICAL/epochtime.h"
 
 namespace uICAL {
-    const timestamp_t EpochTime::NaN = (unsigned)-1;
+    const seconds_t EpochTime::NaN = (unsigned)-1;
 
     EpochTime::EpochTime() {
         this->epochSeconds = NaN;
@@ -19,7 +19,7 @@ namespace uICAL {
     }
     
     EpochTime::dhms_t EpochTime::dhms(const TZ::ptr tz) const {
-        timestamp_t seconds = tz->fromUTC(this->epochSeconds);
+        seconds_t seconds = tz->fromUTC(this->epochSeconds);
         unsigned hour, minute, second;
 
         second = seconds % 60;
@@ -51,8 +51,12 @@ namespace uICAL {
         );
     }
 
-    timestamp_t EpochTime::toSeconds(unsigned day, unsigned hour, unsigned minute, unsigned second) {
-        return (timestamp_t)day * 60 * 60 * 24 + hour * 60 * 60 + minute * 60 + second;
+    seconds_t EpochTime::toSeconds(unsigned day, unsigned hour, unsigned minute, unsigned second) {
+        return (seconds_t)day * 60 * 60 * 24 + hour * 60 * 60 + minute * 60 + second;
+    }
+
+    seconds_t EpochTime::operator - (const EpochTime& other) const {
+        return this->epochSeconds - other.epochSeconds;
     }
 
     bool EpochTime::operator > (const EpochTime& other) const {

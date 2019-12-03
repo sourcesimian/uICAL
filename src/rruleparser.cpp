@@ -15,10 +15,10 @@ namespace uICAL {
         this->interval = 1;
         this->count = -1;
 
-        this->parseRrule(rrule);
+        this->parseRRule(rrule);
     }
 
-    void RRuleParser::parseRrule(const std::string rrule) {
+    void RRuleParser::parseRRule(const std::string rrule) {
         tokenize(rrule, ';', [&](const std::string part){
             size_t equals = part.find("=");
             const std::string key = part.substr(0, equals);

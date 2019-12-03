@@ -3,6 +3,7 @@
 #include "uICAL/datetime.h"
 #include "uICAL/epochtime.h"
 #include "uICAL/datestamp.h"
+#include "uICAL/datespan.h"
 #include "uICAL/error.h"
 
 namespace uICAL {
@@ -30,7 +31,10 @@ namespace uICAL {
     }
 
     DateTime::DateTime(DateStamp ds, TZ::ptr tz) {
-        this->epochtime = EpochTime(ds.year, ds.month, ds.day, ds.hour, ds.minute, ds.second, tz);
+        this->epochtime = EpochTime(
+            ds.year, ds.month, ds.day, ds.hour, ds.minute, ds.second,
+            tz
+        );
         this->tz = tz;
     }
 
@@ -56,26 +60,30 @@ namespace uICAL {
         );
     }
 
-    DateTime& DateTime::operator = (const DateTime &dt) {
-        this->tz = dt.tz;
-        this->epochtime = dt.epochtime;
+    DateTime& DateTime::operator = (const DateTime &other) {
+        this->tz = other.tz;
+        this->epochtime = other.epochtime;
         return *this;
     }
 
-    bool DateTime::operator > (const DateTime& dt) const {
-        return this->epochtime > dt.epochtime;
+    DateSpan DateTime::operator - (const DateTime &other) const {
+        return DateSpan(this->epochtime - other.epochtime);
     }
 
-    bool DateTime::operator < (const DateTime& dt) const {
-        return this->epochtime < dt.epochtime;
+    bool DateTime::operator > (const DateTime& other) const {
+        return this->epochtime > other.epochtime;
     }
 
-    bool DateTime::operator <= (const DateTime& dt) const {
-        return this->epochtime <= dt.epochtime;
+    bool DateTime::operator < (const DateTime& other) const {
+        return this->epochtime < other.epochtime;
     }
 
-    bool DateTime::operator == (const DateTime& dt) const {
-        return this->epochtime == dt.epochtime;
+    bool DateTime::operator <= (const DateTime& other) const {
+        return this->epochtime <= other.epochtime;
+    }
+
+    bool DateTime::operator == (const DateTime& other) const {
+        return this->epochtime == other.epochtime;
     }
 
     void DateTime::str(std::ostream& out) const {

@@ -12,6 +12,7 @@ namespace uICAL {
             TZIdMap(VComponent& calendar);
 
             int getOffset(const std::string tzId);
+            std::string getName(const std::string tzId);
 
             void str(std::ostream& out) const;
 

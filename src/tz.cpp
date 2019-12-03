@@ -2,6 +2,7 @@
 #include "uICAL/tz.h"
 #include "uICAL/epochtime.h"
 #include "uICAL/datestamp.h"
+#include "uICAL/error.h"
 
 namespace uICAL {
     static TZ::ptr NONE = TZ::ptr(new TZ());
@@ -71,26 +72,28 @@ namespace uICAL {
         }
     }
 
-    timestamp_t TZ::toUTC(timestamp_t timestamp) const {
+    seconds_t TZ::toUTC(seconds_t timestamp) const {
         if (this->offsetMins == -1)
-            return timestamp;
+            throw ImplementationError("Timezone not defined");
+
         return timestamp - (this->offsetMins * 60);
     }
 
-    timestamp_t TZ::fromUTC(timestamp_t timestamp) const {
+    seconds_t TZ::fromUTC(seconds_t timestamp) const {
         if (this->offsetMins == -1)
-            return timestamp;
+            throw ImplementationError("Timezone not defined");
+
         return timestamp + (this->offsetMins * 60);
     }
 
     void TZ::str(std::ostream& out) const {
+        if (this->offsetMins == -1)
+            throw ImplementationError("Timezone not defined");
         TZ::offsetAsString(out, this->offsetMins);
     }
 
-    // TZ& TZ::operator= (const TZ &tz) {
-    //     this->offset = tz.offset;
-    //     return *this;
-    // }
-
-
+    std::ostream & operator << (std::ostream &out, const TZ::ptr& tz) {
+        tz->str(out);
+        return out;
+    }
 }

@@ -10,10 +10,17 @@ namespace uICAL {
     : tzidmap(tzidmap)
     , id(id)
     {
-        this->offsetMins = this->tzidmap->getOffset(this->id);
+    }
+
+    seconds_t TZbyId::toUTC(seconds_t timestamp) const {
+        return timestamp - (this->tzidmap->getOffset(this->id) * 60);
+    }
+
+    seconds_t TZbyId::fromUTC(seconds_t timestamp) const {
+        return timestamp + (this->tzidmap->getOffset(this->id) * 60);
     }
 
     void TZbyId::str(std::ostream& out) const {
-
+        out << this->tzidmap->getName(this->id);
     }
 }
