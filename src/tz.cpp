@@ -20,15 +20,18 @@ namespace uICAL {
     }
 
     TZ::TZ() {
-        this->offsetMins = -1;
+        this->offsetMins = 0;
+        this->aware = false;
     }
 
     TZ::TZ(int offsetMins) {
         this->offsetMins = offsetMins;
+        this->aware = true;
     }
 
     TZ::TZ(const std::string tz) {
         this->offsetMins = TZ::parseOffset(tz);
+        this->aware = this->offsetMins != -1;
     }
 
     int TZ::parseOffset(const std::string tz) {
@@ -89,6 +92,8 @@ namespace uICAL {
     void TZ::str(std::ostream& out) const {
         if (this->offsetMins == -1)
             throw ImplementationError("Timezone not defined");
+        if (!this->aware)
+            return;
         TZ::offsetAsString(out, this->offsetMins);
     }
 

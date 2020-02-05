@@ -171,4 +171,3 @@ void test_rrule() {
     run_tests("test/data/rrule.dat", test_basic);
     //test_2();
 }
-

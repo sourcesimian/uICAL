@@ -30,6 +30,7 @@ namespace uICAL {
         
         private:
             int offsetMins;
+            bool aware;
     };
     
     std::ostream & operator << (std::ostream &out, const TZ::ptr& tz);
