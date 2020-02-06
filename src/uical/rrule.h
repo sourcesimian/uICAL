@@ -1,8 +1,9 @@
-#ifndef uical_recurrenceiter_h
-#define uical_recurrenceiter_h
+#ifndef uical_rrule_h
+#define uical_rrule_h
 
-#include "uICAL/counter.h"
-#include "uICAL/rruleparser.h"
+#include "uICAL/datetime.h"
+#include "uICAL/datestamp.h"
+#include "uICAL/tz.h"
 
 namespace uICAL {
     class RRule {
@@ -10,45 +11,61 @@ namespace uICAL {
             using ptr = std::shared_ptr<RRule>;
 
             static RRule::ptr init(const std::string rrule, const DateTime dtstart);
-            RRule(const std::string rrule, const DateTime dtstart);
 
-            void begin(const DateTime begin);
-            void end(const DateTime end);
             void exclude(const DateTime exclude);
 
-            bool next();
-            DateTime now() const;
-
-            void debug(std::ostream& out) const;
             void str(std::ostream& out) const;
+            std::string str() const;
+
+            enum class Freq {
+                NONE, SECONDLY, MINUTELY, HOURLY, DAILY, WEEKLY, MONTHLY, YEARLY,
+            };
+
+            friend class RRuleIter;
+            friend class ByWeekDayCounter;
+
+            using Day_pair = std::pair<int, DateTime::Day>;
+            using Day_vector = std::vector<Day_pair>;
 
         protected:
-            using counters_t = std::vector<Counter::ptr>;
-            using sync_f = std::function<void(counters_t::iterator it)>;
+            RRule(const std::string rrule, const DateTime dtstart);
 
-            bool init();
-            void setupCounters(DateStamp base);
-            bool initCounters(DateStamp base, DateStamp from);
-            bool nextDate();
-            bool nextExclude();
-            bool nextNow();
-            void setCurrentNow();
-            bool resetCascade(counters_t::iterator it, sync_f sync);
-            bool expired(DateTime current) const;
-        
-            const RRuleParser::ptr p;
+            void parseRRule(const std::string rrule);
 
-            DateTime until;
-            DateTime range_begin;
-            DateTime range_end;
-            //std::vector<DateTime> excludes;
+            Day_vector parseByDay(const std::string name) const;
+            int parseInt(const std::string name) const;
+            std::vector<std::string> parseArray(const std::string value) const;
+            DateTime::Day parseDay(const std::string name) const ;
+            DateTime parseDate(const std::string name) const;
 
-            counters_t counters;
+            const char* dayAsString(DateTime::Day day) const;
+            const char* frequencyAsString(Freq freq) const;
+            std::string intAsString(int value) const;
+
+            const DateTime dtstart;
+
+            Freq freq;
+            int interval;
             int count;
+            DateTime::Day wkst;
+            DateTime until;
+            std::vector<unsigned> bySecond;
+            std::vector<unsigned> byMinute;
+            std::vector<unsigned> byHour;
+            std::vector<Day_pair> byDay;
+            std::vector<int> byMonthDay;
+            std::vector<unsigned> byMonth;
+            std::vector<int> byYearDay;
+            std::vector<unsigned> byWeekNo;
+            std::vector<int> bySetPos;
 
-            DateTime current_now;
+            std::vector<DateTime> excludes;
+            bool excluded(const DateTime now) const;
     };
 
     std::ostream & operator << (std::ostream &out, const RRule::ptr &e);
+    std::ostream & operator << (std::ostream &out, const RRule &e);
+
+    std::ostream & operator << (std::ostream &out, const RRule::Day_pair &dp);
 }
 #endif

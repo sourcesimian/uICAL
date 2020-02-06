@@ -3,7 +3,7 @@
 
 #include "uICAL/datetime.h"
 #include "uICAL/tzidmap.h"
-#include "uICAL/rrule.h"
+#include "uICAL/rruleiter.h"
 #include "uICAL/icalcomponent.h"
 #include "uICAL/entry.h"
 
@@ -27,7 +27,7 @@ namespace uICAL {
             DateTime start;
             DateTime end;
             std::string summary;
-            RRule::ptr rrule;
+            RRuleIter::ptr rrule;
     };
 
     std::ostream & operator << (std::ostream &out, const ICalEvent::ptr &e);

@@ -1,18 +1,18 @@
 #include "uICAL/error.h"
 #include "uICAL/cppstl.h"
 #include "uICAL/util.h"
-#include "uICAL/rrule.h"
+#include "uICAL/rruleiter.h"
 
-#include "rrule.h"
+#include "rruleiter.h"
 
 
 using rrule_p = void *;
-using rrule_t = uICAL::RRule *;
+using rrule_t = uICAL::RRuleIter *;
 
 
 extern "C"
 rrule_p RRule_new(char* rrule) {
-    rrule_t this = new uICAL::RRule();
+    rrule_t this = new uICAL::RRuleIter();
 
     return (rrule_p)this;
 }

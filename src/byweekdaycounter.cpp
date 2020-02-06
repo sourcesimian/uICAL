@@ -6,20 +6,20 @@
 namespace uICAL {
     const unsigned ByWeekDayCounter::no_offset = 400;
 
-    Counter::ptr ByWeekDayCounter::init(const values_t& values, const RRuleParser::ptr& p) {
+    Counter::ptr ByWeekDayCounter::init(const values_t& values, const RRule::ptr& p) {
         return Counter::ptr((Counter*)new ByWeekDayCounter(values, p));
     }
 
-    Counter::ptr ByWeekDayCounter::init(const value_t value, const RRuleParser::ptr& p) {
+    Counter::ptr ByWeekDayCounter::init(const value_t value, const RRule::ptr& p) {
         values_t values{value};
         return Counter::ptr((Counter*)new ByWeekDayCounter(values, p));
     }
 
-    ByWeekDayCounter::ByWeekDayCounter(const values_t& values, const RRuleParser::ptr& p)
+    ByWeekDayCounter::ByWeekDayCounter(const values_t& values, const RRule::ptr& p)
     : CounterT(values)
     , p(p)
     {
-        for (RRuleParser::Day_pair id : values) {
+        for (RRule::Day_pair id : values) {
             int index;
             DateTime::Day dayOfWeek;
             unpack(id, index, dayOfWeek);
@@ -63,18 +63,18 @@ namespace uICAL {
             this->span = this->base.daysInMonth();
             this->base.day = 1;
         }
-        else if (this->p->freq == RRuleParser::Freq::DAILY ||
-            this->p->freq == RRuleParser::Freq::MONTHLY
+        else if (this->p->freq == RRule::Freq::DAILY ||
+            this->p->freq == RRule::Freq::MONTHLY
         ) {
             this->span = this->base.daysInMonth();
             this->base.day = 1;
         }
-        else if (this->p->freq == RRuleParser::Freq::YEARLY) {
+        else if (this->p->freq == RRule::Freq::YEARLY) {
             this->span = this->base.daysInYear();
             this->base.day = 1;
             this->base.month = 1;
         }
-        else if (this->p->freq == RRuleParser::Freq::WEEKLY) {
+        else if (this->p->freq == RRule::Freq::WEEKLY) {
             this->span = 7;
             this->base = this->base;
             this->base.decDay(DateTime::daysUntil(this->p->wkst, this->base.dayOfWeek()));

@@ -4,7 +4,7 @@
 
 #include "uICAL/cppstl.h"
 #include "uICAL/util.h"
-#include "uICAL/rrule.h"
+#include "uICAL/rruleiter.h"
 
 #include "error.h"
 #include "rrule.h"

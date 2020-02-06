@@ -3,7 +3,7 @@
 #include "uICAL/error.h"
 #include "uICAL/cppstl.h"
 #include "uICAL/util.h"
-#include "uICAL/rrule.h"
+#include "uICAL/rruleiter.h"
 
 #define PY_SSIZE_T_CLEAN
 #include <Python.h>
@@ -60,7 +60,8 @@ namespace uical_python {
             }
 
             uICAL::DateTime dt = uICAL::DateTime(std::string(dtstart));
-            self->rrule = uICAL::RRule::init(std::string(rrule), dt);
+            uICAL::RRule::ptr rr = uICAL::RRule::init(std::string(rrule), dt);
+            self->rrule = uICAL::RRuleIter::init(rr);
             
             if (begin && PyUnicode_Check(begin)) {
                 self->rrule->begin(uICAL::DateTime(std::string(PyUnicode_AsUTF8(begin))));
@@ -74,11 +75,11 @@ namespace uical_python {
                 if (PyList_Check(exclude)) {
                     for (int i = 0; i < PyList_Size(exclude); ++i) {
                         PyObject *item = PyList_GetItem(exclude, i);
-                        self->rrule->exclude(uICAL::DateTime(std::string(PyUnicode_AsUTF8(item))));
+                        rr->exclude(uICAL::DateTime(std::string(PyUnicode_AsUTF8(item))));
                     }
                 }
                 else {
-                    self->rrule->exclude(uICAL::DateTime(std::string(PyUnicode_AsUTF8(exclude))));
+                    rr->exclude(uICAL::DateTime(std::string(PyUnicode_AsUTF8(exclude))));
                 }
             }
 

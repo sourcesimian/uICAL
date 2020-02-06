@@ -1,12 +1,7 @@
 #include "uICAL/cppstl.h"
-#include "uICAL/util.h"
-#include "uICAL/bysetposcounter.h"
-#include "uICAL/byweekdaycounter.h"
-#include "uICAL/byandcounter.h"
-#include "uICAL/counter.h"
 #include "uICAL/error.h"
 #include "uICAL/rrule.h"
-#include "uICAL/rruleparser.h"
+#include "uICAL/util.h"
 
 namespace uICAL {
     RRule::ptr RRule::init(const std::string rrule, const DateTime dtstart) {
@@ -14,375 +9,279 @@ namespace uICAL {
     }
 
     RRule::RRule(const std::string rrule, const DateTime dtstart)
-    : p(RRuleParser::init(rrule, dtstart))
+    : dtstart(dtstart)
     {
-        this->count = 0;
+        this->freq = Freq::NONE;
+        this->wkst = DateTime::Day::MON;
+        this->interval = 1;
+        this->count = -1;
+
+        this->parseRRule(rrule);
     }
 
-    void RRule::begin(const DateTime begin) {
-        this->range_begin = begin;
-    }
+    void RRule::parseRRule(const std::string rrule) {
+        tokenize(rrule, ';', [&](const std::string part){
+            size_t equals = part.find("=");
+            const std::string key = part.substr(0, equals);
+            const std::string value = part.substr(equals + 1, std::string::npos);
 
-    void RRule::end(const DateTime end) {
-        this->range_end = end;
-    }
-
-    void RRule::exclude(const DateTime exclude) {
-        this->p->exclude(exclude);
-    }
-
-    bool RRule::init() {
-        if (this->range_end.valid() && this->p->dtstart > this->range_end)  {
-            return false;
-        }
-
-        if (this->range_begin.valid() && this->until.valid() && this->until < this->range_begin) {
-            return false;
-        }
-
-        DateStamp base = this->p->dtstart.datestamp();
-        this->setupCounters(base);
-
-        /* 
-        DateStamp begin;
-        if (!this->range_begin.empty()) {
-            begin = this->range_begin.datestamp(this->dtstart.tz);
-        }
-        else {
-            begin = base;
-        }
-        */
-        DateStamp begin = base;
-
-        if (!this->initCounters(base, begin)) {
-            return false;
-        }
-        this->count = this->p->count;
-        this->setCurrentNow();
-
-        if (this->range_begin.valid()) {
-            while (this->now() < this->range_begin) {
-                if (!this->next()) {
-                    return false;
+            if (key == "FREQ") {
+                if      (value == "SECONDLY") this->freq = Freq::SECONDLY;
+                else if (value == "MINUTELY") this->freq = Freq::MINUTELY;
+                else if (value == "HOURLY") this->freq = Freq::HOURLY;
+                else if (value == "DAILY") this->freq = Freq::DAILY;
+                else if (value == "WEEKLY") this->freq = Freq::WEEKLY;
+                else if (value == "MONTHLY") this->freq = Freq::MONTHLY;
+                else if (value == "YEARLY") this->freq = Freq::YEARLY;
+                else {
+                    throw ParseError(std::string("Unknonwn RRULE:FREQ type: ") + value);
                 }
             }
-        }
-        return true;
-    }
-
-    DateTime RRule::now() const {
-        if (this->count != 0) {
-            if (!this->current_now.valid()) {
-                throw ImplementationError("Now is invalid");
+            else if (key == "WKST") {
+                this->wkst = this->parseDay(value);
             }
-            return this->current_now;
-        }
-        if (this->counters.size() == 0) {
-            throw RecurrenceError("Not yet initialised, call next() first");
-        }
-
-        throw RecurrenceError("No more occurrences");
-    }
-
-    bool RRule::next() {
-        if (this->counters.size() == 0) {
-            return this->init();
-        }
-
-        if (this->count > 0) {
-            this->count --;
-        }
-        if (this->count == 0) {
-            return false;
-        }
-
-        for (;;) {
-            if (!this->nextExclude()) {
-                return false;
+            else if (key == "INTERVAL") {
+                this->interval = this->parseInt(value);
             }
-            if (this->now().valid()) {
-                break;
+            else if (key == "UNTIL") {
+                this->until = this->parseDate(value);
             }
-        }
-
-        if (this->expired(this->now())) {
-            this->count = 0;
-            return false;
-        }
-
-        return true;
-    }
-
-    bool RRule::expired(DateTime current) const {
-        if (this->until.valid() && current > this->until) {
-            return true;
-        }
-        if (this->range_end.valid() && current > this->range_end) {
-            return true;
-        }
-        return false;
-    }
-
-
-    bool RRule::nextExclude() {
-        if (!this->nextNow()) {
-            return false;
-        }
-
-        if (this->p->excludes.size()) {
-            for (;;) {
-                if (!this->p->excluded(this->now())) {
-                    break;
-                }
-                if (!this->nextNow()) {
-                    return false;
-                }
+            else if (key == "COUNT") {
+                this->count = this->parseInt(value);
             }
-        }
-
-        return true;
-    }
-
-    bool RRule::nextNow() {
-        if (!this->nextDate()) {
-            return false;
-        }
-        this->setCurrentNow();
-        return true;
-    }
-
-    void RRule::setCurrentNow() {
-        DateStamp now = this->counters.front()->value();
-        this->current_now = DateTime(now, this->p->dtstart.tz);
-    }
-
-    void RRule::setupCounters(DateStamp base) {
-        /*
-        +----------+--------+--------+-------+-------+------+-------+------+
-        |          |SECONDLY|MINUTELY|HOURLY |DAILY  |WEEKLY|MONTHLY|YEARLY|
-        +----------+--------+--------+-------+-------+------+-------+------+
-        |BYMONTH   |Limit   |Limit   |Limit  |Limit  |Limit |Limit  |Expand|
-        |BYWEEKNO  |N/A     |N/A     |N/A    |N/A    |N/A   |N/A    |Expand|
-        |BYYEARDAY |Limit   |Limit   |Limit  |N/A    |N/A   |N/A    |Expand|
-        |BYMONTHDAY|Limit   |Limit   |Limit  |Limit  |N/A   |Expand |Expand|
-        |BYDAY     |Limit   |Limit   |Limit  |Limit  |Expand|Note 1 |Note 2|
-        |BYHOUR    |Limit   |Limit   |Limit  |Expand |Expand|Expand |Expand|
-        |BYMINUTE  |Limit   |Limit   |Expand |Expand |Expand|Expand |Expand|
-        |BYSECOND  |Limit   |Expand  |Expand |Expand |Expand|Expand |Expand|
-        |BYSETPOS  |Limit   |Limit   |Limit  |Limit  |Limit |Limit  |Limit |
-        +----------+--------+--------+-------+-------+------+-------+------+
-        ref: https://icalendar.org/iCalendar-RFC-5545/3-3-10-recurrence-rule.html
-        */
-        
-        if (this->p->freq == RRuleParser::Freq::SECONDLY ||
-            this->p->freq == RRuleParser::Freq::MINUTELY ||
-            this->p->freq == RRuleParser::Freq::HOURLY)
-        {
-            // TODO: BYSETPOS
-            if (this->p->bySecond.size())   this->counters.push_back(BySecondCounter::init(this->p->bySecond));
-            else if (this->p->freq == RRuleParser::Freq::SECONDLY)
-                                            this->counters.push_back(SecondInc::init(this->p->interval));
-            else                            this->counters.push_back(BySecondCounter::init(base.second));
-
-            if (this->p->byMinute.size())   this->counters.push_back(ByMinuteCounter::init(this->p->byMinute));
-            else if (this->p->freq == RRuleParser::Freq::MINUTELY)
-                                            this->counters.push_back(MinuteInc::init(this->p->interval));
-            else                            this->counters.push_back(ByMinuteCounter::init(base.minute));
-
-            if (this->p->byHour.size())     this->counters.push_back(ByHourCounter::init(this->p->byHour));
-            else if (this->p->freq == RRuleParser::Freq::HOURLY)
-                                            this->counters.push_back(HourInc::init(this->p->interval));
-
-            std::vector<Counter::ptr> dayCounters;
-            if (this->p->byDay.size())      dayCounters.push_back(ByWeekDayCounter::init(this->p->byDay, this->p));
-            if (this->p->byMonthDay.size()) dayCounters.push_back(ByMonthDayCounter::init(this->p->byMonthDay));
-            if (this->p->byYearDay.size())  dayCounters.push_back(ByYearDayCounter::init(this->p->byYearDay));
-            if (dayCounters.size())         this->counters.push_back(ByAndCounter::init(dayCounters));
-
-            if (this->p->byWeekNo.size())   throw ICalError("BYWEEKNO is N/A");
-            if (this->p->byMonth.size())    this->counters.push_back(ByMonthCounter::init(this->p->byMonth));
-        }
-
-        else if (this->p->freq == RRuleParser::Freq::DAILY) {
-            // TODO: BYSETPOS
-            if (this->p->bySecond.size())   this->counters.push_back(BySecondCounter::init(this->p->bySecond));
-            else                            this->counters.push_back(BySecondCounter::init(base.second));
-            if (this->p->byMinute.size())   this->counters.push_back(ByMinuteCounter::init(this->p->byMinute));
-            else                            this->counters.push_back(ByMinuteCounter::init(base.minute));
-            if (this->p->byHour.size())     this->counters.push_back(ByHourCounter::init(this->p->byHour));
-            else                            this->counters.push_back(ByHourCounter::init(base.hour));
-
-            std::vector<Counter::ptr> dayCounters;
-            if (this->p->byDay.size())      dayCounters.push_back(ByWeekDayCounter::init(this->p->byDay, this->p));
-            if (this->p->byMonthDay.size()) dayCounters.push_back(ByMonthDayCounter::init(this->p->byMonthDay));
-            if (this->p->byYearDay.size())  throw ICalError("BYYEARDAY is N/A");
-            if (dayCounters.size() == 0)    dayCounters.push_back(DayInc::init(this->p->interval));
-            if (dayCounters.size())         this->counters.push_back(ByAndCounter::init(dayCounters));
-
-            if (this->p->byWeekNo.size())   throw ICalError("BYWEEKNO is N/A for SECONDLY");
-            if (this->p->byMonth.size()) {
-                                        this->counters.push_back(ByMonthCounter::init(this->p->byMonth));
-                                        this->counters.push_back(YearInc::init(1));
+            else if (key == "BYSECOND") {
+                this->bySecond = toVector<unsigned>(value);
             }
-        }
-
-        else if (this->p->freq == RRuleParser::Freq::WEEKLY) {
-            // TODO: BYSETPOS
-            if (this->p->bySecond.size())   this->counters.push_back(BySecondCounter::init(this->p->bySecond));
-            else                            this->counters.push_back(BySecondCounter::init(base.second));
-            if (this->p->byMinute.size())   this->counters.push_back(ByMinuteCounter::init(this->p->byMinute));
-            else                            this->counters.push_back(ByMinuteCounter::init(base.minute));
-            if (this->p->byHour.size())     this->counters.push_back(ByHourCounter::init(this->p->byHour));
-            else                            this->counters.push_back(ByHourCounter::init(base.hour));
-
-            std::vector<Counter::ptr> dayCounters;
-            if (this->p->byDay.size())      dayCounters.push_back(ByWeekDayCounter::init(this->p->byDay, this->p));
-            if (this->p->byMonthDay.size()) throw ICalError("BYMONTHDAY is N/A");
-            if (this->p->byYearDay.size())  throw ICalError("BYYEARDAY is N/A");
-            if (dayCounters.size())         this->counters.push_back(ByAndCounter::init(dayCounters));
-            else                            this->counters.push_back(ByWeekDayCounter::init(RRuleParser::Day_pair(0, base.dayOfWeek()), this->p));
-
-            this->counters.push_back(WeekInc::init(this->p->interval, this->p->wkst));
-
-            if (this->p->byWeekNo.size())   throw ICalError("BYWEEKNO is N/A for SECONDLY");
-            if (this->p->byMonth.size()) {
-                                            this->counters.push_back(ByMonthCounter::init(this->p->byMonth));
-                                            this->counters.push_back(YearInc::init(1));
+            else if (key == "BYMINUTE") {
+                this->byMinute = toVector<unsigned>(value);
             }
-        }
-
-        else if (this->p->freq == RRuleParser::Freq::MONTHLY) {
-            if (this->p->bySecond.size())   this->counters.push_back(BySecondCounter::init(this->p->bySecond));
-            else                            this->counters.push_back(BySecondCounter::init(base.second));
-            if (this->p->byMinute.size())   this->counters.push_back(ByMinuteCounter::init(this->p->byMinute));
-            else                            this->counters.push_back(ByMinuteCounter::init(base.minute));
-            if (this->p->byHour.size())     this->counters.push_back(ByHourCounter::init(this->p->byHour));
-            else                            this->counters.push_back(ByHourCounter::init(base.hour));
-
-            std::vector<Counter::ptr> dayCounters;
-            if (this->p->byDay.size())      dayCounters.push_back(ByWeekDayCounter::init(this->p->byDay, this->p));
-            if (this->p->byMonthDay.size()) dayCounters.push_back(ByMonthDayCounter::init(this->p->byMonthDay));
-            if (this->p->byYearDay.size())  throw ICalError("BYYEARDAY is N/A");
-            if (dayCounters.size())         this->counters.push_back(BySetPosCounter::init(ByAndCounter::init(dayCounters), this->p->bySetPos));
-            else                            this->counters.push_back(ByMonthDayCounter::init(base.day));
-
-            if (this->p->byWeekNo.size())   throw ICalError("BYWEEKNO is N/A for SECONDLY");
-            if (this->p->byMonth.size()) {
-                                            this->counters.push_back(ByMonthCounter::init(this->p->byMonth));
-                                            this->counters.push_back(YearInc::init(1));
+            else if (key == "BYHOUR") {
+                this->byHour = toVector<unsigned>(value);
             }
-            else                            this->counters.push_back(MonthInc::init(this->p->interval));
-        }
-
-        else if (this->p->freq == RRuleParser::Freq::YEARLY) {
-            // TODO: BYSETPOS
-            if (this->p->bySecond.size())   this->counters.push_back(BySecondCounter::init(this->p->bySecond));
-            else                            this->counters.push_back(BySecondCounter::init(base.second));
-            if (this->p->byMinute.size())   this->counters.push_back(ByMinuteCounter::init(this->p->byMinute));
-            else                            this->counters.push_back(ByMinuteCounter::init(base.minute));
-            if (this->p->byHour.size())     this->counters.push_back(ByHourCounter::init(this->p->byHour));
-            else                            this->counters.push_back(ByHourCounter::init(base.hour));
-
-            std::vector<Counter::ptr> dayCounters;
-            if (this->p->byDay.size())      dayCounters.push_back(ByWeekDayCounter::init(this->p->byDay, this->p));
-            if (this->p->byMonthDay.size()) dayCounters.push_back(ByMonthDayCounter::init(this->p->byMonthDay));
-            if (this->p->byYearDay.size())  dayCounters.push_back(ByYearDayCounter::init(this->p->byYearDay));
-            if (dayCounters.size())         this->counters.push_back(ByAndCounter::init(dayCounters));
-            else                            this->counters.push_back(ByMonthDayCounter::init(base.day));
-
-            if (this->p->byWeekNo.size())   this->counters.push_back(ByWeekNoCounter::init(this->p->byWeekNo));
-            if (this->p->byMonth.size())    this->counters.push_back(ByMonthCounter::init(this->p->byMonth));
-            else if (!this->p->byWeekNo.size())
-                                            this->counters.push_back(ByMonthCounter::init(base.month));
-
-            this->counters.push_back(YearInc::init(this->p->interval));
-        }
-    }
-
-    bool RRule::initCounters(DateStamp base, DateStamp begin) {
-        counters_t::iterator it = this->counters.end();
-        -- it;
-        if(!(*it)->reset(base)) {
-            return false;
-        }
-
-        return this->resetCascade(it, [&](counters_t::iterator it) {
-            while (!(*it)->syncLock(begin, (*it)->value())) {
-                if (!(*it)->next()) {
-                    std::ostringstream out;
-                    out << "Can not seek " << (*it)->name() << " (" << "base: " << base << " from: " << begin << ")";
-                    throw ParseError(out.str());
-                }
+            else if (key == "BYDAY") { // FREQ=MONTHLY;INTERVAL=2;COUNT=10;BYDAY=1SU,-1SU
+                this->byDay = this->parseByDay(value);
+            }
+            else if (key == "BYWEEKNO") {
+                this->byWeekNo = toVector<unsigned>(value);
+            }
+            else if (key == "BYMONTH") {
+                this->byMonth = toVector<unsigned>(value);
+            }
+            else if (key == "BYMONTHDAY") {
+                this->byMonthDay = toVector<int>(value);
+            }
+            else if (key == "BYYEARDAY") {
+                this->byYearDay = toVector<int>(value);
+            }
+            else if (key == "BYSETPOS") {
+                this->bySetPos = toVector<int>(value);
+            }
+            else {
+                throw ParseError(std::string("Unknonwn RRULE key: ") + key);
             }
         });
     }
 
-    bool RRule::resetCascade(counters_t::iterator it, sync_f sync) {
-        DateStamp base = (*it)->value();
-        for (;;) {
-            -- it;
-            if (!(*it)->reset(base)) {
-                ++ it;
-                if(!(*it)->next()) {
-                    ++ it;
-                    if (it != this->counters.end()) {
-                        throw ImplementationError("No next available from upper level counter");
-                    }
-                    -- it;
-                }
-            }
-
-            if (sync != nullptr) {
-                sync(it);
-            }
-
-            if (it == this->counters.begin())
-                break;
-            base = (*it)->value();
-            // if (this->expired(base)) {
-            //     return false;
-            // }
-        } 
-        return true;
+    int RRule::parseInt(const std::string value) const {
+        return string_to_int(value);
     }
 
-    bool RRule::nextDate() {
-        counters_t::iterator it = this->counters.begin();
+    std::vector<std::string> RRule::parseArray(const std::string value) const {
+        std::vector<std::string> array;
+        tokenize(value, ',', [&](const std::string part){
+            array.push_back(part);
+        });
+        return array;
+    }
 
-        if(!(*it)->next()) {
-            for (;;) {
-                ++ it;
-                if (it == this->counters.end()) {
-                    -- it;
-                    if (it == this->counters.begin())
-                        return true;
-                    break;
-                }
-                if ((*it)->next())
-                    break;
+    RRule::Day_vector RRule::parseByDay(const std::string value) const {
+        Day_vector array;
+        tokenize(value, ',', [&](const std::string part){
+            int index;
+            if (part.length() > 2) {
+                index = string_to_int(part.substr(0, part.length() - 2));
             }
-            if (!this->resetCascade(it, nullptr)) {
-                return false;
+            else{
+                index = 0;
             }
+
+            DateTime::Day day = this->parseDay(part.substr(part.length() - 2, std::string::npos));
+            array.push_back(Day_pair(index, day));
+        });
+        return array;
+    }
+
+    DateTime::Day RRule::parseDay(const std::string value) const {
+        if (value == "SU") return DateTime::Day::SUN;
+        if (value == "MO") return DateTime::Day::MON;
+        if (value == "TU") return DateTime::Day::TUE;
+        if (value == "WE") return DateTime::Day::WED;
+        if (value == "TH") return DateTime::Day::THU;
+        if (value == "FR") return DateTime::Day::FRI;
+        if (value == "SA") return DateTime::Day::SAT;
+        throw ParseError(std::string("Unknown day name: ") + value);
+    }
+
+    DateTime RRule::parseDate(const std::string value) const {
+        return DateTime(value);
+    }
+
+    const char* RRule::dayAsString(DateTime::Day day) const {
+        switch(day) {
+            case DateTime::Day::MON:    return "MO";
+            case DateTime::Day::TUE:    return "TU";
+            case DateTime::Day::WED:    return "WE";
+            case DateTime::Day::THU:    return "TH";
+            case DateTime::Day::FRI:    return "FR";
+            case DateTime::Day::SAT:    return "SA";
+            case DateTime::Day::SUN:    return "SU";
+            default:
+                std::string err("Unknown day index: ");
+                err += (int)day;
+                throw ParseError(err);
+        }
+    }
+
+    const char* RRule::frequencyAsString(Freq freq) const {
+        switch(freq) {
+            case Freq::SECONDLY:  return "SECONDLY";
+            case Freq::MINUTELY:  return "MINUTELY";
+            case Freq::HOURLY:    return "HOURLY";
+            case Freq::DAILY:     return "DAILY";
+            case Freq::WEEKLY:    return "WEELKY";
+            case Freq::MONTHLY:   return "MONTHLY";
+            case Freq::YEARLY:    return "WEEKLY";
+            default:
+                std::string err("Unknown frequency index: ");
+                err += (int)freq;
+                throw ParseError(err);
+        }
+    }
+
+    std::string RRule::intAsString(int value) const {
+        std::ostringstream out;
+        out << value;
+        return out.str();
+    }
+
+    void RRule::exclude(const DateTime exclude) {
+        this->excludes.push_back(exclude);
+    }
+
+    bool RRule::excluded(const DateTime now) const {
+        auto it = std::find(this->excludes.begin(), this->excludes.end(), now);
+        if (it == this->excludes.end()) {
+            return false;
         }
         return true;
     }
 
-    void RRule::debug(std::ostream& out) const {
-        Joiner counters(',');
-        for (auto it = this->counters.rbegin(); it != this->counters.rend(); ++it) {
-            (*it)->str(counters.out());
-            counters.next();
-        }
-        counters.str(out);
+    std::string RRule::str() const {
+        std::ostringstream out;
+        this->str(out);
+        return out.str();
     }
 
     void RRule::str(std::ostream& out) const {
-        this->p->str(out);
+        out << "RRULE:";
+
+        Joiner values(';');
+        
+        values.out() << "FREQ=" << + this->frequencyAsString(this->freq);
+        values.next();
+
+        if (this->interval) {
+            values.out() << "INTERVAL=" << this->intAsString(this->interval);
+            values.next();
+        }
+
+        if (this->count > 0) {
+            values.out() << "COUNT=" << this->intAsString(this->count);
+            values.next();
+        }
+
+        values.out() << "WKST=" << this->dayAsString(this->wkst);
+        values.next();
+
+        if (this->byDay.size()) {
+            Joiner days(',');
+            for (Day_pair id : this->byDay) {
+                if (id.first)
+                    days.out() << id.first;
+                days.out() << this->dayAsString(id.second);
+                days.next();
+            }
+
+            values.out() << "BYDAY=" << days.str();
+            values.next();
+        }
+
+        if (this->until.valid()) {
+            values.out() << "UNTIL=" << this->until;
+            values.next();
+        }
+
+        if (this->bySecond.size()) {
+            values.out() << "BYSECOND=" << this->bySecond;
+            values.next();
+        }
+
+        if (this->byMinute.size()) {
+            values.out() << "BYMINUTE=" << this->byMinute;
+            values.next();
+        }
+
+        if (this->byHour.size()) {
+            values.out() << "BYHOUR=" << this->byHour;
+            values.next();
+        }
+
+        if (this->byMonthDay.size()) {
+            values.out() << "BYMONTHDAY=" << this->byMonthDay;
+            values.next();
+        }
+
+        if (this->byMonth.size()) {
+            values.out() << "BYMONTH=" << this->byMonth;
+            values.next();
+        }
+
+        if (this->byYearDay.size()) {
+            values.out() << "BYYEARDAY=" << this->byYearDay;
+            values.next();
+        }
+
+        if (this->byWeekNo.size()) {
+            values.out() << "BYWEEKNO=" << this->byWeekNo;
+            values.next();
+        }
+
+        if (this->bySetPos.size()) {
+            values.out() << "BYSETPOS=" << this->bySetPos;
+            values.next();
+        }
+
+        values.str(out);
     }
 
     std::ostream & operator << (std::ostream &out, const RRule::ptr &r) {
         r->str(out);
+        return out;
+    }
+
+    std::ostream & operator << (std::ostream &out, const RRule &r) {
+        r.str(out);
+        return out;
+    }
+
+    std::ostream & operator << (std::ostream &out, const RRule::Day_pair &dp) {
+        int idx;
+        DateTime::Day day;
+        unpack(dp, idx, day);
+        if (idx)
+            out << idx << day;
+        else
+            out << day;
         return out;
     }
 }

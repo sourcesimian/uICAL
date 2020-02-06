@@ -2,13 +2,13 @@
 #define uical_byweekdaycounter_h
 
 #include "uICAL/counter.h"
-#include "uICAL/rruleparser.h"
+#include "uICAL/rrule.h"
 
 namespace uICAL {
-    class ByWeekDayCounter : protected CounterT<RRuleParser::Day_pair> {
+    class ByWeekDayCounter : protected CounterT<RRule::Day_pair> {
         public:
-            static Counter::ptr init(const values_t& values, const RRuleParser::ptr& r);
-            static Counter::ptr init(const value_t value, const RRuleParser::ptr& r);
+            static Counter::ptr init(const values_t& values, const RRule::ptr& r);
+            static Counter::ptr init(const value_t value, const RRule::ptr& r);
 
             virtual bool reset(DateStamp start);
             virtual DateStamp value() const;
@@ -17,15 +17,15 @@ namespace uICAL {
             virtual bool syncLock(DateStamp from, DateStamp now) const;
 
         protected:
-            ByWeekDayCounter(const values_t& values, const RRuleParser::ptr& p);
+            ByWeekDayCounter(const values_t& values, const RRule::ptr& p);
 
             virtual const std::string name() const { return "ByWeekDay"; }
             virtual void wrap();
 
-            const RRuleParser::ptr& p;
+            const RRule::ptr& p;
 
-            RRuleParser::Day_vector byIndexedDay;
-            RRuleParser::Day_vector::const_iterator itIndex;
+            RRule::Day_vector byIndexedDay;
+            RRule::Day_vector::const_iterator itIndex;
             std::vector<DateTime::Day> byDayOfWeek;
 
             DateTime::Day firstDayOfSpan;

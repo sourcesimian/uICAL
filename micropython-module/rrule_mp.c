@@ -5,7 +5,7 @@
 #include "py/runtime.h"
 #include "py/binary.h"
 
-#include "rrule.h"
+#include "rruleiter.h"
 
 typedef struct _rrule_obj_t {
     mp_obj_base_t base;

@@ -20,7 +20,7 @@ namespace uICAL {
         this->start = DateTime(DateStamp(dtStart->value), TZbyId::init(tzidmap, dtStart->getParam("TZID")));
         this->end = DateTime(DateStamp(dtEnd->value), TZbyId::init(tzidmap, dtStart->getParam("TZID")));
         
-        this->rrule = RRule::init(rRule->value, this->start);
+        this->rrule = RRuleIter::init(RRule::init(rRule->value, this->start));
 
         this->summary = summary->value;
     }

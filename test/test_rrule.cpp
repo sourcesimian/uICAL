@@ -9,7 +9,7 @@
 #include "uICAL/util.h"
 #include "uICAL/icalline.h"
 #include "uICAL/datetime.h"
-#include "uICAL/rrule.h"
+#include "uICAL/rruleiter.h"
 #include "uICAL/error.h"
 #include "uICAL/tz.h"
 
@@ -91,7 +91,7 @@ void test_basic(std::string dtstart, std::string rrule, std::string begin, std::
     try {
         //uICAL::Recurrence::ptr rec = uICAL::Recurrence::init(lrrule->value);
 
-        uICAL::RRule::ptr occ = uICAL::RRule::init(lrrule->value, start);
+        uICAL::RRuleIter::ptr occ = uICAL::RRuleIter::init(uICAL::RRule::init(lrrule->value, start));
         
         if (!begin.empty()) {
             uICAL::DateTime dt = uICAL::DateTime(begin);
@@ -158,7 +158,7 @@ void test_2() {
     std::string begin("19970902T090000");
     std::string end("29970902T090000");
 
-    auto rr = uICAL::RRule::init(rrule, uICAL::DateTime(dtstart, uICAL::TZ::unaware()));
+    auto rr = uICAL::RRuleIter::init(uICAL::RRule::init(rrule, uICAL::DateTime(dtstart, uICAL::TZ::unaware())));
     while (rr->next())
     {
         std::cout << rr->now() << std::endl;
