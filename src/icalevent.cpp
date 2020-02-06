@@ -20,7 +20,6 @@ namespace uICAL {
         this->start = DateTime(DateStamp(dtStart->value), TZbyId::init(tzidmap, dtStart->getParam("TZID")));
         this->end = DateTime(DateStamp(dtEnd->value), TZbyId::init(tzidmap, dtStart->getParam("TZID")));
         
-        //this->duration = end - start;
         this->rrule = RRule::init(rRule->value, this->start);
 
         this->summary = summary->value;
@@ -42,10 +41,10 @@ namespace uICAL {
     }
 
     void ICalEvent::str(std::ostream& out) const {
-        out << "EVENT: " << this->summary << std::endl;
+        out << "VEVENT: " << this->summary << std::endl;
         out << " - start: " << this->start << std::endl;
         out << " - end: " << this->end << std::endl;
-        //out << " - recurrence: " << this->recurrence << std::endl;
+        out << " - rrule: " << this->rrule << std::endl;
     }
 
     std::ostream & operator << (std::ostream &out, const ICalEvent::ptr &e) {

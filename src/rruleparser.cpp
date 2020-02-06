@@ -4,11 +4,12 @@
 #include "uICAL/util.h"
 
 namespace uICAL {
-    RRuleParser::ptr RRuleParser::init(const std::string rrule) {
-        return RRuleParser::ptr(new RRuleParser(rrule));
+    RRuleParser::ptr RRuleParser::init(const std::string rrule, const DateTime dtstart) {
+        return RRuleParser::ptr(new RRuleParser(rrule, dtstart));
     }
 
-    RRuleParser::RRuleParser(const std::string rrule)
+    RRuleParser::RRuleParser(const std::string rrule, const DateTime dtstart)
+    : dtstart(dtstart)
     {
         this->freq = Freq::NONE;
         this->wkst = DateTime::Day::MON;
@@ -161,6 +162,18 @@ namespace uICAL {
         std::ostringstream out;
         out << value;
         return out.str();
+    }
+
+    void RRuleParser::exclude(const DateTime exclude) {
+        this->excludes.push_back(exclude);
+    }
+
+    bool RRuleParser::excluded(const DateTime now) const {
+        auto it = std::find(this->excludes.begin(), this->excludes.end(), now);
+        if (it == this->excludes.end()) {
+            return false;
+        }
+        return true;
     }
 
     std::string RRuleParser::str() const {

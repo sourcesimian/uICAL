@@ -19,6 +19,7 @@ namespace uICAL {
             bool next();
             DateTime now() const;
 
+            void debug(std::ostream& out) const;
             void str(std::ostream& out) const;
 
         protected:
@@ -36,17 +37,18 @@ namespace uICAL {
             bool expired(DateTime current) const;
         
             const RRuleParser::ptr p;
-            const DateTime dtstart;
 
             DateTime until;
             DateTime range_begin;
             DateTime range_end;
-            std::vector<DateTime> excludes;
+            //std::vector<DateTime> excludes;
 
             counters_t counters;
             int count;
 
             DateTime current_now;
     };
+
+    std::ostream & operator << (std::ostream &out, const RRule::ptr &e);
 }
 #endif

@@ -31,7 +31,7 @@ namespace uICAL {
             // std::cout << " - " << std::endl;
             // std::cout << (*it) << std::endl;
 
-            // std::cout << e << std::endl;
+            std::cout << ev << std::endl;
             //std::cout << " - - " << std::endl;
             //std::cout << e << std::endl;
         }

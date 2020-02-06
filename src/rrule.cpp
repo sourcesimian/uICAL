@@ -14,8 +14,7 @@ namespace uICAL {
     }
 
     RRule::RRule(const std::string rrule, const DateTime dtstart)
-    : p(RRuleParser::init(rrule))
-    , dtstart(dtstart)
+    : p(RRuleParser::init(rrule, dtstart))
     {
         this->count = 0;
     }
@@ -29,11 +28,11 @@ namespace uICAL {
     }
 
     void RRule::exclude(const DateTime exclude) {
-        this->excludes.push_back(exclude);
+        this->p->exclude(exclude);
     }
 
     bool RRule::init() {
-        if (this->range_end.valid() && this->dtstart > this->range_end)  {
+        if (this->range_end.valid() && this->p->dtstart > this->range_end)  {
             return false;
         }
 
@@ -41,7 +40,7 @@ namespace uICAL {
             return false;
         }
 
-        DateStamp base = this->dtstart.datestamp();
+        DateStamp base = this->p->dtstart.datestamp();
         this->setupCounters(base);
 
         /* 
@@ -130,10 +129,9 @@ namespace uICAL {
             return false;
         }
 
-        if (this->excludes.size()) {
+        if (this->p->excludes.size()) {
             for (;;) {
-                auto it = std::find(this->excludes.begin(), this->excludes.end(), this->now());
-                if (it == this->excludes.end()) {
+                if (!this->p->excluded(this->now())) {
                     break;
                 }
                 if (!this->nextNow()) {
@@ -155,7 +153,7 @@ namespace uICAL {
 
     void RRule::setCurrentNow() {
         DateStamp now = this->counters.front()->value();
-        this->current_now = DateTime(now, this->dtstart.tz);
+        this->current_now = DateTime(now, this->p->dtstart.tz);
     }
 
     void RRule::setupCounters(DateStamp base) {
@@ -370,12 +368,21 @@ namespace uICAL {
         return true;
     }
 
-    void RRule::str(std::ostream& out) const {
+    void RRule::debug(std::ostream& out) const {
         Joiner counters(',');
         for (auto it = this->counters.rbegin(); it != this->counters.rend(); ++it) {
             (*it)->str(counters.out());
             counters.next();
         }
         counters.str(out);
+    }
+
+    void RRule::str(std::ostream& out) const {
+        this->p->str(out);
+    }
+
+    std::ostream & operator << (std::ostream &out, const RRule::ptr &r) {
+        r->str(out);
+        return out;
     }
 }

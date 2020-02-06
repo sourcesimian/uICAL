@@ -5,10 +5,15 @@
 #include "uICAL/error.h"
 
 namespace uICAL {
-    static TZ::ptr NONE = TZ::ptr(new TZ());
+    static TZ::ptr UNDEF = TZ::ptr(new TZ());
+    static TZ::ptr UNAWARE = TZ::ptr(new TZ(false));
 
-    TZ::ptr TZ::none() {
-        return NONE;
+    TZ::ptr TZ::undef() {
+        return UNDEF;
+    }
+
+    TZ::ptr TZ::unaware() {
+        return UNAWARE;
     }
 
     TZ::ptr TZ::init(int offsetMins) {
@@ -20,8 +25,13 @@ namespace uICAL {
     }
 
     TZ::TZ() {
-        this->offsetMins = 0;
+        this->offsetMins = -1;
         this->aware = false;
+    }
+
+    TZ::TZ(bool aware) {
+        this->offsetMins = 0;
+        this->aware = aware;
     }
 
     TZ::TZ(int offsetMins) {

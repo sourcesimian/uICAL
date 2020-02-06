@@ -158,7 +158,7 @@ void test_2() {
     std::string begin("19970902T090000");
     std::string end("29970902T090000");
 
-    auto rr = uICAL::RRule::init(rrule, uICAL::DateTime(dtstart, uICAL::TZ::none()));
+    auto rr = uICAL::RRule::init(rrule, uICAL::DateTime(dtstart, uICAL::TZ::unaware()));
     while (rr->next())
     {
         std::cout << rr->now() << std::endl;

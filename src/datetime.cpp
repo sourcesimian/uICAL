@@ -8,7 +8,7 @@
 
 namespace uICAL {
     DateTime::DateTime() {
-        this->tz = TZ::none();
+        this->tz = TZ::undef();
     }
 
     DateTime::DateTime(const std::string datetime) {        
@@ -21,7 +21,7 @@ namespace uICAL {
             this->tz = TZ::init(datetime.substr(15));
         }
         else {
-            this->tz = TZ::none();
+            this->tz = TZ::unaware();
         }
 
         this->epochtime = EpochTime(

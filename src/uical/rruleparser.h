@@ -10,7 +10,7 @@ namespace uICAL {
         public:
             using ptr = std::shared_ptr<RRuleParser>;
 
-            static RRuleParser::ptr init(const std::string rrule);
+            static RRuleParser::ptr init(const std::string rrule, const DateTime dtstart);
 
             void str(std::ostream& out) const;
             std::string str() const;
@@ -26,7 +26,7 @@ namespace uICAL {
             using Day_vector = std::vector<Day_pair>;
 
         protected:
-            RRuleParser(const std::string rrule);
+            RRuleParser(const std::string rrule, const DateTime dtstart);
 
             void parseRRule(const std::string rrule);
 
@@ -39,6 +39,8 @@ namespace uICAL {
             const char* dayAsString(DateTime::Day day) const;
             const char* frequencyAsString(Freq freq) const;
             std::string intAsString(int value) const;
+
+            const DateTime dtstart;
 
             Freq freq;
             int interval;
@@ -54,6 +56,10 @@ namespace uICAL {
             std::vector<int> byYearDay;
             std::vector<unsigned> byWeekNo;
             std::vector<int> bySetPos;
+
+            std::vector<DateTime> excludes;
+            void exclude(const DateTime exclude);
+            bool excluded(const DateTime now) const;
     };
 
     std::ostream & operator << (std::ostream &out, const RRuleParser::ptr &e);

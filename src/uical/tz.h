@@ -11,10 +11,12 @@ namespace uICAL {
         public:
             using ptr = std::shared_ptr<TZ>;
 
-            static ptr none();
+            static ptr undef();
+            static ptr unaware();
             static ptr init(int offsetMins);
             static ptr init(const std::string tz);
             TZ();
+            TZ(bool aware);
             TZ(int offsetMins);
             TZ(const std::string tz);
 
