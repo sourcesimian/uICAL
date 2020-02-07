@@ -1,4 +1,5 @@
 #include "uICAL/cppstl.h"
+#include "uICAL/types.h"
 #include "uICAL/icalcomponent.h"
 #include "uICAL/tzidmap.h"
 #include "uICAL/tz.h"

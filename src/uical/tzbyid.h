@@ -1,6 +1,7 @@
 #ifndef uical_tzbyid_h
 #define uical_tzbyid_h
 
+#include "uICAL/types.h"
 #include "uICAL/tz.h"
 #include "uICAL/tzidmap.h"
 

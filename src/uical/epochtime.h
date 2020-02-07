@@ -11,13 +11,11 @@ namespace uICAL {
             EpochTime(unsigned year, unsigned month, unsigned day, unsigned hour, unsigned minute, unsigned second, const TZ::ptr& tz);
             
             using ymd_t = std::tuple<unsigned, unsigned, unsigned>;
-            using dhms_t = std::tuple<unsigned, unsigned, unsigned, unsigned>;
             using ymdhms_t = std::tuple<unsigned, unsigned, unsigned, unsigned, unsigned, unsigned>;
 
             bool valid() const;
             
             ymd_t ymd(const TZ::ptr tz) const;
-            dhms_t dhms(const TZ::ptr tz) const;
             ymdhms_t ymdhms(const TZ::ptr tz) const;
 
             seconds_t operator - (const EpochTime& other) const;
@@ -35,7 +33,6 @@ namespace uICAL {
             seconds_t epochSeconds;
 
         protected:
-            seconds_t toSeconds(unsigned day, unsigned hour, unsigned minute, unsigned second);
             static const seconds_t NaN;
     };
 

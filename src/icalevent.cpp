@@ -66,4 +66,9 @@ namespace uICAL {
                      this->rrule->now(),
                      this->ice->end - this->ice->start);
     }
+
+    bool operator < (const ICalEventIter::ptr &a, const ICalEventIter::ptr &b) {
+        return a->rrule->now() < b->rrule->now();
+    }
+
 }

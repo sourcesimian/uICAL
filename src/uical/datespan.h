@@ -11,9 +11,15 @@ namespace uICAL {
 
             seconds_t totalSeconds() const;
 
+            void str(std::ostream& out) const;
+
         protected:
+            // std::tuple<unsigned, unsigned, unsigned, unsigned> dhms(seconds_t spanSeconds) const;
+
             seconds_t spanSeconds;
     };
+
+    std::ostream & operator << (std::ostream &out, const DateSpan& ds);
 }
 
 #endif

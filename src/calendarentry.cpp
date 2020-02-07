@@ -48,4 +48,15 @@ namespace uICAL {
     DateSpan CalendarEntry::span() const {
         return this->_span;
     }
+
+    void CalendarEntry::str(std::ostream& out) const {
+        out << "Calendar " << this->asString(this->_type) << ": " << this->_summary << std::endl;
+        out << " - start: " << this->_start << std::endl;
+        out << " - span: " << this->_span << std::endl;
+    }
+
+    std::ostream & operator << (std::ostream &out, const CalendarEntry::ptr &ce) {
+        ce->str(out);
+        return out;
+    }
 }

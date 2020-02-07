@@ -41,9 +41,12 @@ namespace uICAL {
             DateTime now() const;
             CalendarEntry::ptr entry() const;
 
+            friend bool operator < (const ICalEventIter::ptr &a, const ICalEventIter::ptr &);
         private:
             const ICalEvent::ptr ice;
             RRuleIter::ptr rrule;
     };
+
+    bool operator < (const ICalEventIter::ptr &a, const ICalEventIter::ptr &);
 }
 #endif

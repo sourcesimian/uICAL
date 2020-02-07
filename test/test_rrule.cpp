@@ -6,6 +6,7 @@
 #include <fstream>
 #include <map>
 
+#include "uICAL/types.h"
 #include "uICAL/util.h"
 #include "uICAL/icalline.h"
 #include "uICAL/datetime.h"

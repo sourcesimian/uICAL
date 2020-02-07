@@ -1,4 +1,5 @@
 #include "uICAL/cppstl.h"
+#include "uICAL/types.h"
 #include "uICAL/datecalc.h"
 #include "uICAL/datestamp.h"
 #include "uICAL/tz.h"

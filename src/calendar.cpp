@@ -60,10 +60,10 @@ namespace uICAL {
     : cal(cal)
     {
         for (auto it = this->cal->events.begin(); it != this->cal->events.end(); ++it) {
-            ICalEventIter::ptr evi = ICalEventIter::init(*it, begin, end);
+            ICalEventIter::ptr evIt = ICalEventIter::init(*it, begin, end);
 
-            if (evi->next()) {  // Initialise and filter
-                this->events.push_back(evi);
+            if (evIt->next()) {  // Initialise and filter
+                this->events.push_back(evIt);
             }
         }
     }

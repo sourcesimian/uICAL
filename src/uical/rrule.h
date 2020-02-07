@@ -1,6 +1,7 @@
 #ifndef uical_rrule_h
 #define uical_rrule_h
 
+#include "uICAL/types.h"
 #include "uICAL/datetime.h"
 #include "uICAL/datestamp.h"
 #include "uICAL/tz.h"

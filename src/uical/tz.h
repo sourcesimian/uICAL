@@ -3,8 +3,6 @@
 
 
 namespace uICAL {
-    using seconds_t = long long int;
-    
     class DateStamp;
 
     class TZ {

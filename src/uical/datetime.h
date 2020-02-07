@@ -1,6 +1,7 @@
 #ifndef uical_datetime_h
 #define uical_datetime_h
 
+#include "uICAL/types.h"
 #include "uICAL/epochtime.h"
 #include "uICAL/tz.h"
 

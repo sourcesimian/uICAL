@@ -12,5 +12,10 @@ namespace uICAL {
     unsigned weekday_difference(unsigned x, unsigned y) noexcept;
     unsigned next_weekday(unsigned wd) noexcept;
     unsigned prev_weekday(unsigned wd) noexcept;
+
+    using dhms_t = std::tuple<unsigned, unsigned, unsigned, unsigned>;
+
+    dhms_t to_dhms(seconds_t seconds);
+    seconds_t to_seconds(unsigned day, unsigned hour, unsigned minute, unsigned second);
 }
 #endif

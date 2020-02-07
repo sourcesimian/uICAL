@@ -23,6 +23,8 @@ namespace uICAL {
             DateTime start() const;
             DateSpan span() const;
 
+            void str(std::ostream& out) const;
+
             static std::string asString(Type type);
 
         protected:
@@ -31,6 +33,8 @@ namespace uICAL {
             DateTime _start;
             DateSpan _span;
     };
+
+    std::ostream & operator << (std::ostream &out, const CalendarEntry::ptr &e);
 }
 
 #endif

@@ -1,4 +1,5 @@
 #include "uICAL/cppstl.h"
+#include "uICAL/types.h"
 #include "uICAL/datecalc.h"
 
 namespace uICAL {
@@ -78,5 +79,24 @@ namespace uICAL {
     unsigned weekday_from_days(unsigned z) noexcept
     {
         return (z+4) % 7;
+    }
+
+    dhms_t to_dhms(seconds_t seconds) {
+        unsigned hour, minute, second;
+
+        second = seconds % 60;
+        seconds /= 60;
+
+        minute = seconds % 60;
+        seconds /= 60;
+
+        hour = seconds % 24;
+        seconds /= 24;
+
+        return dhms_t(seconds, hour, minute, second);
+    }
+
+    seconds_t to_seconds(unsigned day, unsigned hour, unsigned minute, unsigned second) {
+        return (seconds_t)day * 60 * 60 * 24 + hour * 60 * 60 + minute * 60 + second;
     }
 }
