@@ -61,15 +61,17 @@ namespace uical_python {
 
             uICAL::DateTime dt = uICAL::DateTime(std::string(dtstart));
             uICAL::RRule::ptr rr = uICAL::RRule::init(std::string(rrule), dt);
-            self->rrule = uICAL::RRuleIter::init(rr);
             
+            uICAL::DateTime rrBegin;
+            uICAL::DateTime rrEnd;
             if (begin && PyUnicode_Check(begin)) {
-                self->rrule->begin(uICAL::DateTime(std::string(PyUnicode_AsUTF8(begin))));
+                rrBegin = uICAL::DateTime(std::string(PyUnicode_AsUTF8(begin)));
+            }
+            if (end && PyUnicode_Check(end)) {
+                rrEnd = uICAL::DateTime(std::string(PyUnicode_AsUTF8(end)));
             }
 
-            if (end && PyUnicode_Check(end)) {
-                self->rrule->end(uICAL::DateTime(std::string(PyUnicode_AsUTF8(end))));
-            }
+            self->rrule = uICAL::RRuleIter::init(rr, rrBegin, rrEnd);
 
             if (exclude) {
                 if (PyList_Check(exclude)) {

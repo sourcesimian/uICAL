@@ -20,24 +20,9 @@ namespace uICAL {
         this->start = DateTime(DateStamp(dtStart->value), TZbyId::init(tzidmap, dtStart->getParam("TZID")));
         this->end = DateTime(DateStamp(dtEnd->value), TZbyId::init(tzidmap, dtStart->getParam("TZID")));
         
-        this->rrule = RRuleIter::init(RRule::init(rRule->value, this->start));
-
         this->summary = summary->value;
-    }
 
-    bool ICalEvent::next() {
-        return this->rrule->next();
-    }
-
-    DateTime ICalEvent::now() const {
-        return this->rrule->now();
-    }
-
-    Entry ICalEvent::entry() const {
-        return Entry(Entry::Type::EVENT,
-                     this->summary,
-                     this->rrule->now(),
-                     this->end - this->start);
+        this->rrule = RRule::init(rRule->value, this->start);
     }
 
     void ICalEvent::str(std::ostream& out) const {
@@ -55,5 +40,30 @@ namespace uICAL {
     std::ostream & operator << (std::ostream &out, const ICalEvent &e) {
         e.str(out);
         return out;
+    }
+
+    ICalEventIter::ptr ICalEventIter::init(const ICalEvent::ptr ice, DateTime begin, DateTime end) {
+        return ptr(new ICalEventIter(ice, begin, end));
+    }
+
+    ICalEventIter::ICalEventIter(const ICalEvent::ptr ice, DateTime begin, DateTime end)
+    : ice(ice)
+    {
+        this->rrule = RRuleIter::init(this->ice->rrule, begin, end);
+    }
+
+    bool ICalEventIter::next() {
+        return this->rrule->next();
+    }
+
+    DateTime ICalEventIter::now() const {
+        return this->rrule->now();
+    }
+
+    CalendarEntry::ptr ICalEventIter::entry() const {
+        return CalendarEntry::init(CalendarEntry::Type::EVENT,
+                     this->ice->summary,
+                     this->rrule->now(),
+                     this->ice->end - this->ice->start);
     }
 }

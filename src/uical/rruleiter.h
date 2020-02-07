@@ -9,16 +9,12 @@ namespace uICAL {
         public:
             using ptr = std::shared_ptr<RRuleIter>;
 
-            static RRuleIter::ptr init(const RRule::ptr rr);
-            RRuleIter(const RRule::ptr rr);
-
-            void begin(const DateTime begin);
-            void end(const DateTime end);
+            static RRuleIter::ptr init(const RRule::ptr rr, const DateTime begin, const DateTime end);
+            RRuleIter(const RRule::ptr rr, const DateTime begin, const DateTime end);
 
             bool next();
             DateTime now() const;
 
-            void debug(std::ostream& out) const;
             void str(std::ostream& out) const;
 
         protected:
@@ -40,7 +36,6 @@ namespace uICAL {
             DateTime until;
             DateTime range_begin;
             DateTime range_end;
-            //std::vector<DateTime> excludes;
 
             counters_t counters;
             int count;

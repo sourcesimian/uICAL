@@ -5,7 +5,7 @@
 #include "uICAL/icalcomponent.h"
 #include "uICAL/icalline.h"
 #include "uICAL/tzidmap.h"
-#include "uICAL/entry.h"
+#include "uICAL/calendarentry.h"
 
 namespace uICAL {
     Calendar::ptr Calendar::init(std::istream& ical) {
@@ -26,7 +26,7 @@ namespace uICAL {
 
         // std::cout << "Events: " << events.size() << std::endl;
         for (auto it = events.begin(); it != events.end(); ++it) {
-            auto ev = ICalEvent::init(*it, tzidmap);
+            ICalEvent::ptr ev = ICalEvent::init(*it, tzidmap);
             this->events.push_back(ev);
             // std::cout << " - " << std::endl;
             // std::cout << (*it) << std::endl;
@@ -36,27 +36,6 @@ namespace uICAL {
             //std::cout << e << std::endl;
         }
         // std::cout << "---" << std::endl;
-    }
-
-    // bool Calendar::event_init() {
-    //     this->
-    // }
-
-    bool Calendar::next_entry() {
-        std::vector<events_t::iterator> complete;
-
-        for (auto it = this->events.begin(); it != this->events.end(); ++it) {
-            if (!(*it)->next()) {
-                complete.push_back(it);
-            }
-        }
-        for (auto it : complete) {
-            this->events.erase(it);
-        }
-    }
-    
-    Entry Calendar::current_entry() const {
-        return Entry(Entry::Type::NONE, "", DateTime());
     }
 
     void Calendar::str(std::ostream& out) const {
@@ -72,4 +51,40 @@ namespace uICAL {
         c.str(out);
         return out;
     }
+
+    CalendarIter::ptr CalendarIter::init(const Calendar::ptr cal, DateTime begin, DateTime end) {
+        return CalendarIter::ptr(new CalendarIter(cal, begin, end));
+    }
+
+    CalendarIter::CalendarIter(const Calendar::ptr cal, DateTime begin, DateTime end)
+    : cal(cal)
+    {
+        for (auto it = this->cal->events.begin(); it != this->cal->events.end(); ++it) {
+            ICalEventIter::ptr evi = ICalEventIter::init(*it, begin, end);
+
+            if (evi->next()) {  // Initialise and filter
+                this->events.push_back(evi);
+            }
+        }
+    }
+
+    bool CalendarIter::next() {
+        if (this->events.size() == 0) {
+            return false;
+        }
+
+        auto minIt = std::min_element(this->events.begin(), this->events.end());
+
+        this->currentEntry = (*minIt)->entry();
+
+        if (! (*minIt)->next()) {
+            this->events.erase(minIt);
+        }
+        return true;
+    }
+
+    CalendarEntry::ptr CalendarIter::current() const {
+        return this->currentEntry;
+    }
+
 }

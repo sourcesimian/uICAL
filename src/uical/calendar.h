@@ -9,12 +9,10 @@ namespace uICAL {
             using ptr = std::shared_ptr<Calendar>;
             static ptr init(std::istream& ical);
             Calendar(std::istream& ical);
-
-            bool next_entry();
-            Entry current_entry() const;
             
             void str(std::ostream& out) const;
 
+            friend class CalendarIter;
         protected:
             using events_t = std::vector<ICalEvent::ptr>;
             events_t events;
@@ -22,5 +20,23 @@ namespace uICAL {
 
     std::ostream & operator << (std::ostream &out, const Calendar::ptr &c);
     std::ostream & operator << (std::ostream &out, const Calendar &c);
+
+    class CalendarIter {
+        public:
+            using ptr = std::shared_ptr<CalendarIter>;
+            static ptr init(const Calendar::ptr cal, DateTime begin, DateTime end);
+            CalendarIter(const Calendar::ptr cal, DateTime begin, DateTime end);
+
+            bool next();
+            CalendarEntry::ptr current() const;
+
+        protected:
+            const Calendar::ptr cal;
+
+            using events_t = std::vector<ICalEventIter::ptr>;
+            events_t events;
+
+            CalendarEntry::ptr currentEntry;
+    };
 }
 #endif

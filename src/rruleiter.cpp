@@ -9,23 +9,29 @@
 #include "uICAL/rrule.h"
 
 namespace uICAL {
-    RRuleIter::ptr RRuleIter::init(const RRule::ptr rr) {
-        return RRuleIter::ptr(new RRuleIter(rr));
+    RRuleIter::ptr RRuleIter::init(const RRule::ptr rr, const DateTime begin, const DateTime end) {
+        return RRuleIter::ptr(new RRuleIter(rr, begin, end));
     }
 
-    RRuleIter::RRuleIter(const RRule::ptr rr)
+    RRuleIter::RRuleIter(const RRule::ptr rr, const DateTime begin, const DateTime end)
     : rr(rr)
     {
         this->count = 0;
+        if (begin.valid())
+            this->range_begin = begin;
+        if (end.valid())
+            this->range_end = end;
     }
 
-    void RRuleIter::begin(const DateTime begin) {
-        this->range_begin = begin;
-    }
+    // void RRuleIter::begin(const DateTime begin) {
+    //     if (begin.valid())
+    //         this->range_begin = begin;
+    // }
 
-    void RRuleIter::end(const DateTime end) {
-        this->range_end = end;
-    }
+    // void RRuleIter::end(const DateTime end) {
+    //     if (end.valid())
+    //         this->range_end = end;
+    // }
 
     bool RRuleIter::init() {
         if (this->range_end.valid() && this->rr->dtstart > this->range_end)  {
@@ -364,17 +370,13 @@ namespace uICAL {
         return true;
     }
 
-    void RRuleIter::debug(std::ostream& out) const {
+    void RRuleIter::str(std::ostream& out) const {
         Joiner counters(',');
         for (auto it = this->counters.rbegin(); it != this->counters.rend(); ++it) {
             (*it)->str(counters.out());
             counters.next();
         }
         counters.str(out);
-    }
-
-    void RRuleIter::str(std::ostream& out) const {
-        this->rr->str(out);
     }
 
     std::ostream & operator << (std::ostream &out, const RRuleIter::ptr &r) {

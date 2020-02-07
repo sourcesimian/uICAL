@@ -91,12 +91,14 @@ void test_basic(std::string dtstart, std::string rrule, std::string begin, std::
     try {
         //uICAL::Recurrence::ptr rec = uICAL::Recurrence::init(lrrule->value);
 
-        uICAL::RRuleIter::ptr occ = uICAL::RRuleIter::init(uICAL::RRule::init(lrrule->value, start));
-        
+        uICAL::DateTime rrBegin;
         if (!begin.empty()) {
-            uICAL::DateTime dt = uICAL::DateTime(begin);
-            occ->begin(dt);
+            rrBegin = uICAL::DateTime(begin);
         }
+
+        uICAL::RRuleIter::ptr occ = uICAL::RRuleIter::init(
+            uICAL::RRule::init(lrrule->value, start),
+            rrBegin, uICAL::DateTime());
 
         std::vector<std::string> results;
         for (auto eit = expected.begin(); eit != expected.end(); ++eit) {
@@ -158,7 +160,9 @@ void test_2() {
     std::string begin("19970902T090000");
     std::string end("29970902T090000");
 
-    auto rr = uICAL::RRuleIter::init(uICAL::RRule::init(rrule, uICAL::DateTime(dtstart, uICAL::TZ::unaware())));
+    auto rr = uICAL::RRuleIter::init(
+        uICAL::RRule::init(rrule, uICAL::DateTime(dtstart, uICAL::TZ::unaware())),
+        uICAL::DateTime(), uICAL::DateTime());
     while (rr->next())
     {
         std::cout << rr->now() << std::endl;
