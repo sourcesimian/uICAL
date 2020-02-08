@@ -33,7 +33,7 @@ namespace uICAL {
     //         this->range_end = end;
     // }
 
-    bool RRuleIter::init() {
+    bool RRuleIter::start() {
         if (this->range_end.valid() && this->rr->dtstart > this->range_end)  {
             return false;
         }
@@ -88,7 +88,7 @@ namespace uICAL {
 
     bool RRuleIter::next() {
         if (this->counters.size() == 0) {
-            return this->init();
+            return this->start();
         }
 
         if (this->count > 0) {
@@ -379,7 +379,7 @@ namespace uICAL {
         counters.str(out);
     }
 
-    std::ostream & operator << (std::ostream &out, const RRuleIter::ptr &r) {
+    std::ostream& operator << (std::ostream& out, const RRuleIter::ptr& r) {
         r->str(out);
         return out;
     }

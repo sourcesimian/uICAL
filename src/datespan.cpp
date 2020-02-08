@@ -26,7 +26,7 @@ namespace uICAL {
         if (std::get<3>(dhms)) out << std::get<3>(dhms) << "S";
     }
 
-    std::ostream & operator << (std::ostream &out, const DateSpan& ds) {
+    std::ostream& operator << (std::ostream& out, const DateSpan& ds) {
         ds.str(out);
         return out;
     }

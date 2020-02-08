@@ -4,12 +4,16 @@
 namespace uICAL {
     class VComponent;
 
-    class TZIdMap {
+    class TZMap {
         public:
-            using ptr = std::shared_ptr<TZIdMap>;
+            using ptr = std::shared_ptr<TZMap>;
 
+            static ptr init();
             static ptr init(VComponent& calendar);
-            TZIdMap(VComponent& calendar);
+            TZMap();
+            TZMap(VComponent& calendar);
+
+            std::string findId(const std::string nameOrId) const;
 
             int getOffset(const std::string tzId);
             std::string getName(const std::string tzId);
@@ -17,6 +21,7 @@ namespace uICAL {
             void str(std::ostream& out) const;
 
         protected:
+            void add(const std::string id, const std::string name, const std::string tz);
             int parseOffset(const std::string offset) const;
 
             typedef struct {

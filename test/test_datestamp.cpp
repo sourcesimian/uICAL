@@ -1,5 +1,6 @@
 #include <cstdio>
 #include <iostream>
+#include <map>
 
 #include "uICAL/datetime.h"
 #include "uICAL/datestamp.h"

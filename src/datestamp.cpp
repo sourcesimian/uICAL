@@ -61,7 +61,7 @@ namespace uICAL {
         return (this->year + this->month + this->day + this->hour + this->minute + this->second);
     }
 
-    DateStamp& DateStamp::operator= (const DateStamp &ds) {
+    DateStamp& DateStamp::operator= (const DateStamp& ds) {
         this->year = ds.year;
         this->month = ds.month;
         this->day = ds.day;
@@ -71,23 +71,23 @@ namespace uICAL {
         return *this;
     }
 
-    bool DateStamp::operator > (const DateStamp &ds) const {
+    bool DateStamp::operator > (const DateStamp& ds) const {
         return this->index() > ds.index();
     }
 
-    bool DateStamp::operator < (const DateStamp &ds) const {
+    bool DateStamp::operator < (const DateStamp& ds) const {
         return this->index() < ds.index();
     }
 
-    bool DateStamp::operator <= (const DateStamp &ds) const {
+    bool DateStamp::operator <= (const DateStamp& ds) const {
         return this->index() <= ds.index();
     }
 
-    bool DateStamp::operator == (const DateStamp &ds) const {
+    bool DateStamp::operator == (const DateStamp& ds) const {
         return this->index() == ds.index();
     }
 
-    bool DateStamp::operator != (const DateStamp &ds) const {
+    bool DateStamp::operator != (const DateStamp& ds) const {
         return this->index() != ds.index();
     }
 
@@ -105,7 +105,7 @@ namespace uICAL {
         this->second < 60 ? out << std::setfill('0') << std::setw(2) << this->second : out << "??";;
     }
 
-    std::ostream & operator << (std::ostream &out, const DateStamp& dt) {
+    std::ostream& operator << (std::ostream& out, const DateStamp& dt) {
         dt.str(out);
         return out;
     }

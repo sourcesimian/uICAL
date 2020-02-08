@@ -264,17 +264,17 @@ namespace uICAL {
         values.str(out);
     }
 
-    std::ostream & operator << (std::ostream &out, const RRule::ptr &r) {
+    std::ostream& operator << (std::ostream& out, const RRule::ptr& r) {
         r->str(out);
         return out;
     }
 
-    std::ostream & operator << (std::ostream &out, const RRule &r) {
+    std::ostream& operator << (std::ostream& out, const RRule& r) {
         r.str(out);
         return out;
     }
 
-    std::ostream & operator << (std::ostream &out, const RRule::Day_pair &dp) {
+    std::ostream& operator << (std::ostream& out, const RRule::Day_pair& dp) {
         int idx;
         DateTime::Day day;
         unpack(dp, idx, day);

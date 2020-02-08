@@ -87,12 +87,12 @@ namespace uICAL {
         return ret;
     }
 
-    std::ostream & operator << (std::ostream &out, const VComponent::ptr &c) {
+    std::ostream& operator << (std::ostream& out, const VComponent::ptr& c) {
         c->str(out);
         return out;
     }
 
-    std::ostream & operator << (std::ostream &out, const VComponent &c) {
+    std::ostream& operator << (std::ostream& out, const VComponent& c) {
         c.str(out);
         return out;
     }

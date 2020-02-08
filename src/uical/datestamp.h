@@ -41,7 +41,7 @@ namespace uICAL {
 
             void setWeekNo(unsigned n);
 
-            DateStamp& operator = (const DateStamp &ds);
+            DateStamp& operator = (const DateStamp& ds);
 
             bool operator > (const DateStamp& ds) const;
             bool operator < (const DateStamp& ds) const;
@@ -55,7 +55,7 @@ namespace uICAL {
             DateTime::Day getWeekDay(unsigned days) const;
     };
     
-    std::ostream & operator << (std::ostream &out, const DateStamp& dt);
+    std::ostream& operator << (std::ostream& out, const DateStamp& dt);
 
 }
 #endif

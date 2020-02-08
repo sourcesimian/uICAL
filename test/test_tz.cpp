@@ -1,45 +1,56 @@
 #include "uICAL/cppstl.h"
 #include "uICAL/types.h"
 #include "uICAL/tz.h"
-#include "uICAL/tzbyid.h"
-#include "uICAL/tzidmap.h"
+#include "uICAL/tzmap.h"
 #include "uICAL/icalcomponent.h"
 #include "uICAL/datestamp.h"
 #include "uICAL/datetime.h"
 
 #include <iostream>
 #include <fstream>
+#include <list>
 
 void test_tz1() {
     std::ifstream input(std::string("test/data/calendar2.dat"));
 
     auto vcalendar = uICAL::VComponent::parse(input);
 
-    auto tzidmap = uICAL::TZIdMap::init(*vcalendar.get());
+    auto tzmap = uICAL::TZMap::init(*vcalendar.get());
 
     {
         auto ds = uICAL::DateStamp("20191105T175555");
-        auto tz0 = uICAL::TZbyId::init(tzidmap, "Pacific/Auckland");
-        auto tz1 = uICAL::TZbyId::init(tzidmap, "Europe/Paris");
-        auto tz2 = uICAL::TZbyId::init(tzidmap, "America/New_York");
-        auto tz3 = uICAL::TZbyId::init(tzidmap, "America/Chicago");
-        auto tz4 = uICAL::TZbyId::init(tzidmap, "America/Phoenix");
-        auto tz5 = uICAL::TZbyId::init(tzidmap, "America/Los_Angeles");
-        auto dt = uICAL::DateTime(ds, tz1);
+
+        std::list<uICAL::TZ::ptr> tzList;
+        
+        tzList.push_back(uICAL::TZ::init("NZDT", tzmap));
+        tzList.push_back(uICAL::TZ::init("Pacific/Auckland", tzmap));
+
+        tzList.push_back(uICAL::TZ::init("CET", tzmap));
+        tzList.push_back(uICAL::TZ::init("Europe/Paris", tzmap));
+
+        tzList.push_back(uICAL::TZ::init("EST", tzmap));
+        tzList.push_back(uICAL::TZ::init("America/New_York", tzmap));
+
+        tzList.push_back(uICAL::TZ::init("CST", tzmap));
+        tzList.push_back(uICAL::TZ::init("America/Chicago", tzmap));
+
+        tzList.push_back(uICAL::TZ::init("MST", tzmap));
+        tzList.push_back(uICAL::TZ::init("America/Phoenix", tzmap));
+
+        tzList.push_back(uICAL::TZ::init("PST", tzmap));
+        tzList.push_back(uICAL::TZ::init("America/Los_Angeles", tzmap));
+
+        auto tz = uICAL::TZ::init("Z");
+        auto dt = uICAL::DateTime(ds, tz);
 
         std::cout << ds << std::endl;
         std::cout << dt.datestamp() << std::endl;
         std::cout << "--" << std::endl;
-        std::cout << dt.datestamp(tz0) << " " << tz0 << std::endl;
-        std::cout << dt.datestamp(tz1) << " " << tz1 << std::endl;
-        std::cout << dt.datestamp(tz2) << " " << tz2 << std::endl;
-        std::cout << dt.datestamp(tz3) << " " << tz3 << std::endl;
-        std::cout << dt.datestamp(tz4) << " " << tz4 << std::endl;
-        std::cout << dt.datestamp(tz5) << " " << tz5 << std::endl;
+
+        for (auto tz : tzList) {
+            std::cout << dt.datestamp(tz) << " " << tz << std::endl;    
+        }
     }
-
-
-    std::cout << "DONE" <<std::endl;
 }
 
 void test_tz() {

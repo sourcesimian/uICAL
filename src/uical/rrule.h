@@ -64,9 +64,9 @@ namespace uICAL {
             bool excluded(const DateTime now) const;
     };
 
-    std::ostream & operator << (std::ostream &out, const RRule::ptr &e);
-    std::ostream & operator << (std::ostream &out, const RRule &e);
+    std::ostream& operator << (std::ostream& out, const RRule::ptr& e);
+    std::ostream& operator << (std::ostream& out, const RRule& e);
 
-    std::ostream & operator << (std::ostream &out, const RRule::Day_pair &dp);
+    std::ostream& operator << (std::ostream& out, const RRule::Day_pair& dp);
 }
 #endif

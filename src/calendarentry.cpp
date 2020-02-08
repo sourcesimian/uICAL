@@ -55,7 +55,7 @@ namespace uICAL {
         out << " - span: " << this->_span << std::endl;
     }
 
-    std::ostream & operator << (std::ostream &out, const CalendarEntry::ptr &ce) {
+    std::ostream& operator << (std::ostream& out, const CalendarEntry::ptr& ce) {
         ce->str(out);
         return out;
     }

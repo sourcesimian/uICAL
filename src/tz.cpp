@@ -25,6 +25,10 @@ namespace uICAL {
         return ptr(new TZ(tz));
     }
 
+    TZ::ptr TZ::init(const std::string tz, const TZMap::ptr& tzmap) {
+        return ptr(new TZ(tz, tzmap));
+    }
+
     TZ::TZ() {
         this->offsetMins = -1;
         this->aware = false;
@@ -42,7 +46,21 @@ namespace uICAL {
 
     TZ::TZ(const std::string tz) {
         this->offsetMins = TZ::parseOffset(tz);
-        this->aware = this->offsetMins != -1;
+        this->aware = true;
+    }
+
+    TZ::TZ(const std::string tz, const TZMap::ptr& tzmap)
+    : idmap(tzmap)
+    {
+        std::string id = this->idmap->findId(tz);
+        if (!id.empty()) {
+            this->id = id;
+            this->aware = true;
+        }
+        else {
+            this->offsetMins = TZ::parseOffset(tz);
+            this->aware = true;
+        }
     }
 
     bool TZ::is_aware() const {
@@ -91,6 +109,10 @@ namespace uICAL {
     }
 
     seconds_t TZ::toUTC(seconds_t timestamp) const {
+        if (!this->id.empty()) {
+            return timestamp - (this->idmap->getOffset(this->id) * 60);
+        }
+
         if (this->offsetMins == -1)
             throw ImplementationError("Timezone not defined");
 
@@ -98,6 +120,10 @@ namespace uICAL {
     }
 
     seconds_t TZ::fromUTC(seconds_t timestamp) const {
+        if (!this->id.empty()) {
+            return timestamp + (this->idmap->getOffset(this->id) * 60);
+        }
+
         if (this->offsetMins == -1)
             throw ImplementationError("Timezone not defined");
 
@@ -105,6 +131,11 @@ namespace uICAL {
     }
 
     void TZ::str(std::ostream& out) const {
+        if (!this->id.empty()) {
+            out << this->idmap->getName(this->id);
+            return;
+        }
+
         if (this->offsetMins == -1)
             throw ImplementationError("Timezone not defined");
         if (!this->aware)
@@ -118,7 +149,7 @@ namespace uICAL {
         return out.str();
     }
 
-    std::ostream & operator << (std::ostream &out, const TZ::ptr& tz) {
+    std::ostream& operator << (std::ostream& out, const TZ::ptr& tz) {
         tz->str(out);
         return out;
     }

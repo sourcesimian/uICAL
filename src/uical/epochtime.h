@@ -36,6 +36,6 @@ namespace uICAL {
             static const seconds_t NaN;
     };
 
-    std::ostream & operator << (std::ostream &out, const EpochTime& et);
+    std::ostream& operator << (std::ostream& out, const EpochTime& et);
 }
 #endif

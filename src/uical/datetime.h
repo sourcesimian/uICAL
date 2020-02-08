@@ -15,7 +15,8 @@ namespace uICAL {
 
             DateTime();
             DateTime(const std::string datetime);
-            DateTime(DateStamp datestamp, TZ::ptr tz);
+            DateTime(const std::string datetime, const TZMap::ptr& tzmap);
+            DateTime(DateStamp datestamp, const TZ::ptr& tz);
 
             void str(std::ostream& out) const;
             std::string str() const;
@@ -23,7 +24,7 @@ namespace uICAL {
             bool valid() const;
             
             DateStamp datestamp() const;
-            DateStamp datestamp(const TZ::ptr tz) const;
+            DateStamp datestamp(const TZ::ptr& tz) const;
 
             enum class Day {
                 NONE, MON, TUE, WED, THU, FRI, SAT, SUN
@@ -33,8 +34,8 @@ namespace uICAL {
             static unsigned daysUntil(DateTime::Day today, int index, DateTime::Day then, unsigned span);
             static DateTime::Day dayOfWeekAfter(DateTime::Day today, unsigned days);
 
-            DateTime& operator = (const DateTime &ds);
-            DateSpan operator - (const DateTime &ds) const;
+            DateTime& operator = (const DateTime& ds);
+            DateSpan operator - (const DateTime& ds) const;
 
             bool operator > (const DateTime& dt) const;
             bool operator < (const DateTime& dt) const;
@@ -44,12 +45,14 @@ namespace uICAL {
             TZ::ptr tz;
 
         protected:
-            void assert_awareness(const DateTime &other) const;
+            void construct(const std::string datetime, const TZMap::ptr& tzmap);
+            void construct(DateStamp ds, const TZ::ptr& tz);
+            void assert_awareness(const DateTime& other) const;
 
             EpochTime epochtime;
     };
 
-    std::ostream & operator << (std::ostream &out, const DateTime& dt);
-    std::ostream & operator << (std::ostream &out, const DateTime::Day &day);
+    std::ostream& operator << (std::ostream& out, const DateTime& dt);
+    std::ostream& operator << (std::ostream& out, const DateTime::Day& day);
 }
 #endif

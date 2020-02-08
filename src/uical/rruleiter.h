@@ -21,7 +21,7 @@ namespace uICAL {
             using counters_t = std::vector<Counter::ptr>;
             using sync_f = std::function<void(counters_t::iterator it)>;
 
-            bool init();
+            bool start();
             void setupCounters(DateStamp base);
             bool initCounters(DateStamp base, DateStamp from);
             bool nextDate();
@@ -43,6 +43,6 @@ namespace uICAL {
             DateTime current_now;
     };
 
-    std::ostream & operator << (std::ostream &out, const RRuleIter::ptr &e);
+    std::ostream& operator << (std::ostream& out, const RRuleIter::ptr& e);
 }
 #endif

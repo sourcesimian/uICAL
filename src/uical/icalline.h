@@ -14,14 +14,14 @@ namespace uICAL {
             std::string value;
             std::string getParam(const std::string key);
 
-            void str(std::ostream &) const;
+            void str(std::ostream& out) const;
 
         private:
             void readParams(const std::string str);
     };
 
-    std::ostream & operator << (std::ostream &out, const VLine::ptr &l);
-    std::ostream & operator << (std::ostream &out, const VLine &l);
+    std::ostream& operator << (std::ostream& out, const VLine::ptr& l);
+    std::ostream& operator << (std::ostream& out, const VLine& l);
 
     class VLineReader {
         public:

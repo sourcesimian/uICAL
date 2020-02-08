@@ -65,7 +65,7 @@ namespace uICAL {
         out << this->epochSeconds;
     }
 
-    std::ostream & operator << (std::ostream &out, const EpochTime& et) {
+    std::ostream& operator << (std::ostream& out, const EpochTime& et) {
         et.str(out);
         return out;
     }

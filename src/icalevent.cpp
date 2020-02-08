@@ -3,22 +3,23 @@
 #include "uICAL/datetime.h"
 #include "uICAL/icalevent.h"
 #include "uICAL/icalcomponent.h"
-#include "uICAL/tzbyid.h"
 
 namespace uICAL {
-    ICalEvent::ptr ICalEvent::init(VComponent::ptr& event, const TZIdMap::ptr& tzidmap) {
-        return ptr(new ICalEvent(event, tzidmap));
+    ICalEvent::ptr ICalEvent::init(VComponent::ptr& event, const TZMap::ptr& tzmap) {
+        return ptr(new ICalEvent(event, tzmap));
     }
 
-    ICalEvent::ICalEvent(VComponent::ptr& event, const TZIdMap::ptr& tzidmap) {
+    ICalEvent::ICalEvent(VComponent::ptr& event, const TZMap::ptr& tzmap) {
 
         VLine::ptr dtStart = event->getPropertyByName("DTSTART");
         VLine::ptr dtEnd = event->getPropertyByName("DTEND");
         VLine::ptr rRule = event->getPropertyByName("RRULE");
         VLine::ptr summary = event->getPropertyByName("SUMMARY");
         
-        this->start = DateTime(DateStamp(dtStart->value), TZbyId::init(tzidmap, dtStart->getParam("TZID")));
-        this->end = DateTime(DateStamp(dtEnd->value), TZbyId::init(tzidmap, dtStart->getParam("TZID")));
+        // this->start = DateTime(DateStamp(dtStart->value), TZbyId::init(tzmap, dtStart->getParam("TZID")));
+        // this->end = DateTime(DateStamp(dtEnd->value), TZbyId::init(tzmap, dtStart->getParam("TZID")));
+        this->start = DateTime(dtStart->value + dtStart->getParam("TZID"), tzmap);
+        this->end = DateTime(dtEnd->value + dtStart->getParam("TZID"), tzmap);
         
         this->summary = summary->value;
 
@@ -32,12 +33,12 @@ namespace uICAL {
         out << " - rrule: " << this->rrule << std::endl;
     }
 
-    std::ostream & operator << (std::ostream &out, const ICalEvent::ptr &e) {
+    std::ostream& operator << (std::ostream& out, const ICalEvent::ptr& e) {
         e->str(out);
         return out;
     }
 
-    std::ostream & operator << (std::ostream &out, const ICalEvent &e) {
+    std::ostream& operator << (std::ostream& out, const ICalEvent& e) {
         e.str(out);
         return out;
     }
@@ -67,7 +68,7 @@ namespace uICAL {
                      this->ice->end - this->ice->start);
     }
 
-    bool operator < (const ICalEventIter::ptr &a, const ICalEventIter::ptr &b) {
+    bool operator < (const ICalEventIter::ptr& a, const ICalEventIter::ptr& b) {
         return a->rrule->now() < b->rrule->now();
     }
 

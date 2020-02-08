@@ -34,7 +34,7 @@ namespace uICAL {
             DateSpan _span;
     };
 
-    std::ostream & operator << (std::ostream &out, const CalendarEntry::ptr &e);
+    std::ostream& operator << (std::ostream& out, const CalendarEntry::ptr& e);
 }
 
 #endif

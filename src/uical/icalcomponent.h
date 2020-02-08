@@ -30,7 +30,7 @@ namespace uICAL {
             std::vector<VComponent::ptr> children;
     };
 
-    std::ostream & operator << (std::ostream &out, const VComponent::ptr &c);
-    std::ostream & operator << (std::ostream &out, const VComponent &c);
+    std::ostream& operator << (std::ostream& out, const VComponent::ptr& c);
+    std::ostream& operator << (std::ostream& out, const VComponent& c);
 }
 #endif

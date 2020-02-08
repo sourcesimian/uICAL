@@ -2,7 +2,7 @@
 #define uical_icalevent_h
 
 #include "uICAL/datetime.h"
-#include "uICAL/tzidmap.h"
+#include "uICAL/tzmap.h"
 #include "uICAL/rruleiter.h"
 #include "uICAL/icalcomponent.h"
 #include "uICAL/calendarentry.h"
@@ -15,10 +15,10 @@ namespace uICAL {
     class ICalEvent {
         public:
             using ptr = std::shared_ptr<ICalEvent>;
-            static ptr init(VComponent::ptr& event, const TZIdMap::ptr& tzidmap);
-            ICalEvent(VComponent::ptr& event, const TZIdMap::ptr& tzidmap);
+            static ptr init(VComponent::ptr& event, const TZMap::ptr& tzmap);
+            ICalEvent(VComponent::ptr& event, const TZMap::ptr& tzmap);
 
-            void str(std::ostream &) const;
+            void str(std::ostream& out) const;
 
             friend class ICalEventIter;
         private:
@@ -28,8 +28,8 @@ namespace uICAL {
             RRule::ptr rrule;
     };
 
-    std::ostream & operator << (std::ostream &out, const ICalEvent::ptr &e);
-    std::ostream & operator << (std::ostream &out, const ICalEvent &e);
+    std::ostream& operator << (std::ostream& out, const ICalEvent::ptr& e);
+    std::ostream& operator << (std::ostream& out, const ICalEvent& e);
 
     class ICalEventIter {
         public:
@@ -41,12 +41,12 @@ namespace uICAL {
             DateTime now() const;
             CalendarEntry::ptr entry() const;
 
-            friend bool operator < (const ICalEventIter::ptr &a, const ICalEventIter::ptr &);
+            friend bool operator < (const ICalEventIter::ptr& a, const ICalEventIter::ptr& b);
         private:
             const ICalEvent::ptr ice;
             RRuleIter::ptr rrule;
     };
 
-    bool operator < (const ICalEventIter::ptr &a, const ICalEventIter::ptr &);
+    bool operator < (const ICalEventIter::ptr& a, const ICalEventIter::ptr& b);
 }
 #endif

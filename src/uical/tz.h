@@ -1,6 +1,7 @@
 #ifndef uical_tz_h
 #define uical_tz_h
 
+#include "uICAL/tzmap.h"
 
 namespace uICAL {
     class DateStamp;
@@ -11,6 +12,7 @@ namespace uICAL {
 
             static ptr init(int offsetMins);
             static ptr init(const std::string tz);
+            static ptr init(const std::string tz, const TZMap::ptr& tzmap);
 
             static ptr undef();
             static ptr unaware();
@@ -19,6 +21,7 @@ namespace uICAL {
             TZ(bool aware);
             TZ(int offsetMins);
             TZ(const std::string tz);
+            TZ(const std::string tz, const TZMap::ptr& tzmap);
 
             virtual ~TZ() {}
 
@@ -38,8 +41,10 @@ namespace uICAL {
 
         private:
             int offsetMins;
+            const TZMap::ptr idmap;
+            std::string id;
     };
     
-    std::ostream & operator << (std::ostream &out, const TZ::ptr& tz);
+    std::ostream& operator << (std::ostream& out, const TZ::ptr& tz);
 }
 #endif

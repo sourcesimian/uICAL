@@ -11,26 +11,35 @@ namespace uICAL {
         this->tz = TZ::undef();
     }
 
-    DateTime::DateTime(const std::string datetime) {        
+    DateTime::DateTime(DateStamp ds, const TZ::ptr& tz) {
+        this->construct(ds, tz);
+    }
+
+    DateTime::DateTime(const std::string datetime) {
+        this->construct(datetime, TZMap::init());
+    }
+
+    DateTime::DateTime(const std::string datetime, const TZMap::ptr& tzmap) {
+        this->construct(datetime, tzmap);
+    }
+
+    void DateTime::construct(const std::string datetime, const TZMap::ptr& tzmap) {
         if (datetime.length() < 15)
             throw ValueError(std::string("Bad datetime: \"") + datetime + "\"");
 
         DateStamp ds(datetime.substr(0, 15));
 
         if (datetime.length() > 15) {
-            this->tz = TZ::init(datetime.substr(15));
+            this->tz = TZ::init(datetime.substr(15), tzmap);
         }
         else {
             this->tz = TZ::unaware();
         }
 
-        this->epochtime = EpochTime(
-            ds.year, ds.month, ds.day, ds.hour, ds.minute, ds.second,
-            this->tz
-        );
+        this->construct(ds, tz);
     }
 
-    DateTime::DateTime(DateStamp ds, TZ::ptr tz) {
+    void DateTime::construct(DateStamp ds, const TZ::ptr& tz) {
         this->epochtime = EpochTime(
             ds.year, ds.month, ds.day, ds.hour, ds.minute, ds.second,
             tz
@@ -51,7 +60,7 @@ namespace uICAL {
         );
     }
 
-    DateStamp DateTime::datestamp(const TZ::ptr tz) const {
+    DateStamp DateTime::datestamp(const TZ::ptr& tz) const {
         auto ymdhms = this->epochtime.ymdhms(tz);
 
         return DateStamp(
@@ -60,19 +69,19 @@ namespace uICAL {
         );
     }
 
-    DateTime& DateTime::operator = (const DateTime &other) {
+    DateTime& DateTime::operator = (const DateTime& other) {
         this->tz = other.tz;
         this->epochtime = other.epochtime;
         return *this;
     }
 
-    void DateTime::assert_awareness(const DateTime &other) const {
+    void DateTime::assert_awareness(const DateTime& other) const {
         if (this->tz->is_aware() != other.tz->is_aware()) {
             throw TZAwarenessConflictError(this->str() + this->tz->str() + " <> " + other.str() + other.tz->str());
         }
     }
 
-    DateSpan DateTime::operator - (const DateTime &other) const {
+    DateSpan DateTime::operator - (const DateTime& other) const {
         this->assert_awareness(other);
         return DateSpan(this->epochtime - other.epochtime);
     }
@@ -117,7 +126,7 @@ namespace uICAL {
         return out.str();
     }
 
-    std::ostream& operator << (std::ostream &out, const DateTime& dt) {
+    std::ostream& operator << (std::ostream& out, const DateTime& dt) {
         dt.str(out);
         return out;
     }
@@ -144,7 +153,7 @@ namespace uICAL {
         return DateTime::Day( ((int)today + days - 1) % 7 + 1 );
     }
 
-    std::ostream & operator << (std::ostream &out, const DateTime::Day &day) {
+    std::ostream& operator << (std::ostream& out, const DateTime::Day& day) {
         if (day == DateTime::Day::MON) out << "MO";
         else if (day == DateTime::Day::TUE) out << "TU";
         else if (day == DateTime::Day::WED) out << "WE";

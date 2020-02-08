@@ -47,12 +47,12 @@ namespace uICAL {
         });
     }
 
-    std::ostream & operator << (std::ostream &out, const VLine::ptr &l) {
+    std::ostream& operator << (std::ostream& out, const VLine::ptr& l) {
         l->str(out);
         return out;
     }
 
-    std::ostream & operator << (std::ostream &out, const VLine &l) {
+    std::ostream& operator << (std::ostream& out, const VLine& l) {
         l.str(out);
         return out;
     }

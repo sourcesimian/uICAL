@@ -19,7 +19,7 @@ namespace uICAL {
             seconds_t spanSeconds;
     };
 
-    std::ostream & operator << (std::ostream &out, const DateSpan& ds);
+    std::ostream& operator << (std::ostream& out, const DateSpan& ds);
 }
 
 #endif

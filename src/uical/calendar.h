@@ -12,7 +12,7 @@ namespace uICAL {
             
             void str(std::ostream& out) const;
 
-            TZIdMap::ptr tzmap;
+            TZMap::ptr tzmap;
 
             friend class CalendarIter;
         protected:
@@ -20,8 +20,8 @@ namespace uICAL {
             events_t events;
     };
 
-    std::ostream & operator << (std::ostream &out, const Calendar::ptr &c);
-    std::ostream & operator << (std::ostream &out, const Calendar &c);
+    std::ostream& operator << (std::ostream& out, const Calendar::ptr& c);
+    std::ostream& operator << (std::ostream& out, const Calendar& c);
 
     class CalendarIter {
         public:

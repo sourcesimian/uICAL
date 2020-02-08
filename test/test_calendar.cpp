@@ -14,7 +14,7 @@ void test_cal1() {
 
     auto calIt = uICAL::CalendarIter::init(cal,
         uICAL::DateTime("20191231T100000Z"),
-        uICAL::DateTime("20200123T100000-0500"));
+        uICAL::DateTime("20200123T100000EST", cal->tzmap));
 
     while (calIt->next()) {
         auto entry = calIt->current();

@@ -36,7 +36,7 @@ namespace uICAL {
     }
 
     template <typename I>
-    std::ostream & operator << (std::ostream &out, const std::vector<I> &ia) {
+    std::ostream& operator << (std::ostream& out, const std::vector<I> &ia) {
         Joiner values(',');
         
         for (I value : ia) {

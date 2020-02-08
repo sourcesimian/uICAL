@@ -4,7 +4,7 @@
 #include "uICAL/icalevent.h"
 #include "uICAL/icalcomponent.h"
 #include "uICAL/icalline.h"
-#include "uICAL/tzidmap.h"
+#include "uICAL/tzmap.h"
 #include "uICAL/calendarentry.h"
 
 namespace uICAL {
@@ -16,7 +16,7 @@ namespace uICAL {
     {
         auto vcalendar = uICAL::VComponent::parse(ical);
 
-        this->tzmap = TZIdMap::init(*vcalendar.get());
+        this->tzmap = TZMap::init(*vcalendar.get());
 
         auto events = vcalendar->listComponents("VEVENT");
 
@@ -38,12 +38,12 @@ namespace uICAL {
         out << "CALENDAR" << std::endl;
     }
 
-    std::ostream & operator << (std::ostream &out, const Calendar::ptr &c) {
+    std::ostream& operator << (std::ostream& out, const Calendar::ptr& c) {
         c->str(out);
         return out;
     }
     
-    std::ostream & operator << (std::ostream &out, const Calendar &c) {
+    std::ostream& operator << (std::ostream& out, const Calendar& c) {
         c.str(out);
         return out;
     }
