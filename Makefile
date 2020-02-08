@@ -18,16 +18,18 @@ test-python: virtualenv
 			. ./virtualenv/bin/activate; \
 		fi; \
 		python3 ./setup.py build install && \
-		pytest ./test/test_*.py; \
+		pytest ./test/python/test_*.py; \
 	}
 
 
 test-cpp: $(BIN)/test
 	./$(BIN)/test
 
+
 $(BIN)/test: $(SRC)/*.cpp $(INCLUDE)/uical/*.h
 	mkdir -p $(BIN)
-	$(CXX) $(CXX_FLAGS) -I$(INCLUDE)/ $(SRC)/*.cpp  test/*.cpp -o $@
+	$(CXX) $(CXX_FLAGS) -I$(INCLUDE)/ $(SRC)/*.cpp test/cpp/*.cpp -o $@
+
 
 clean:
 	rm -rf $(BIN)/*

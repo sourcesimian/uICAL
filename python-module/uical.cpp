@@ -5,8 +5,10 @@
 #include "uICAL/cppstl.h"
 #include "uICAL/util.h"
 #include "uICAL/rruleiter.h"
+#include "uICAL/calendar.h"
 
 #include "error.h"
+#include "calendar.h"
 #include "rrule.h"
 
 namespace uical_python {
@@ -28,6 +30,11 @@ PyInit_uICAL(void)
         return NULL;
 
     if (!uical_python::PyInit_Error(m)) {
+        //PY_DECREF(m);  TODO error: use of undeclared identifier 'PY_DECREF'
+        return NULL;
+    }
+
+    if (!uical_python::PyInit_Calendar(m)) {
         //PY_DECREF(m);  TODO error: use of undeclared identifier 'PY_DECREF'
         return NULL;
     }

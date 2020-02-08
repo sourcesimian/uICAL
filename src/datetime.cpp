@@ -3,7 +3,7 @@
 #include "uICAL/datetime.h"
 #include "uICAL/epochtime.h"
 #include "uICAL/datestamp.h"
-#include "uICAL/datespan.h"
+#include "uICAL/dateperiod.h"
 #include "uICAL/error.h"
 
 namespace uICAL {
@@ -81,9 +81,9 @@ namespace uICAL {
         }
     }
 
-    DateSpan DateTime::operator - (const DateTime& other) const {
+    DatePeriod DateTime::operator - (const DateTime& other) const {
         this->assert_awareness(other);
-        return DateSpan(this->epochtime - other.epochtime);
+        return DatePeriod(this->epochtime - other.epochtime);
     }
 
     bool DateTime::operator > (const DateTime& other) const {

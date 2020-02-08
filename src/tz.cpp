@@ -108,26 +108,21 @@ namespace uICAL {
         }
     }
 
-    seconds_t TZ::toUTC(seconds_t timestamp) const {
+    int TZ::offset() const {
         if (!this->id.empty()) {
-            return timestamp - (this->idmap->getOffset(this->id) * 60);
+            return this->idmap->getOffset(this->id);
         }
-
         if (this->offsetMins == -1)
             throw ImplementationError("Timezone not defined");
+        return this->offsetMins;
+    }
 
-        return timestamp - (this->offsetMins * 60);
+    seconds_t TZ::toUTC(seconds_t timestamp) const {
+        return timestamp - (this->offset() * 60);
     }
 
     seconds_t TZ::fromUTC(seconds_t timestamp) const {
-        if (!this->id.empty()) {
-            return timestamp + (this->idmap->getOffset(this->id) * 60);
-        }
-
-        if (this->offsetMins == -1)
-            throw ImplementationError("Timezone not defined");
-
-        return timestamp + (this->offsetMins * 60);
+        return timestamp + (this->offset() * 60);
     }
 
     void TZ::str(std::ostream& out) const {

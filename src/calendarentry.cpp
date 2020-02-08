@@ -6,7 +6,7 @@ namespace uICAL {
         return CalendarEntry::ptr(new CalendarEntry(type, summary, start));
     }
 
-    CalendarEntry::ptr CalendarEntry::init(Type type, std::string summary, DateTime start, DateSpan span) {
+    CalendarEntry::ptr CalendarEntry::init(Type type, std::string summary, DateTime start, DatePeriod span) {
         return CalendarEntry::ptr(new CalendarEntry(type, summary, start, span));
     }
 
@@ -16,7 +16,7 @@ namespace uICAL {
         this->_start = start;
     }
 
-    CalendarEntry::CalendarEntry(Type type, std::string summary, DateTime start, DateSpan span) {
+    CalendarEntry::CalendarEntry(Type type, std::string summary, DateTime start, DatePeriod span) {
         this->_type = type;
         this->_summary = summary;
         this->_start = start;
@@ -45,7 +45,7 @@ namespace uICAL {
         return this->_start;
     }
 
-    DateSpan CalendarEntry::span() const {
+    DatePeriod CalendarEntry::duration() const {
         return this->_span;
     }
 

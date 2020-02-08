@@ -29,6 +29,7 @@ namespace uICAL {
             virtual seconds_t fromUTC(seconds_t timestamp) const;
 
             bool is_aware() const;
+            int offset() const;
 
             virtual void str(std::ostream& out) const;
             std::string str() const;

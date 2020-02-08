@@ -13,8 +13,8 @@ void test_cal1() {
     cal->tzmap->str(std::cout);
 
     auto calIt = uICAL::CalendarIter::init(cal,
-        uICAL::DateTime("20191231T100000Z"),
-        uICAL::DateTime("20200123T100000EST", cal->tzmap));
+        uICAL::DateTime("20191016T102000Z"),
+        uICAL::DateTime("20191017T103000EST", cal->tzmap));
 
     while (calIt->next()) {
         auto entry = calIt->current();

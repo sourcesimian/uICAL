@@ -7,7 +7,7 @@
 
 namespace uICAL {
     class DateStamp;
-    class DateSpan;
+    class DatePeriod;
     
     class DateTime {
         public:
@@ -35,7 +35,7 @@ namespace uICAL {
             static DateTime::Day dayOfWeekAfter(DateTime::Day today, unsigned days);
 
             DateTime& operator = (const DateTime& ds);
-            DateSpan operator - (const DateTime& ds) const;
+            DatePeriod operator - (const DateTime& ds) const;
 
             bool operator > (const DateTime& dt) const;
             bool operator < (const DateTime& dt) const;

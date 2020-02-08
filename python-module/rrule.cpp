@@ -135,10 +135,10 @@ namespace uical_python {
 
     static PyMethodDef RRule_methods[] = {
         {"next", (PyCFunction) RRule_next, METH_NOARGS,
-        "Test is there is a next value"
+         "Test if there is a next value"
         },
         {"now", (PyCFunction) RRule_now, METH_NOARGS,
-        "Get the next value"
+         "Get the latest value"
         },
         {NULL}
     };
@@ -148,7 +148,7 @@ namespace uical_python {
     static PyTypeObject RRuleType = {
         PyVarObject_HEAD_INIT(NULL, 0)
         .tp_name = "uical.RRule",
-        .tp_doc = "Iterator object for uicalRRule",
+        .tp_doc = "Iterator object for uICAL::RRule",
         .tp_basicsize = sizeof(RRuleObject),
         .tp_itemsize = 0,
         .tp_flags = Py_TPFLAGS_DEFAULT,

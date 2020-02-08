@@ -1,21 +1,21 @@
 #include "uICAL/cppstl.h"
 #include "uICAL/datecalc.h"
-#include "uICAL/datespan.h"
+#include "uICAL/dateperiod.h"
 
 namespace uICAL {
-    DateSpan::DateSpan() {
+    DatePeriod::DatePeriod() {
         this->spanSeconds = 0;
     }
 
-    DateSpan::DateSpan(seconds_t seconds) {
+    DatePeriod::DatePeriod(seconds_t seconds) {
         this->spanSeconds = seconds;
     }
 
-    seconds_t DateSpan::totalSeconds() const {
+    seconds_t DatePeriod::totalSeconds() const {
         return this->spanSeconds;
     }
 
-    void DateSpan::str(std::ostream& out) const {
+    void DatePeriod::str(std::ostream& out) const {
         auto dhms = to_dhms(this->spanSeconds);
 
         out << "P";
@@ -26,7 +26,7 @@ namespace uICAL {
         if (std::get<3>(dhms)) out << std::get<3>(dhms) << "S";
     }
 
-    std::ostream& operator << (std::ostream& out, const DateSpan& ds) {
+    std::ostream& operator << (std::ostream& out, const DatePeriod& ds) {
         ds.str(out);
         return out;
     }

@@ -2,7 +2,7 @@
 #define uical_calendarentry_h
 
 #include "uICAL/datetime.h"
-#include "uICAL/datespan.h"
+#include "uICAL/dateperiod.h"
 
 namespace uICAL {
     class CalendarEntry {
@@ -13,15 +13,15 @@ namespace uICAL {
 
             using ptr = std::shared_ptr<CalendarEntry>;
             static ptr init(Type type, std::string summary, DateTime start);
-            static ptr init(Type type, std::string summary, DateTime start, DateSpan span);
+            static ptr init(Type type, std::string summary, DateTime start, DatePeriod span);
 
             CalendarEntry(Type type, std::string summary, DateTime start);
-            CalendarEntry(Type type, std::string summary, DateTime start, DateSpan span);
+            CalendarEntry(Type type, std::string summary, DateTime start, DatePeriod span);
             
             Type type() const;
             const std::string summary() const;
             DateTime start() const;
-            DateSpan span() const;
+            DatePeriod duration() const;
 
             void str(std::ostream& out) const;
 
@@ -31,7 +31,7 @@ namespace uICAL {
             Type _type;
             std::string _summary;
             DateTime _start;
-            DateSpan _span;
+            DatePeriod _span;
     };
 
     std::ostream& operator << (std::ostream& out, const CalendarEntry::ptr& e);

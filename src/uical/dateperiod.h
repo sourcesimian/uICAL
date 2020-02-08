@@ -4,10 +4,10 @@
 #include "uICAL/datetime.h"
 
 namespace uICAL {
-    class DateSpan {
+    class DatePeriod {
         public:
-            DateSpan();
-            DateSpan(seconds_t span);
+            DatePeriod();
+            DatePeriod(seconds_t span);
 
             seconds_t totalSeconds() const;
 
@@ -19,7 +19,7 @@ namespace uICAL {
             seconds_t spanSeconds;
     };
 
-    std::ostream& operator << (std::ostream& out, const DateSpan& ds);
+    std::ostream& operator << (std::ostream& out, const DatePeriod& ds);
 }
 
 #endif
