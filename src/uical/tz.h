@@ -9,10 +9,12 @@ namespace uICAL {
         public:
             using ptr = std::shared_ptr<TZ>;
 
-            static ptr undef();
-            static ptr unaware();
             static ptr init(int offsetMins);
             static ptr init(const std::string tz);
+
+            static ptr undef();
+            static ptr unaware();
+
             TZ();
             TZ(bool aware);
             TZ(int offsetMins);
@@ -23,14 +25,19 @@ namespace uICAL {
             virtual seconds_t toUTC(seconds_t timestamp) const;
             virtual seconds_t fromUTC(seconds_t timestamp) const;
 
+            bool is_aware() const;
+
             virtual void str(std::ostream& out) const;
+            std::string str() const;
 
             static int parseOffset(const std::string offset);
             static void offsetAsString(std::ostream& out, int offsetMins);
         
+        protected:
+            bool aware;
+
         private:
             int offsetMins;
-            bool aware;
     };
     
     std::ostream & operator << (std::ostream &out, const TZ::ptr& tz);

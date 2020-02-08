@@ -49,5 +49,12 @@ namespace uICAL {
             }
     };
 
+    class TZAwarenessConflictError : public Error {
+        public:
+            TZAwarenessConflictError(std::string m) {
+                this->message = std::string("TZAwarenessConflictError: ") + m;
+            }
+    };
+
 }
 #endif

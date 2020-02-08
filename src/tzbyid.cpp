@@ -10,6 +10,7 @@ namespace uICAL {
     : tzidmap(tzidmap)
     , id(id)
     {
+        this->aware = true;
     }
 
     seconds_t TZbyId::toUTC(seconds_t timestamp) const {

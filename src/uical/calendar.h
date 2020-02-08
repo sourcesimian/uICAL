@@ -12,6 +12,8 @@ namespace uICAL {
             
             void str(std::ostream& out) const;
 
+            TZIdMap::ptr tzmap;
+
             friend class CalendarIter;
         protected:
             using events_t = std::vector<ICalEvent::ptr>;

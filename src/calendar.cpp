@@ -16,17 +16,13 @@ namespace uICAL {
     {
         auto vcalendar = uICAL::VComponent::parse(ical);
 
-        auto tzidmap = TZIdMap::init(*vcalendar.get());
-
-        // std::cout << "TZ ID Map:" << std::endl;
-        tzidmap->str(std::cout);
-        // std::cout << std::endl;
+        this->tzmap = TZIdMap::init(*vcalendar.get());
 
         auto events = vcalendar->listComponents("VEVENT");
 
         // std::cout << "Events: " << events.size() << std::endl;
         for (auto it = events.begin(); it != events.end(); ++it) {
-            ICalEvent::ptr ev = ICalEvent::init(*it, tzidmap);
+            ICalEvent::ptr ev = ICalEvent::init(*it, this->tzmap);
             this->events.push_back(ev);
             // std::cout << " - " << std::endl;
             // std::cout << (*it) << std::endl;

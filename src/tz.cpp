@@ -45,11 +45,14 @@ namespace uICAL {
         this->aware = this->offsetMins != -1;
     }
 
+    bool TZ::is_aware() const {
+        return this->aware;
+    }
+
     int TZ::parseOffset(const std::string tz) {
         if (tz == "Z") {
             return 0;
         }
-        int offset = -1;
         if (tz.length() == 5) {
             char sign;
             unsigned tzH, tzM;
@@ -57,12 +60,13 @@ namespace uICAL {
             // e.g.: +0200
             sscanf(tz.c_str(), "%c%02d%02d", &sign, &tzH, &tzM);
 
-            offset = (tzH * 60) + tzM;
+            int offset = (tzH * 60) + tzM;
             if (sign == '-') {
                 offset *= -1;
             }
+            return offset;
         }
-        return offset;
+        throw ValueError("Could not identify timezone: \"" + tz + "\"");
     }
 
     void TZ::offsetAsString(std::ostream& out, int offsetMins) {
@@ -106,6 +110,12 @@ namespace uICAL {
         if (!this->aware)
             return;
         TZ::offsetAsString(out, this->offsetMins);
+    }
+
+    std::string TZ::str() const {
+        std::ostringstream out;
+        this->str(out);
+        return out.str();
     }
 
     std::ostream & operator << (std::ostream &out, const TZ::ptr& tz) {

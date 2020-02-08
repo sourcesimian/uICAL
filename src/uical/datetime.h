@@ -44,6 +44,8 @@ namespace uICAL {
             TZ::ptr tz;
 
         protected:
+            void assert_awareness(const DateTime &other) const;
+
             EpochTime epochtime;
     };
 

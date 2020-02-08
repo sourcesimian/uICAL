@@ -66,23 +66,34 @@ namespace uICAL {
         return *this;
     }
 
+    void DateTime::assert_awareness(const DateTime &other) const {
+        if (this->tz->is_aware() != other.tz->is_aware()) {
+            throw TZAwarenessConflictError(this->str() + this->tz->str() + " <> " + other.str() + other.tz->str());
+        }
+    }
+
     DateSpan DateTime::operator - (const DateTime &other) const {
+        this->assert_awareness(other);
         return DateSpan(this->epochtime - other.epochtime);
     }
 
     bool DateTime::operator > (const DateTime& other) const {
+        this->assert_awareness(other);
         return this->epochtime > other.epochtime;
     }
 
     bool DateTime::operator < (const DateTime& other) const {
+        this->assert_awareness(other);
         return this->epochtime < other.epochtime;
     }
 
     bool DateTime::operator <= (const DateTime& other) const {
+        this->assert_awareness(other);
         return this->epochtime <= other.epochtime;
     }
 
     bool DateTime::operator == (const DateTime& other) const {
+        this->assert_awareness(other);
         return this->epochtime == other.epochtime;
     }
 
