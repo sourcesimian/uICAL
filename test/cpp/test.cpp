@@ -10,6 +10,8 @@ int main() {
         test_calendar();
         void test_tz();
         test_tz();
+        void test_datestamp();
+        test_datestamp();
     }
     catch(uICAL::Error e) {
         std::cout << "EXCEPTION: " << e.message << std::endl;

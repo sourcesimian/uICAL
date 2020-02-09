@@ -1,6 +1,8 @@
 build/
 virtualenv/
 **/.DS_Store
+*.gcno
+*.gcda
 
 **/__pycache__
 

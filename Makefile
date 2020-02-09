@@ -1,5 +1,6 @@
 CXX		  := clang++
 CXX_FLAGS := -Wall -Wextra -std=c++11 -g
+CXX_GCOV := -fprofile-arcs -ftest-coverage
 
 BIN		:= build/bin
 SRC		:= src
@@ -31,5 +32,22 @@ $(BIN)/test: $(SRC)/*.cpp $(INCLUDE)/uical/*.h
 	$(CXX) $(CXX_FLAGS) -I$(INCLUDE)/ $(SRC)/*.cpp test/cpp/*.cpp -o $@
 
 
+$(BIN)/cov: $(SRC)/*.cpp $(INCLUDE)/uical/*.h
+	mkdir -p $(BIN)
+	$(CXX) $(CXX_FLAGS) $(CXX_GCOV) -I$(INCLUDE)/ $(SRC)/*.cpp test/cpp/*.cpp -o $@
+
+
 clean:
 	rm -rf $(BIN)/*
+
+
+.PHONY: coverage
+coverage: $(BIN)/cov
+	./$(BIN)/cov
+	gcov -dump *.gcno *.gcda >/dev/null 2>/dev/null
+	rm -f *.gcno *.gcda
+	mkdir -p build/coverage/
+	rm -f build/coverage/*
+	mv *.gcov build/coverage/
+	ls build/coverage/*.gcov | grep -v -e ".cpp" -e ".h" | xargs rm
+	grep "####" build/coverage/*.gcov | wc -l
