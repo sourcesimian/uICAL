@@ -66,7 +66,12 @@ namespace uical_python {
                 calEnd = uICAL::DateTime(std::string(PyUnicode_AsUTF8(end)));
             }
 
-            self->calendar = uICAL::CalendarIter::init(cal, calBegin, calEnd);
+            try {
+                self->calendar = uICAL::CalendarIter::init(cal, calBegin, calEnd);
+            }
+            catch(PyError ex) {
+                return -1;
+            }
 
             return 0;
         }

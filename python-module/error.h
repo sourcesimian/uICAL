@@ -7,5 +7,19 @@ namespace uical_python {
     #endif
 
     bool PyInit_Error(PyObject* module);
+    class PyError {
+        public:
+            PyError(const std::string message, int pyExc)
+            : message(message)
+            , pyExc(pyExc)
+            {
+                PyErr_SetString(this->pyExec, this->message.c_str());
+            }
+
+        protected:
+            const std::string message;
+            int pyExc;
+    };
+
 }
 #endif
