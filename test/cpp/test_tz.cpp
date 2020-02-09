@@ -11,7 +11,7 @@
 #include <list>
 
 void test_tz1() {
-    std::ifstream input(std::string("test/data/calendar2.dat"));
+    std::ifstream input(std::string("test/data/ical2.txt"));
 
     auto vcalendar = uICAL::VComponent::parse(input);
 

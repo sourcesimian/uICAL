@@ -1,11 +1,12 @@
 import pytest
 
-def test_basic():
-    import uICAL
+import uICAL
 
-    ical = open("test/data/calendar1.dat").read()
 
+def test_basic_calendar1():
+    ical = open("test/data/ical1.txt").read()
     cal = uICAL.Calendar(ical, begin="20191016T102000Z", end="20191017T103000-0500")
+
     res = []
     while cal.next():
         res.append(cal.current())

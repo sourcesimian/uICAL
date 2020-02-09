@@ -28,7 +28,7 @@ std::string string_diff(const std::string a, const std::string b) {
     return out.str();
 }
 
-using test_f = std::function<void(std::string, std::string, std::string, std::vector<std::string>)>;
+using test_f = std::function<void(std::string, std::string, std::string, std::vector<std::string>, std::vector<std::string>)>;
 
 static void run_tests(const std::string dat_file, test_f test)
 {
@@ -36,6 +36,7 @@ static void run_tests(const std::string dat_file, test_f test)
 
     std::string dtstart;
     std::string rrule;
+    std::vector<std::string> excludes;
     std::vector<std::string> expected;
 
     int i = 1;
@@ -51,7 +52,7 @@ static void run_tests(const std::string dat_file, test_f test)
             rrule = line;
         }
         else if (line.find("EXDATE") == 0) {
-            // TODO
+            excludes.push_back(line);
         }
         else if (line.find(" - ") == 0) {
             expected.push_back(line.substr(3));
@@ -60,7 +61,7 @@ static void run_tests(const std::string dat_file, test_f test)
                  rrule.size() &&
                  expected.size() &&
                  (line.find(" ") == 0 || line.length() == 0)) {
-            test(dtstart, rrule, expected[0], expected);
+            test(dtstart, rrule, expected[0], excludes, expected);
 
             dtstart.clear();
             rrule.clear();
@@ -79,7 +80,7 @@ static void run_tests(const std::string dat_file, test_f test)
 
 }
 
-void test_basic(std::string dtstart, std::string rrule, std::string begin, std::vector<std::string> expected) {
+void test_basic(std::string dtstart, std::string rrule, std::string begin, std::vector<std::string> excludes, std::vector<std::string> expected) {
     // if (std::string::npos == rrule.find("RRULE:FREQ=MONTHLY;BYDAY=FR;BYMONTHDAY=13"))
     //     return;
     
@@ -97,9 +98,13 @@ void test_basic(std::string dtstart, std::string rrule, std::string begin, std::
             rrBegin = uICAL::DateTime(begin);
         }
 
-        uICAL::RRuleIter::ptr occ = uICAL::RRuleIter::init(
-            uICAL::RRule::init(lrrule->value, start),
-            rrBegin, uICAL::DateTime());
+        uICAL::RRule::ptr rr = uICAL::RRule::init(lrrule->value, start);
+        for (std::string exclude : excludes) {
+            uICAL::VLine::ptr excl = uICAL::VLine::init(exclude);
+            rr->exclude(uICAL::DateTime(excl->value));
+        }
+
+        uICAL::RRuleIter::ptr occ = uICAL::RRuleIter::init(rr, rrBegin, uICAL::DateTime());
 
         std::vector<std::string> results;
         for (auto eit = expected.begin(); eit != expected.end(); ++eit) {
@@ -173,6 +178,6 @@ void test_2() {
 
 
 void test_rrule() {
-    run_tests("test/data/rrule.dat", test_basic);
-    //test_2();
+    run_tests("test/data/rrule.txt", test_basic);
+    test_2();
 }

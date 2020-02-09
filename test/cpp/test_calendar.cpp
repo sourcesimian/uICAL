@@ -7,7 +7,7 @@
 #include <fstream>
 
 void test_cal1() {
-    std::ifstream input(std::string("test/data/calendar1.dat"));
+    std::ifstream input(std::string("test/data/ical1.txt"));
 
     auto cal = uICAL::Calendar::init(input);
     cal->tzmap->str(std::cout);
