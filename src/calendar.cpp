@@ -59,6 +59,10 @@ namespace uICAL {
     CalendarIter::CalendarIter(const Calendar::ptr cal, DateTime begin, DateTime end)
     : cal(cal)
     {
+        if (begin.valid() && end.valid() && end < begin) {
+            throw ValueError("Begin and end describe a negative range");
+        }
+
         for (auto ev : this->cal->events) {
             ICalEventIter::ptr evIt = ICalEventIter::init(ev, begin, end);
 

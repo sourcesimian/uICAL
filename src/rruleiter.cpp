@@ -17,6 +17,10 @@ namespace uICAL {
     RRuleIter::RRuleIter(const RRule::ptr rr, const DateTime begin, const DateTime end)
     : rr(rr)
     {
+        if (begin.valid() && end.valid() && begin > end) {
+            throw ValueError("Begin and end describe a negative range");
+        }
+
         this->count = 0;
         if (begin.valid())
             this->range_begin = begin;

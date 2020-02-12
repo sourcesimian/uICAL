@@ -46,6 +46,7 @@ namespace uICAL {
         private:
             const ICalEvent::ptr ice;
             RRuleIter::ptr rrule;
+            DateTime range_begin;
     };
 
     bool operator < (const ICalEventIter::ptr& a, const ICalEventIter::ptr& b);

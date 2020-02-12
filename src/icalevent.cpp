@@ -54,11 +54,24 @@ namespace uICAL {
     ICalEventIter::ICalEventIter(const ICalEvent::ptr ice, DateTime begin, DateTime end)
     : ice(ice)
     {
-        this->rrule = RRuleIter::init(this->ice->rrule, begin, end);
+        this->range_begin = begin;
+        this->rrule = RRuleIter::init(this->ice->rrule, DateTime(), end);
     }
 
     bool ICalEventIter::next() {
-        return this->rrule->next();
+        if (! this->range_begin.valid()) {
+            return this->rrule->next();
+        }
+        DatePeriod span = this->ice->end - this->ice->start;
+        while (this->rrule->next())
+        {
+            DateTime end = this->rrule->now() + span;
+
+            if (end <= this->range_begin)
+                continue;
+            return true;
+        }
+        return false;
     }
 
     DateTime ICalEventIter::now() const {
