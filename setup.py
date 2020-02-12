@@ -17,6 +17,8 @@ if _DEBUG:
 else:
     extra_compile_args += ["-DNDEBUG", "-O3"]
 
+#extra_compile_args += ["-ftest-coverage", "-fprofile-arcs"]
+
 
 uical = Extension(
     'uICAL',

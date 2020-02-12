@@ -114,7 +114,7 @@ namespace uical_python {
             PyDict_SetItemString(ret, "type", PyUnicode_FromString(uICAL::CalendarEntry::asString(entry->type()).c_str()));
             PyDict_SetItemString(ret, "summary", PyUnicode_FromString(entry->summary().c_str()));
             PyDict_SetItemString(ret, "start", start);
-            PyDict_SetItemString(ret, "duration", PyLong_FromLong(entry->duration().totalSeconds()));
+            PyDict_SetItemString(ret, "duration", PyLong_FromLong((entry->end() - entry->start()).totalSeconds()));
             return ret;
         } catch (uICAL::Error ex) {
             PyErr_SetString(UicalError, ex.message.c_str());
@@ -130,7 +130,7 @@ namespace uical_python {
         {"current", (PyCFunction) Calendar_current, METH_NOARGS,
          "Get the latest value"
         },
-        {NULL}
+        {NULL, NULL, 0, NULL}
     };
 
 

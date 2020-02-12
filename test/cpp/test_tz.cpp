@@ -1,10 +1,4 @@
-#include "uICAL/cppstl.h"
-#include "uICAL/types.h"
-#include "uICAL/tz.h"
-#include "uICAL/tzmap.h"
-#include "uICAL/icalcomponent.h"
-#include "uICAL/datestamp.h"
-#include "uICAL/datetime.h"
+#include "uICAL.h"
 
 #include <iostream>
 #include <fstream>

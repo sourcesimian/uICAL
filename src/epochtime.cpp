@@ -14,6 +14,10 @@ namespace uICAL {
         this->epochSeconds = tz->toUTC(to_seconds(epochDays, hour, minute, second));
     }
 
+    EpochTime::EpochTime(seconds_t seconds) {
+        this->epochSeconds = seconds;
+    }
+
     bool EpochTime::valid() const {
         return this->epochSeconds != NaN;
     }

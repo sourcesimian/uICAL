@@ -18,17 +18,14 @@ namespace uICAL {
 
     TZMap::TZMap(VComponent& calendar) {
         auto timezones = calendar.listComponents("VTIMEZONE");
-        for (auto it = timezones.begin(); it != timezones.end(); ++it) {
-            std::string tzId = (*it)->getPropertyByName("TZID")->value;
+        for (auto timezone : timezones) {
+            std::string tzId = timezone->getPropertyByName("TZID")->value;
 
-            auto standards = (*it)->listComponents("STANDARD");
-            for (auto it = standards.begin(); it != standards.end(); ++it) {
+            auto standards = timezone->listComponents("STANDARD");
+            for (auto standard : standards) {
 
-                std::string offset = (*it)->getPropertyByName("TZOFFSETFROM")->value;
-                // this->id_attrib_map[tzId].offset = TZ::parseOffset(offset);
-
-                std::string name = (*it)->getPropertyByName("TZNAME")->value;
-                // this->id_attrib_map[tzId].name = name;
+                std::string offset = standard->getPropertyByName("TZOFFSETFROM")->value;
+                std::string name = standard->getPropertyByName("TZNAME")->value;
 
                 this->add(tzId, name, offset);
             }
@@ -65,5 +62,4 @@ namespace uICAL {
             out << std::endl;
         }
     }
-
 }

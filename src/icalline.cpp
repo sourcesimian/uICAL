@@ -2,18 +2,30 @@
 #include "uICAL/error.h"
 #include "uICAL/icalline.h"
 #include "uICAL/util.h"
+#include "uICAL/debug.h"
 
 namespace uICAL {
+    VLine::ptr VLine::init() {
+        return VLine::ptr(new VLine());
+    }
+
     VLine::ptr VLine::init(const std::string line) {
         return VLine::ptr(new VLine(line));
     }
 
+    VLine::VLine() {
+    }
+
     VLine::VLine(const std::string line) {
+        if(line.empty()) {
+            throw ParseError("VLINE is empty");
+        }
+
         size_t colon = line.find(":");
         size_t semicolon = line.find(";");
 
         if (colon == std::string::npos) {
-            throw ParseError(std::string("\n!BAD LINE: ") + line);
+            throw ParseError(std::string("VLINE does not have a ':' \"") + line + "\"");
         }
         
         if (semicolon != std::string::npos && semicolon < colon) {
@@ -24,12 +36,13 @@ namespace uICAL {
             this->name = line.substr(0, colon);
         }
         this->value = line.substr(colon + 1, line.length() - colon - 1);
+        debug(std::string("VLINE ") + this->name + " " + this->value);
     }
 
     std::string VLine::getParam(const std::string key) {
-        for (auto it = this->params.begin(); it != this->params.end(); ++it) {
-            if (it->first == key) {
-                return it->second;
+        for (auto param : this->params) {
+            if (param.first == key) {
+                return param.second;
             }
         }
         return std::string("");
@@ -91,6 +104,8 @@ namespace uICAL {
         if (this->current.empty()) {
             std::string token;
             while(std::getline(this->ical, token, '\n')) {
+                rtrim(token);
+
                 if (this->current.empty()) {
                     this->current = token;
                 }

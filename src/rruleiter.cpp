@@ -7,6 +7,7 @@
 #include "uICAL/error.h"
 #include "uICAL/rruleiter.h"
 #include "uICAL/rrule.h"
+#include "uICAL/debug.h"
 
 namespace uICAL {
     RRuleIter::ptr RRuleIter::init(const RRule::ptr rr, const DateTime begin, const DateTime end) {
@@ -124,7 +125,6 @@ namespace uICAL {
         }
         return false;
     }
-
 
     bool RRuleIter::nextExclude() {
         if (!this->nextNow()) {
@@ -372,8 +372,8 @@ namespace uICAL {
 
     void RRuleIter::str(std::ostream& out) const {
         Joiner counters(',');
-        for (auto it = this->counters.rbegin(); it != this->counters.rend(); ++it) {
-            (*it)->str(counters.out());
+        for (auto counter : this->counters) {
+            counter->str(counters.out());
             counters.next();
         }
         counters.str(out);

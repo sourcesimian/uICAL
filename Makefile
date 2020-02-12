@@ -38,7 +38,9 @@ $(BIN)/cov: $(SRC)/*.cpp $(INCLUDE)/uical/*.h
 
 
 clean:
-	rm -rf $(BIN)/*
+	rm -rf ./$(BIN)/*
+	rm -rf ./build/*
+	rm -rf ./virtualenv/lib/python3.7/site-packages/uICAL*
 
 
 .PHONY: coverage

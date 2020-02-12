@@ -46,5 +46,8 @@ namespace uICAL {
         values.str(out);
         return out;
     }
+
+    void ltrim(std::string& s);
+    void rtrim(std::string& s);
 }
 #endif

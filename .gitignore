@@ -1,6 +1,7 @@
 build/
 virtualenv/
 **/.DS_Store
+*.gcov
 *.gcno
 *.gcda
 

@@ -16,14 +16,18 @@ namespace uICAL {
         VLine::ptr rRule = event->getPropertyByName("RRULE");
         VLine::ptr summary = event->getPropertyByName("SUMMARY");
         
-        // this->start = DateTime(DateStamp(dtStart->value), TZbyId::init(tzmap, dtStart->getParam("TZID")));
-        // this->end = DateTime(DateStamp(dtEnd->value), TZbyId::init(tzmap, dtStart->getParam("TZID")));
         this->start = DateTime(dtStart->value + dtStart->getParam("TZID"), tzmap);
         this->end = DateTime(dtEnd->value + dtStart->getParam("TZID"), tzmap);
         
         this->summary = summary->value;
 
         this->rrule = RRule::init(rRule->value, this->start);
+    }
+
+    std::string ICalEvent::str() const {
+        std::ostringstream out;
+        this->str(out);
+        return out.str();
     }
 
     void ICalEvent::str(std::ostream& out) const {

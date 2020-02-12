@@ -1,9 +1,6 @@
-#include "uICAL/cppstl.h"
-#include "uICAL/util.h"
 
-#include "uICAL/calendar.h"
+#include "uICAL.h"
 
-#include <iostream>
 #include <fstream>
 
 void test_cal1() {

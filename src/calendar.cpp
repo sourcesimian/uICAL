@@ -1,4 +1,5 @@
 #include "uICAL/cppstl.h"
+#include "uICAL/error.h"
 #include "uICAL/util.h"
 #include "uICAL/calendar.h"
 #include "uICAL/icalevent.h"
@@ -6,6 +7,7 @@
 #include "uICAL/icalline.h"
 #include "uICAL/tzmap.h"
 #include "uICAL/calendarentry.h"
+#include "uICAL/debug.h"
 
 namespace uICAL {
     Calendar::ptr Calendar::init(std::istream& ical) {
@@ -21,13 +23,15 @@ namespace uICAL {
         auto events = vcalendar->listComponents("VEVENT");
 
         // std::cout << "Events: " << events.size() << std::endl;
-        for (auto it = events.begin(); it != events.end(); ++it) {
-            ICalEvent::ptr ev = ICalEvent::init(*it, this->tzmap);
+        for (auto comp : events) {
+            ICalEvent::ptr ev = ICalEvent::init(comp, this->tzmap);
             this->events.push_back(ev);
+            debug(std::string("Calendar ") + ev->str());
+
             // std::cout << " - " << std::endl;
             // std::cout << (*it) << std::endl;
 
-            std::cout << ev << std::endl;
+            //std::cout << ev << std::endl;
             //std::cout << " - - " << std::endl;
             //std::cout << e << std::endl;
         }
@@ -55,8 +59,8 @@ namespace uICAL {
     CalendarIter::CalendarIter(const Calendar::ptr cal, DateTime begin, DateTime end)
     : cal(cal)
     {
-        for (auto it = this->cal->events.begin(); it != this->cal->events.end(); ++it) {
-            ICalEventIter::ptr evIt = ICalEventIter::init(*it, begin, end);
+        for (auto ev : this->cal->events) {
+            ICalEventIter::ptr evIt = ICalEventIter::init(ev, begin, end);
 
             if (evIt->next()) {  // Initialise and filter
                 this->events.push_back(evIt);
@@ -80,6 +84,9 @@ namespace uICAL {
     }
 
     CalendarEntry::ptr CalendarIter::current() const {
+        if (! this->currentEntry) {
+            throw RecurrenceError("No more entries");
+        }
         return this->currentEntry;
     }
 

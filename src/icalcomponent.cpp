@@ -2,6 +2,7 @@
 #include "uICAL/error.h"
 #include "uICAL/icalcomponent.h"
 #include "uICAL/util.h"
+#include "uICAL/debug.h"
 
 namespace uICAL {
 
@@ -20,12 +21,6 @@ namespace uICAL {
     void VComponent::addComponent(VComponent::ptr component) {
         this->children.push_back(component);
     }
-
-    // VComponent::ptr VComponent::parse(const std::string ical) {
-    //     std::istringstream icals(ical);
-    //     VComponent::ptr comp = VComponent::parse(icals);
-    //     return comp;
-    // }
 
     VComponent::ptr VComponent::parse(std::istream& ical) {
         VLineReader::ptr lines = std::make_shared<VLineReaderStream>(ical);
@@ -50,6 +45,7 @@ namespace uICAL {
 
                 if (line->name == "END" && section == section) {
                     lines->pop();
+                    debug(std::string("VCOMPONENT ") + component->getName());
                     return component;
                 }
 
@@ -69,19 +65,19 @@ namespace uICAL {
     }
 
     VLine::ptr VComponent::getPropertyByName(std::string name) {
-        for (auto it = this->lines.begin(); it != this->lines.end(); ++it) {
-            if ( (*it)->name == name) {
-                return (*it);
+        for (auto line : this->lines) {
+            if (line->name == name) {
+                return line;
             }
         }
-        return VLine::init(std::string(""));
+        return VLine::init();
     }
 
     VComponent::vector VComponent::listComponents(std::string name) {
         VComponent::vector ret;
-        for ( auto it = this->children.begin(); it != this->children.end(); ++it) {
-            if ((*it)->name == name) {
-                ret.push_back(*it);
+        for (auto child : this->children) {
+            if (child->name == name) {
+                ret.push_back(child);
             }
         }
         return ret;

@@ -6,7 +6,9 @@ namespace uICAL {
         public:
             using ptr = std::shared_ptr<VLine>;
 
+            static VLine::ptr init();
             static VLine::ptr init(const std::string line);
+            VLine();
             VLine(const std::string line);
 
             std::string name;

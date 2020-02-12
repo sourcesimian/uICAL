@@ -21,7 +21,7 @@ namespace uICAL {
             Type type() const;
             const std::string summary() const;
             DateTime start() const;
-            DatePeriod duration() const;
+            DateTime end() const;
 
             void str(std::ostream& out) const;
 

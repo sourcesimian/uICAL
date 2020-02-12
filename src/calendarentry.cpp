@@ -45,8 +45,8 @@ namespace uICAL {
         return this->_start;
     }
 
-    DatePeriod CalendarEntry::duration() const {
-        return this->_span;
+    DateTime CalendarEntry::end() const {
+        return this->_start + this->_span;
     }
 
     void CalendarEntry::str(std::ostream& out) const {

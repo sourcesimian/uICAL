@@ -6,13 +6,7 @@
 #include <fstream>
 #include <map>
 
-#include "uICAL/types.h"
-#include "uICAL/util.h"
-#include "uICAL/icalline.h"
-#include "uICAL/datetime.h"
-#include "uICAL/rruleiter.h"
-#include "uICAL/error.h"
-#include "uICAL/tz.h"
+#include "uICAL.h"
 
 std::string string_diff(const std::string a, const std::string b) {
     std::ostringstream out;

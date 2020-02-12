@@ -23,6 +23,16 @@ namespace uICAL {
         this->construct(datetime, tzmap);
     }
 
+    DateTime::DateTime(seconds_t epochSeconds) {
+        this->epochtime = EpochTime(epochSeconds);
+        this->tz = TZ::init("Z");
+    }
+
+    DateTime::DateTime(seconds_t epochSeconds, const TZ::ptr& tz) {
+        this->epochtime = EpochTime(epochSeconds);
+        this->tz = tz;
+    }
+
     void DateTime::construct(const std::string datetime, const TZMap::ptr& tzmap) {
         if (datetime.length() < 15)
             throw ValueError(std::string("Bad datetime: \"") + datetime + "\"");
@@ -83,7 +93,20 @@ namespace uICAL {
 
     DatePeriod DateTime::operator - (const DateTime& other) const {
         this->assert_awareness(other);
-        return DatePeriod(this->epochtime - other.epochtime);
+        return DatePeriod(this->epochtime.epochSeconds - other.epochtime.epochSeconds);
+    }
+
+    DatePeriod DateTime::operator + (const DateTime& other) const {
+        this->assert_awareness(other);
+        return DatePeriod(this->epochtime.epochSeconds + other.epochtime.epochSeconds);
+    }
+
+    DateTime DateTime::operator + (const DatePeriod& dp) const {
+        return DateTime(this->epochtime.epochSeconds + dp.totalSeconds(), this->tz);
+    }
+
+    DateTime DateTime::operator - (const DatePeriod& dp) const {
+        return DateTime(this->epochtime.epochSeconds - dp.totalSeconds(), this->tz);
     }
 
     bool DateTime::operator > (const DateTime& other) const {

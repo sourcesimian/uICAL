@@ -1,5 +1,5 @@
 #ifdef uical_cppstl_h
-    #warning "uical/cppstl.h used in a .h file"
+    #warning "uICAL/cppstl.h used in a .h file"
 #endif
 #define uical_cppstl_h
 

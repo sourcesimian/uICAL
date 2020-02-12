@@ -2,6 +2,7 @@
 #include "uICAL/error.h"
 #include "uICAL/rrule.h"
 #include "uICAL/util.h"
+#include "uICAL/debug.h"
 
 namespace uICAL {
     RRule::ptr RRule::init(const std::string rrule, const DateTime dtstart) {
@@ -16,7 +17,12 @@ namespace uICAL {
         this->interval = 1;
         this->count = -1;
 
-        this->parseRRule(rrule);
+        if (rrule.empty())
+            this->parseRRule("FREQ=DAILY;COUNT=1");
+        else
+            this->parseRRule(rrule);
+
+        debug(std::string("RRULE ") + this->str());
     }
 
     void RRule::parseRRule(const std::string rrule) {

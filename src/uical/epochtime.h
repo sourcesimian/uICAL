@@ -9,6 +9,7 @@ namespace uICAL {
         public:
             EpochTime();
             EpochTime(unsigned year, unsigned month, unsigned day, unsigned hour, unsigned minute, unsigned second, const TZ::ptr& tz);
+            EpochTime(seconds_t seconds);
             
             using ymd_t = std::tuple<unsigned, unsigned, unsigned>;
             using ymdhms_t = std::tuple<unsigned, unsigned, unsigned, unsigned, unsigned, unsigned>;

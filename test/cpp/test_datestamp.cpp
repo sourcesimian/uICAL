@@ -2,8 +2,7 @@
 #include <iostream>
 #include <map>
 
-#include "uICAL/datetime.h"
-#include "uICAL/datestamp.h"
+#include "uICAL.h"
 
 uICAL::DateStamp ds(const std::string& value) {
     using namespace uICAL;

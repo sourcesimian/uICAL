@@ -140,7 +140,7 @@ namespace uical_python {
         {"now", (PyCFunction) RRule_now, METH_NOARGS,
          "Get the latest value"
         },
-        {NULL}
+        {NULL, NULL, 0, NULL}
     };
 
 
