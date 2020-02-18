@@ -49,6 +49,13 @@ namespace uICAL {
         return now;
     }
 
+    bool BySecondCounter::syncLock(const DateStamp& from, const DateStamp& now) const
+    {
+        return from.second <= now.second;
+    }
+
+    const std::string BySecondCounter::name() const { return "BySecond"; }
+
     bool ByMinuteCounter::reset(const DateStamp& base) {
         DateStamp _base = base;
         _base.second = 0;
@@ -70,12 +77,11 @@ namespace uICAL {
         return now;
     }
 
-    bool ByHourCounter::reset(const DateStamp& base) {
-        DateStamp _base = base;
-        _base.second = 0;
-        _base.minute = 0;
-        return CounterT::reset(_base);
+    bool ByMinuteCounter::syncLock(const DateStamp& from, const DateStamp& now) const {
+        return from.minute <= now.minute;
     }
+
+    const std::string ByMinuteCounter::name() const { return "ByMinute"; }
 
     Counter::ptr ByHourCounter::init(const values_t values) {
         return Counter::ptr((Counter*)new ByHourCounter(values));
@@ -86,11 +92,24 @@ namespace uICAL {
         return Counter::ptr((Counter*)new ByHourCounter(values));
     }
 
+    bool ByHourCounter::reset(const DateStamp& base) {
+        DateStamp _base = base;
+        _base.second = 0;
+        _base.minute = 0;
+        return CounterT::reset(_base);
+    }
+
     DateStamp ByHourCounter::value() const {
         DateStamp now = this->base;
         now.hour = *this->it;
         return now;
     }
+
+    bool ByHourCounter::syncLock(const DateStamp& from, const DateStamp& now) const {
+        return from.hour <= now.hour;
+    }
+
+    const std::string ByHourCounter::name() const { return "ByHour"; }
 
     Counter::ptr ByMonthDayCounter::init(const values_t values) {
         return Counter::ptr((Counter*)new ByMonthDayCounter(values));
@@ -130,6 +149,12 @@ namespace uICAL {
         return ret;
     }
 
+    bool ByMonthDayCounter::syncLock(const DateStamp& from, const DateStamp& now) const {
+        return from.day <= now.day;
+    }
+
+    const std::string ByMonthDayCounter::name() const { return "ByMonthDay"; }
+
     Counter::ptr ByWeekNoCounter::init(const values_t values) {
         return Counter::ptr((Counter*)new ByWeekNoCounter(values));
     }
@@ -144,6 +169,12 @@ namespace uICAL {
         now.setWeekNo(*this->it);
         return now;
     }
+
+    bool ByWeekNoCounter::syncLock(const DateStamp& from, const DateStamp& now) const {
+        return from.weekNo() <= now.weekNo();
+    }
+
+    const std::string ByWeekNoCounter::name() const { return "ByWeekNo"; }
 
     Counter::ptr ByMonthCounter::init(const values_t values) {
         return Counter::ptr((Counter*)new ByMonthCounter(values));
@@ -165,6 +196,12 @@ namespace uICAL {
         now.month = *this->it;
         return now;
     }
+
+    bool ByMonthCounter::syncLock(const DateStamp& from, const DateStamp& now) const {
+        return from.month <= now.month;
+    }
+
+    const std::string ByMonthCounter::name() const { return "ByMonth"; }
 
     Counter::ptr ByYearDayCounter::init(const values_t values) {
         return Counter::ptr((Counter*)new ByYearDayCounter(values));
@@ -207,31 +244,133 @@ namespace uICAL {
         return ret;
     }
 
+    bool ByYearDayCounter::syncLock(const DateStamp& from, const DateStamp& now) const {
+        return from.dayOfYear() == now.dayOfYear();
+    }
+
+    const std::string ByYearDayCounter::name() const { return "ByYearDay"; }
+
+    void IncCounter::str(std::ostream& out) const {
+        out << "<" << this->name() << " " << this->interval << ">";
+    }
+
     Counter::ptr SecondInc::init(unsigned interval) {
         return Counter::ptr((Counter*)new SecondInc(interval));
     }
+
+    bool SecondInc::next() {
+        unsigned minute = this->base.minute;
+        this->base.incSecond(this->interval);
+        return minute == this->base.minute;
+    }
+
+    const std::string SecondInc::name() const { return "SecondInc"; }
 
     Counter::ptr MinuteInc::init(unsigned interval) {
         return Counter::ptr((Counter*)new MinuteInc(interval));
     }
 
+    bool MinuteInc::reset(const DateStamp& base) {
+        DateStamp _base = base;
+        _base.second = 0;
+        return IncCounter::reset(_base);
+    }
+
+    bool MinuteInc::next() {
+        unsigned hour = this->base.hour;
+        this->base.incMinute(this->interval);
+        return hour == this->base.hour;
+    }
+
+    const std::string MinuteInc::name() const { return "MinuteInc"; }
+
     Counter::ptr HourInc::init(unsigned interval) {
         return Counter::ptr((Counter*)new HourInc(interval));
     }
+
+    bool HourInc::reset(const DateStamp& base) {
+        DateStamp _base = base;
+        _base.second = 0;
+        _base.minute = 0;
+        return IncCounter::reset(_base);
+    }
+
+    bool HourInc::next() {
+        unsigned day = this->base.day;
+        this->base.incHour(this->interval);
+        return day == this->base.day;
+    }
+
+    const std::string HourInc::name() const { return "HourInc"; }
 
     Counter::ptr DayInc::init(unsigned interval) {
         return Counter::ptr((Counter*)new DayInc(interval));
     }
 
+    bool DayInc::next() {
+        unsigned month = this->base.month;
+        this->base.incDay(this->interval);
+        return month == this->base.month;
+    }
+
+    const std::string DayInc::name() const { return "DayInc"; }
+
     Counter::ptr WeekInc::init(unsigned interval, DateTime::Day wkst) {
         return Counter::ptr((Counter*)new WeekInc(interval, wkst));
     }
+
+    bool WeekInc::reset(const DateStamp& base) {
+        DateStamp _base = base;
+        unsigned weekNo = _base.weekNo();
+        _base.setWeekNo(weekNo);
+        return IncCounter::reset(_base);
+    }
+
+    bool WeekInc::next() {
+        unsigned year = this->base.year;
+        this->base.incWeek(this->interval, this->wkst);
+        return year == this->base.year;
+    }
+
+    const std::string WeekInc::name() const { return "WeekInc"; }
 
     Counter::ptr MonthInc::init(unsigned interval) {
         return Counter::ptr((Counter*)new MonthInc(interval));
     }
 
+    bool MonthInc::reset(const DateStamp& base) {
+        DateStamp _base = base;
+        _base.day = 1;
+        return IncCounter::reset(_base);
+    }
+
+    bool MonthInc::next() {
+        unsigned year = this->base.year;
+        this->base.day = 1;
+        this->base.incMonth(this->interval);
+        return year == this->base.year;
+    }
+
+    const std::string MonthInc::name() const { return "MonthInc"; }
+
     Counter::ptr YearInc::init(unsigned interval) {
         return Counter::ptr((Counter*)new YearInc(interval));
     }
+
+    bool YearInc::reset(const DateStamp& base) {
+        DateStamp _base = base;
+        _base.day = 1;
+        _base.month = 1;
+        return IncCounter::reset(_base);
+    }
+
+    bool YearInc::next() {
+        this->base.day = 1;
+        this->base.month = 1;
+        this->base.incYear(this->interval);
+        return true;
+    }
+
+    const std::string YearInc::name() const { return "YearInc"; }
+
 }

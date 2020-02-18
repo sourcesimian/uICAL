@@ -77,8 +77,8 @@ namespace uICAL {
 
             DateStamp value() const;      
 
-            virtual bool syncLock(const DateStamp& from, const DateStamp& now) const { return from.second <= now.second; }
-            virtual const std::string name() const { return "BySecond"; }
+            virtual bool syncLock(const DateStamp& from, const DateStamp& now) const;
+            virtual const std::string name() const;
     };
 
     class ByMinuteCounter : protected CounterT<unsigned> {
@@ -91,8 +91,8 @@ namespace uICAL {
             virtual bool reset(const DateStamp& base);
             virtual DateStamp value() const;      
 
-            virtual bool syncLock(const DateStamp& from, const DateStamp& now) const { return from.minute <= now.minute; }
-            virtual const std::string name() const { return "ByMinute"; }
+            virtual bool syncLock(const DateStamp& from, const DateStamp& now) const;
+            virtual const std::string name() const;
     };
 
     class ByHourCounter : protected CounterT<unsigned> {
@@ -104,8 +104,8 @@ namespace uICAL {
             virtual bool reset(const DateStamp& base);
             virtual DateStamp value() const;      
 
-            virtual bool syncLock(const DateStamp& from, const DateStamp& now) const { return from.hour <= now.hour; }
-            virtual const std::string name() const { return "ByHour"; }
+            virtual bool syncLock(const DateStamp& from, const DateStamp& now) const;
+            virtual const std::string name() const;
     };
 
     class ByMonthDayCounter : protected CounterT<int> {
@@ -119,8 +119,8 @@ namespace uICAL {
             virtual DateStamp value() const;      
             virtual bool next();
 
-            virtual bool syncLock(const DateStamp& from, const DateStamp& now) const { return from.day <= now.day; }
-            virtual const std::string name() const { return "ByMonthDay"; }
+            virtual bool syncLock(const DateStamp& from, const DateStamp& now) const;
+            virtual const std::string name() const;
     };
 
     class ByWeekNoCounter : protected CounterT<unsigned> {
@@ -132,8 +132,8 @@ namespace uICAL {
 
             virtual DateStamp value() const;
 
-            virtual bool syncLock(const DateStamp& from, const DateStamp& now) const { return from.weekNo() <= now.weekNo(); }
-            virtual const std::string name() const { return "ByWeekNo"; }
+            virtual bool syncLock(const DateStamp& from, const DateStamp& now) const;
+            virtual const std::string name() const;
     };
 
     class ByMonthCounter : protected CounterT<unsigned> {
@@ -146,8 +146,8 @@ namespace uICAL {
             virtual bool reset(const DateStamp& base);
             virtual DateStamp value() const;      
 
-            virtual bool syncLock(const DateStamp& from, const DateStamp& now) const { return from.month <= now.month; }
-            virtual const std::string name() const { return "ByMonth"; }
+            virtual bool syncLock(const DateStamp& from, const DateStamp& now) const;
+            virtual const std::string name() const;
     };
 
     class ByYearDayCounter : protected CounterT<int> {
@@ -161,17 +161,15 @@ namespace uICAL {
             virtual DateStamp value() const;      
             virtual bool next();
 
-            virtual bool syncLock(const DateStamp& from, const DateStamp& now) const { return from.dayOfYear() == now.dayOfYear(); }
-            virtual const std::string name() const { return "ByYearDay"; }
+            virtual bool syncLock(const DateStamp& from, const DateStamp& now) const;
+            virtual const std::string name() const;
     };
 
     class IncCounter : protected Counter {
         public:
             IncCounter(unsigned interval) : interval(interval) {}
 
-            virtual void str(std::ostream& out) const {
-                out << "<" << this->name() << " " << this->interval << ">";
-            }
+            virtual void str(std::ostream& out) const;
 
             virtual bool syncLock(const DateStamp& from, const DateStamp& now) const { std::ignore = from; std::ignore = now; return true; }
 
@@ -187,13 +185,9 @@ namespace uICAL {
 
             SecondInc(unsigned interval) : IncCounter(interval) {}
 
-            virtual bool next() {
-                unsigned minute = this->base.minute;
-                this->base.incSecond(this->interval);
-                return minute == this->base.minute;
-            }
+            virtual bool next();
 
-            virtual const std::string name() const { return "SecondInc"; }
+            virtual const std::string name() const;
     };
 
     class MinuteInc : protected IncCounter {
@@ -202,19 +196,10 @@ namespace uICAL {
 
             MinuteInc(unsigned interval) : IncCounter(interval) {}
 
-            virtual bool reset(const DateStamp& base) {
-                DateStamp _base = base;
-                _base.second = 0;
-                return IncCounter::reset(_base);
-            }
+            virtual bool reset(const DateStamp& base);
+            virtual bool next();
 
-            virtual bool next() {
-                unsigned hour = this->base.hour;
-                this->base.incMinute(this->interval);
-                return hour == this->base.hour;
-            }
-
-            virtual const std::string name() const { return "MinuteInc"; }
+            virtual const std::string name() const;
     };
 
     class HourInc : protected IncCounter {
@@ -223,20 +208,10 @@ namespace uICAL {
 
             HourInc(unsigned interval) : IncCounter(interval) {}
 
-            virtual bool reset(const DateStamp& base) {
-                DateStamp _base = base;
-                _base.second = 0;
-                _base.minute = 0;
-                return IncCounter::reset(_base);
-            }
+            virtual bool reset(const DateStamp& base);
+            virtual bool next();
 
-            virtual bool next() {
-                unsigned day = this->base.day;
-                this->base.incHour(this->interval);
-                return day == this->base.day;
-            }
-
-            virtual const std::string name() const { return "HourInc"; }
+            virtual const std::string name() const;
     };
 
     class DayInc : protected IncCounter {
@@ -245,13 +220,9 @@ namespace uICAL {
 
             DayInc(unsigned interval) : IncCounter(interval) {}
 
-            virtual bool next() {
-                unsigned month = this->base.month;
-                this->base.incDay(this->interval);
-                return month == this->base.month;
-            }
+            virtual bool next();
 
-            virtual const std::string name() const { return "DayInc"; }
+            virtual const std::string name() const;
     };
 
     class WeekInc : protected IncCounter {
@@ -260,20 +231,10 @@ namespace uICAL {
 
             WeekInc(unsigned interval, DateTime::Day wkst) : IncCounter(interval), wkst(wkst) {}
 
-            virtual bool reset(const DateStamp& base) {
-                DateStamp _base = base;
-                unsigned weekNo = _base.weekNo();
-                _base.setWeekNo(weekNo);
-                return IncCounter::reset(_base);
-            }
+            virtual bool reset(const DateStamp& base);
+            virtual bool next();
 
-            virtual bool next() {
-                unsigned year = this->base.year;
-                this->base.incWeek(this->interval, this->wkst);
-                return year == this->base.year;
-            }
-
-            virtual const std::string name() const { return "WeekInc"; }
+            virtual const std::string name() const;
 
         protected:
             DateTime::Day wkst;
@@ -285,20 +246,10 @@ namespace uICAL {
 
             MonthInc(unsigned interval) : IncCounter(interval) {}
 
-            virtual bool reset(const DateStamp& base) {
-                DateStamp _base = base;
-                _base.day = 1;
-                return IncCounter::reset(_base);
-            }
+            virtual bool reset(const DateStamp& base);
+            virtual bool next();
 
-            virtual bool next() {
-                unsigned year = this->base.year;
-                this->base.day = 1;
-                this->base.incMonth(this->interval);
-                return year == this->base.year;
-            }
-
-            virtual const std::string name() const { return "MonthInc"; }
+            virtual const std::string name() const;
     };
 
     class YearInc : protected IncCounter {
@@ -307,21 +258,10 @@ namespace uICAL {
 
             YearInc(unsigned interval) : IncCounter(interval) {}
 
-            virtual bool reset(const DateStamp& base) {
-                DateStamp _base = base;
-                _base.day = 1;
-                _base.month = 1;
-                return IncCounter::reset(_base);
-            }
+            virtual bool reset(const DateStamp& base);
+            virtual bool next();
 
-            virtual bool next() {
-                this->base.day = 1;
-                this->base.month = 1;
-                this->base.incYear(this->interval);
-                return true;
-            }
-
-            virtual const std::string name() const { return "YearInc"; }
+            virtual const std::string name() const;
     };
 }
 #endif
