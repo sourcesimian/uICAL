@@ -1,3 +1,6 @@
+/*############################################################################
+# Copyright (c) 2020 Source Simian  :  https://github.com/sourcesimian/uICAL #
+############################################################################*/
 #ifndef python_error_h
 #define python_error_h
 

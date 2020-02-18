@@ -1,3 +1,6 @@
+/*############################################################################
+# Copyright (c) 2020 Source Simian  :  https://github.com/sourcesimian/uICAL #
+############################################################################*/
 #include "uICAL/cppstl.h"
 #include "uICAL/util.h"
 #include "uICAL/byandcounter.h"
@@ -23,7 +26,7 @@ namespace uICAL {
         this->current = nullptr;
     }
 
-    bool ByAndCounter::syncLock(DateStamp from, DateStamp now) const {
+    bool ByAndCounter::syncLock(const DateStamp& from, const DateStamp& now) const {
         for(auto counter : this->counters) {
             if  (!counter->syncLock(from, now))
                 return false;
@@ -31,7 +34,7 @@ namespace uICAL {
         return true;
     }
 
-    bool ByAndCounter::reset(DateStamp base) {
+    bool ByAndCounter::reset(const DateStamp& base) {
         for(auto counter : this->counters) {
             counter->reset(base);
         }

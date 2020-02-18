@@ -1,3 +1,6 @@
+/*############################################################################
+# Copyright (c) 2020 Source Simian  :  https://github.com/sourcesimian/uICAL #
+############################################################################*/
 #include "uICAL/cppstl.h"
 #include "uICAL/util.h"
 #include "uICAL/bysetposcounter.h"
@@ -27,16 +30,6 @@ namespace uICAL {
         if (end.valid())
             this->range_end = end;
     }
-
-    // void RRuleIter::begin(const DateTime begin) {
-    //     if (begin.valid())
-    //         this->range_begin = begin;
-    // }
-
-    // void RRuleIter::end(const DateTime end) {
-    //     if (end.valid())
-    //         this->range_end = end;
-    // }
 
     bool RRuleIter::start() {
         if (this->range_end.valid() && this->rr->dtstart > this->range_end)  {

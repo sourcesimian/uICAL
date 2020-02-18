@@ -1,3 +1,6 @@
+/*############################################################################
+# Copyright (c) 2020 Source Simian  :  https://github.com/sourcesimian/uICAL #
+############################################################################*/
 #ifndef uical_types_h
 #define uical_types_h
 

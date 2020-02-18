@@ -1,3 +1,6 @@
+/*############################################################################
+# Copyright (c) 2020 Source Simian  :  https://github.com/sourcesimian/uICAL #
+############################################################################*/
 #define PY_SSIZE_T_CLEAN
 #include <Python.h>
 #include <structmember.h>

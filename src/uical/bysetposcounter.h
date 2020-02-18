@@ -1,3 +1,6 @@
+/*############################################################################
+# Copyright (c) 2020 Source Simian  :  https://github.com/sourcesimian/uICAL #
+############################################################################*/
 #ifndef uical_bysetpos_h
 #define uical_bysetpos_h
 
@@ -9,10 +12,10 @@ namespace uICAL {
         public:
             static Counter::ptr init(Counter::ptr counter, const values_t& values);
 
-            virtual bool reset(DateStamp base);
+            virtual bool reset(const DateStamp& base);
             virtual DateStamp value() const;
 
-            virtual bool syncLock(DateStamp from, DateStamp now) const;
+            virtual bool syncLock(const DateStamp& from, const DateStamp& now) const;
             virtual const std::string name() const { return "BySetPos"; }
 
             virtual void str(std::ostream& out) const;

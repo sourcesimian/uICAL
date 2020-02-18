@@ -1,3 +1,6 @@
+/*############################################################################
+# Copyright (c) 2020 Source Simian  :  https://github.com/sourcesimian/uICAL #
+############################################################################*/
 #include "uICAL/cppstl.h"
 #include "uICAL/util.h"
 #include "uICAL/byweekdaycounter.h"
@@ -34,7 +37,7 @@ namespace uICAL {
         this->wrap();
     }
 
-    bool ByWeekDayCounter::syncLock(DateStamp from, DateStamp now) const {
+    bool ByWeekDayCounter::syncLock(const DateStamp& from, const DateStamp& now) const {
         return from.day <= now.day;
     }
 
@@ -49,7 +52,7 @@ namespace uICAL {
         }
     }
 
-    bool ByWeekDayCounter::reset(DateStamp base) {
+    bool ByWeekDayCounter::reset(const DateStamp& base) {
         this->base = base;
         this->wrap();
         this->cursor = 0;

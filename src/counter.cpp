@@ -1,3 +1,6 @@
+/*############################################################################
+# Copyright (c) 2020 Source Simian  :  https://github.com/sourcesimian/uICAL #
+############################################################################*/
 #include "uICAL/cppstl.h"
 #include "uICAL/util.h"
 #include "uICAL/counter.h"
@@ -5,7 +8,7 @@
 
 namespace uICAL {
 
-    bool Counter::reset(DateStamp base) {
+    bool Counter::reset(const DateStamp& base) {
         this->wrap();
         this->base = base;
         return true;
@@ -46,9 +49,10 @@ namespace uICAL {
         return now;
     }
 
-    bool ByMinuteCounter::reset(DateStamp base) {
-        base.second = 0;
-        return CounterT::reset(base);
+    bool ByMinuteCounter::reset(const DateStamp& base) {
+        DateStamp _base = base;
+        _base.second = 0;
+        return CounterT::reset(_base);
     }
 
     Counter::ptr ByMinuteCounter::init(const values_t values) {
@@ -66,10 +70,11 @@ namespace uICAL {
         return now;
     }
 
-    bool ByHourCounter::reset(DateStamp base) {
-        base.second = 0;
-        base.minute = 0;
-        return CounterT::reset(base);
+    bool ByHourCounter::reset(const DateStamp& base) {
+        DateStamp _base = base;
+        _base.second = 0;
+        _base.minute = 0;
+        return CounterT::reset(_base);
     }
 
     Counter::ptr ByHourCounter::init(const values_t values) {
@@ -96,7 +101,7 @@ namespace uICAL {
         return Counter::ptr((Counter*)new ByMonthDayCounter(values));
     }
 
-    bool ByMonthDayCounter::reset(DateStamp base) {
+    bool ByMonthDayCounter::reset(const DateStamp& base) {
         return CounterT::reset(base);
     }
 
@@ -149,9 +154,10 @@ namespace uICAL {
         return Counter::ptr((Counter*)new ByMonthCounter(values));
     }
 
-    bool ByMonthCounter::reset(DateStamp base) {
-        base.day = 1;
-        return CounterT::reset(base);
+    bool ByMonthCounter::reset(const DateStamp& base) {
+        DateStamp _base = base;
+        _base.day = 1;
+        return CounterT::reset(_base);
     }
 
     DateStamp ByMonthCounter::value() const {
@@ -169,10 +175,11 @@ namespace uICAL {
         return Counter::ptr((Counter*)new ByYearDayCounter(values));
     }
 
-    bool ByYearDayCounter::reset(DateStamp base) {
-        base.day = 1;
-        base.month = 1;
-        return CounterT::reset(base);
+    bool ByYearDayCounter::reset(const DateStamp& base) {
+        DateStamp _base = base;
+        _base.day = 1;
+        _base.month = 1;
+        return CounterT::reset(_base);
     }
 
     DateStamp ByYearDayCounter::value() const {

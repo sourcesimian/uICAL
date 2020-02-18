@@ -1,3 +1,6 @@
+/*############################################################################
+# Copyright (c) 2020 Source Simian  :  https://github.com/sourcesimian/uICAL #
+############################################################################*/
 #ifndef uical_bycounter_h
 #define uical_bycounter_h
 
@@ -11,11 +14,11 @@ namespace uICAL {
             Counter() {}
             virtual ~Counter() {}
 
-            virtual bool reset(DateStamp base);
+            virtual bool reset(const DateStamp& base);
             virtual bool next() { return true; }
             virtual DateStamp value() const { return this->base; }
             
-            virtual bool syncLock(DateStamp from, DateStamp now) const = 0;
+            virtual bool syncLock(const DateStamp& from, const DateStamp& now) const = 0;
             virtual const std::string name() const = 0;
 
             virtual void str(std::ostream& out) const;
@@ -74,7 +77,7 @@ namespace uICAL {
 
             DateStamp value() const;      
 
-            virtual bool syncLock(DateStamp from, DateStamp now) const { return from.second <= now.second; }
+            virtual bool syncLock(const DateStamp& from, const DateStamp& now) const { return from.second <= now.second; }
             virtual const std::string name() const { return "BySecond"; }
     };
 
@@ -85,10 +88,10 @@ namespace uICAL {
             
             ByMinuteCounter(const values_t values) : CounterT(values) {}
 
-            virtual bool reset(DateStamp base);
+            virtual bool reset(const DateStamp& base);
             virtual DateStamp value() const;      
 
-            virtual bool syncLock(DateStamp from, DateStamp now) const { return from.minute <= now.minute; }
+            virtual bool syncLock(const DateStamp& from, const DateStamp& now) const { return from.minute <= now.minute; }
             virtual const std::string name() const { return "ByMinute"; }
     };
 
@@ -98,10 +101,10 @@ namespace uICAL {
             static Counter::ptr init(const value_t value);
 
             ByHourCounter(const values_t values) : CounterT(values) {}
-            virtual bool reset(DateStamp base);
+            virtual bool reset(const DateStamp& base);
             virtual DateStamp value() const;      
 
-            virtual bool syncLock(DateStamp from, DateStamp now) const { return from.hour <= now.hour; }
+            virtual bool syncLock(const DateStamp& from, const DateStamp& now) const { return from.hour <= now.hour; }
             virtual const std::string name() const { return "ByHour"; }
     };
 
@@ -112,11 +115,11 @@ namespace uICAL {
 
             ByMonthDayCounter(const values_t values) : CounterT(values) {}
 
-            virtual bool reset(DateStamp base);
+            virtual bool reset(const DateStamp& base);
             virtual DateStamp value() const;      
             virtual bool next();
 
-            virtual bool syncLock(DateStamp from, DateStamp now) const { return from.day <= now.day; }
+            virtual bool syncLock(const DateStamp& from, const DateStamp& now) const { return from.day <= now.day; }
             virtual const std::string name() const { return "ByMonthDay"; }
     };
 
@@ -129,7 +132,7 @@ namespace uICAL {
 
             virtual DateStamp value() const;
 
-            virtual bool syncLock(DateStamp from, DateStamp now) const { return from.weekNo() <= now.weekNo(); }
+            virtual bool syncLock(const DateStamp& from, const DateStamp& now) const { return from.weekNo() <= now.weekNo(); }
             virtual const std::string name() const { return "ByWeekNo"; }
     };
 
@@ -140,10 +143,10 @@ namespace uICAL {
 
             ByMonthCounter(const values_t values) : CounterT(values) {}
 
-            virtual bool reset(DateStamp base);
+            virtual bool reset(const DateStamp& base);
             virtual DateStamp value() const;      
 
-            virtual bool syncLock(DateStamp from, DateStamp now) const { return from.month <= now.month; }
+            virtual bool syncLock(const DateStamp& from, const DateStamp& now) const { return from.month <= now.month; }
             virtual const std::string name() const { return "ByMonth"; }
     };
 
@@ -154,11 +157,11 @@ namespace uICAL {
 
             ByYearDayCounter(const values_t values) : CounterT(values) {}
 
-            virtual bool reset(DateStamp base);
+            virtual bool reset(const DateStamp& base);
             virtual DateStamp value() const;      
             virtual bool next();
 
-            virtual bool syncLock(DateStamp from, DateStamp now) const { return from.dayOfYear() == now.dayOfYear(); }
+            virtual bool syncLock(const DateStamp& from, const DateStamp& now) const { return from.dayOfYear() == now.dayOfYear(); }
             virtual const std::string name() const { return "ByYearDay"; }
     };
 
@@ -170,7 +173,7 @@ namespace uICAL {
                 out << "<" << this->name() << " " << this->interval << ">";
             }
 
-            virtual bool syncLock(DateStamp from, DateStamp now) const { std::ignore = from; std::ignore = now; return true; }
+            virtual bool syncLock(const DateStamp& from, const DateStamp& now) const { std::ignore = from; std::ignore = now; return true; }
 
         protected:
             virtual void wrap() {};
@@ -199,9 +202,10 @@ namespace uICAL {
 
             MinuteInc(unsigned interval) : IncCounter(interval) {}
 
-            virtual bool reset(DateStamp base) {
-                base.second = 0;
-                return IncCounter::reset(base);
+            virtual bool reset(const DateStamp& base) {
+                DateStamp _base = base;
+                _base.second = 0;
+                return IncCounter::reset(_base);
             }
 
             virtual bool next() {
@@ -219,10 +223,11 @@ namespace uICAL {
 
             HourInc(unsigned interval) : IncCounter(interval) {}
 
-            virtual bool reset(DateStamp base) {
-                base.second = 0;
-                base.minute = 0;
-                return IncCounter::reset(base);
+            virtual bool reset(const DateStamp& base) {
+                DateStamp _base = base;
+                _base.second = 0;
+                _base.minute = 0;
+                return IncCounter::reset(_base);
             }
 
             virtual bool next() {
@@ -255,10 +260,11 @@ namespace uICAL {
 
             WeekInc(unsigned interval, DateTime::Day wkst) : IncCounter(interval), wkst(wkst) {}
 
-            virtual bool reset(DateStamp base) {
-                unsigned weekNo = base.weekNo();
-                base.setWeekNo(weekNo);
-                return IncCounter::reset(base);
+            virtual bool reset(const DateStamp& base) {
+                DateStamp _base = base;
+                unsigned weekNo = _base.weekNo();
+                _base.setWeekNo(weekNo);
+                return IncCounter::reset(_base);
             }
 
             virtual bool next() {
@@ -279,9 +285,10 @@ namespace uICAL {
 
             MonthInc(unsigned interval) : IncCounter(interval) {}
 
-            virtual bool reset(DateStamp base) {
-                base.day = 1;
-                return IncCounter::reset(base);
+            virtual bool reset(const DateStamp& base) {
+                DateStamp _base = base;
+                _base.day = 1;
+                return IncCounter::reset(_base);
             }
 
             virtual bool next() {
@@ -300,10 +307,11 @@ namespace uICAL {
 
             YearInc(unsigned interval) : IncCounter(interval) {}
 
-            virtual bool reset(DateStamp base) {
-                base.day = 1;
-                base.month = 1;
-                return IncCounter::reset(base);
+            virtual bool reset(const DateStamp& base) {
+                DateStamp _base = base;
+                _base.day = 1;
+                _base.month = 1;
+                return IncCounter::reset(_base);
             }
 
             virtual bool next() {

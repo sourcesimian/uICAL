@@ -1,3 +1,6 @@
+/*############################################################################
+# Copyright (c) 2020 Source Simian  :  https://github.com/sourcesimian/uICAL #
+############################################################################*/
 #ifndef uical_byweekdaycounter_h
 #define uical_byweekdaycounter_h
 
@@ -10,11 +13,11 @@ namespace uICAL {
             static Counter::ptr init(const values_t& values, const RRule::ptr& r);
             static Counter::ptr init(const value_t value, const RRule::ptr& r);
 
-            virtual bool reset(DateStamp start);
+            virtual bool reset(const DateStamp& start);
             virtual DateStamp value() const;
             virtual bool next();
 
-            virtual bool syncLock(DateStamp from, DateStamp now) const;
+            virtual bool syncLock(const DateStamp& from, const DateStamp& now) const;
 
         protected:
             ByWeekDayCounter(const values_t& values, const RRule::ptr& p);

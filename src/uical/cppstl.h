@@ -1,3 +1,6 @@
+/*############################################################################
+# Copyright (c) 2020 Source Simian  :  https://github.com/sourcesimian/uICAL #
+############################################################################*/
 #ifdef uical_cppstl_h
     #warning "uICAL/cppstl.h used in a .h file"
 #endif
