@@ -37,8 +37,8 @@ def test_basic_ical1():
 def test_basic_range():
     ical = open("test/data/ical1.txt").read()
 
-    # Miss on begin
-    cal = uICAL.Calendar(ical, begin="20191017T095500-0500", end="20191017T090059-0500")
+    # Miss on begin: (2019, 10, 17, 10, 0, 0, -300) 1200s
+    cal = uICAL.Calendar(ical, begin="20191017T095500-0500", end="20191017T095959-0500")
 
     res = []
     while cal.next():
@@ -46,7 +46,7 @@ def test_basic_range():
 
     assert res == []
 
-    # Miss on end
+    # Miss on end: (2019, 10, 17, 10, 30, 0, -300) 600s
     cal = uICAL.Calendar(ical, begin="20191017T104000-0500", end="20191017T104100-0500")
 
     res = []
@@ -97,10 +97,8 @@ def test_bad_range():
     # Negative Range
     ical = open("test/data/ical1.txt").read()
 
-    cal = uICAL.Calendar(ical, begin="20191017T104000-0500", end="20191017T103000-0500")
-
-    res = []
-    while cal.next():
-        res.append(cal.current())
-
-    assert res == []
+    with pytest.raises(uICAL.error) as ex:
+        cal = uICAL.Calendar(ical, begin="20191017T104000-0500", end="20191017T103000-0500")
+        while cal.next():
+            pass
+    assert str(ex.value) == "ValueError: Begin and end describe a negative range"

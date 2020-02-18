@@ -71,20 +71,28 @@ namespace uICAL {
         if (tz == "Z") {
             return 0;
         }
-        if (tz.length() == 5) {
-            char sign;
-            unsigned tzH, tzM;
+        try {
+            if (tz.length() == 5) {
+                char sign;
+                unsigned tzH, tzM;
 
-            // e.g.: +0200
-            sscanf(tz.c_str(), "%c%02d%02d", &sign, &tzH, &tzM);
+                // e.g.: +0200
+                sign = tz.at(0);
+                tzH = std::atoi(tz.substr(1, 2).c_str());
+                tzM = std::atoi(tz.substr(3, 2).c_str());
 
-            int offset = (tzH * 60) + tzM;
-            if (sign == '-') {
-                offset *= -1;
+                int offset = (tzH * 60) + tzM;
+                if (sign == '-') {
+                    offset *= -1;
+                }
+                return offset;
             }
-            return offset;
         }
-        throw ValueError("Could not identify timezone: \"" + tz + "\"");
+        catch (std::invalid_argument const &e)
+        {}
+        catch (std::out_of_range const &e)
+        {}
+        throw ValueError("Bad timezone: \"" + tz + "\"");
     }
 
     void TZ::offsetAsString(std::ostream& out, int offsetMins) {

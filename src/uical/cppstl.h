@@ -4,16 +4,14 @@
 #define uical_cppstl_h
 
 #include <algorithm>
-#include <cstdio>
 #include <functional>
 #include <iomanip>
-#include <iostream>
-#include <map>
 #include <memory>
 #include <sstream>
 #include <string>
 #include <tuple>
 #include <vector>
+#include <map>
 
 namespace uICAL {
     using seconds_t = long long int;

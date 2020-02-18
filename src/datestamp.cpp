@@ -16,13 +16,29 @@ namespace uICAL {
     }
 
     DateStamp::DateStamp(const std::string datestamp) {
-        if (datestamp.length() != 15)
-            throw ValueError(std::string("Bad datestamp: \"") + datestamp + "\"");
-
-        sscanf(datestamp.c_str(), "%04d%02d%02dT%02d%02d%02d",
-               &this->year, &this->month, &this->day, &this->hour, &this->minute, &this->second);
-
-        this->validate();
+        for (;;) {
+            try {
+                if (datestamp.length() != 15) {
+                    break;
+                }
+                this->year = std::atoi(datestamp.substr(0, 4).c_str());
+                this->month = std::atoi(datestamp.substr(4, 2).c_str());
+                this->day = std::atoi(datestamp.substr(6, 2).c_str());
+                if (datestamp.substr(8, 1) != "T") {
+                    break;
+                }
+                this->hour = std::atoi(datestamp.substr(9, 2).c_str());
+                this->minute = std::atoi(datestamp.substr(11, 2).c_str());
+                this->second = std::atoi(datestamp.substr(13, 2).c_str());
+                this->validate();
+                return;
+            }
+            catch (std::invalid_argument const &e)
+            {}
+            catch (std::out_of_range const &e)
+            {}
+        }
+        throw ValueError(std::string("Bad datestamp: \"") + datestamp + "\"");
     }
 
     DateStamp::DateStamp(unsigned year, unsigned month, unsigned day, unsigned hour, unsigned minute, unsigned second) {
@@ -37,24 +53,29 @@ namespace uICAL {
 
     void DateStamp::validate() const {
         std::stringstream m;
-        if (this->year < 1970) {
-            m << "Invalid year: " << year; throw ValueError(m.str());
+        for (;;) {
+            m << "Invalid ";
+            if (this->year < 1970) {
+                m << "year: " << year; break;
+            }
+            if (this->month < 1 || this->month > 12) {
+                m << "month: " << month; break;
+            }
+            if (this->day < 1 || this->day > 31) {
+                m << "day: " << day; break;
+            }
+            if (this->hour > 23) {
+                m << "hour: " << hour; break;
+            }
+            if (this->minute > 59) {
+                m << "minute: " << minute; break;
+            }
+            if (this->second > 59) {
+                m << "second: " << second; break;
+            }
+            return;
         }
-        if (this->month < 1 || this->month > 12) {
-            m << "Invalid month: " << month; throw ValueError(m.str());
-        }
-        if (this->day < 1 || this->day > 31) {
-            m << "Invalid day: " << day; throw ValueError(m.str());
-        }
-        if (this->hour > 23) {
-            m << "Invalid hour: " << hour; throw ValueError(m.str());
-        }
-        if (this->minute > 59) {
-            m << "Invalid minute: " << minute; throw ValueError(m.str());
-        }
-        if (this->second > 59) {
-            m << "Invalid second: " << second; throw ValueError(m.str());
-        }
+        throw ValueError(m.str());
     }
 
     bool DateStamp::valid() const {
@@ -268,6 +289,4 @@ namespace uICAL {
     void DateStamp::incYear(unsigned n) {
         this->year += n;
     }
-
-
 }
