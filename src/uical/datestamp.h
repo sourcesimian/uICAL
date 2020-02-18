@@ -11,7 +11,7 @@ namespace uICAL {
     class DateStamp {
         public:
             DateStamp();
-            DateStamp(const std::string datestamp);
+            DateStamp(const std::string& datestamp);
             DateStamp(unsigned year, unsigned month, unsigned day, unsigned hour, unsigned minute, unsigned second);
 
             void str(std::ostream& out) const;

@@ -29,8 +29,8 @@ namespace uICAL {
     class CalendarIter {
         public:
             using ptr = std::shared_ptr<CalendarIter>;
-            static ptr init(const Calendar::ptr cal, DateTime begin, DateTime end);
-            CalendarIter(const Calendar::ptr cal, DateTime begin, DateTime end);
+            static ptr init(const Calendar::ptr cal, const DateTime& begin, const DateTime& end);
+            CalendarIter(const Calendar::ptr cal, const DateTime& begin, const DateTime& end);
 
             bool next();
             CalendarEntry::ptr current() const;

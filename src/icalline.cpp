@@ -12,14 +12,14 @@ namespace uICAL {
         return VLine::ptr(new VLine());
     }
 
-    VLine::ptr VLine::init(const std::string line) {
+    VLine::ptr VLine::init(const std::string& line) {
         return VLine::ptr(new VLine(line));
     }
 
     VLine::VLine() {
     }
 
-    VLine::VLine(const std::string line) {
+    VLine::VLine(const std::string& line) {
         if(line.empty()) {
             throw ParseError("VLINE is empty");
         }
@@ -42,7 +42,7 @@ namespace uICAL {
         debug(std::string("VLINE ") + this->name + " " + this->value);
     }
 
-    std::string VLine::getParam(const std::string key) {
+    std::string VLine::getParam(const std::string& key) {
         for (auto param : this->params) {
             if (param.first == key) {
                 return param.second;
@@ -51,7 +51,7 @@ namespace uICAL {
         return std::string("");
     }
 
-    void VLine::readParams(const std::string str) {
+    void VLine::readParams(const std::string& str) {
         tokenize(str, ';', [&](const std::string token){
             size_t equals = token.find("=");
             if (equals == std::string::npos) {

@@ -14,9 +14,11 @@ namespace uICAL {
         public:
             using ptr = std::shared_ptr<RRule>;
 
-            static RRule::ptr init(const std::string rrule, const DateTime dtstart);
+            static RRule::ptr init(const std::string& rrule, const DateTime& dtstart);
+            RRule(const std::string& rrule, const DateTime& dtstart);
 
-            void exclude(const DateTime exclude);
+
+            void exclude(const DateTime& exclude);
 
             void str(std::ostream& out) const;
             std::string str() const;
@@ -32,19 +34,19 @@ namespace uICAL {
             using Day_vector = std::vector<Day_pair>;
 
         protected:
-            RRule(const std::string rrule, const DateTime dtstart);
+            void parseRRule(const std::string& rrule);
 
-            void parseRRule(const std::string rrule);
-
-            Day_vector parseByDay(const std::string name) const;
-            int parseInt(const std::string name) const;
-            std::vector<std::string> parseArray(const std::string value) const;
-            DateTime::Day parseDay(const std::string name) const ;
-            DateTime parseDate(const std::string name) const;
+            Day_vector parseByDay(const std::string& name) const;
+            int parseInt(const std::string& name) const;
+            std::vector<std::string> parseArray(const std::string& value) const;
+            DateTime::Day parseDay(const std::string& name) const ;
+            DateTime parseDate(const std::string& name) const;
 
             const char* dayAsString(DateTime::Day day) const;
             const char* frequencyAsString(Freq freq) const;
             std::string intAsString(int value) const;
+
+            bool excluded(const DateTime& now) const;
 
             const DateTime dtstart;
 
@@ -64,7 +66,6 @@ namespace uICAL {
             std::vector<int> bySetPos;
 
             std::vector<DateTime> excludes;
-            bool excluded(const DateTime now) const;
     };
 
     std::ostream& operator << (std::ostream& out, const RRule::ptr& e);

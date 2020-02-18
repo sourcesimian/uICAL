@@ -5,8 +5,8 @@
 #define uical_util_h
 
 namespace uICAL {
-    void tokenize(const std::string input, char token, std::function<void (std::string)> cb);
-    int string_to_int(const std::string input);
+    void tokenize(const std::string& input, char token, std::function<void (std::string)> cb);
+    int string_to_int(const std::string& input);
 
     class Joiner {
         public:

@@ -8,11 +8,11 @@
 #include "uICAL/debug.h"
 
 namespace uICAL {
-    RRule::ptr RRule::init(const std::string rrule, const DateTime dtstart) {
+    RRule::ptr RRule::init(const std::string& rrule, const DateTime& dtstart) {
         return RRule::ptr(new RRule(rrule, dtstart));
     }
 
-    RRule::RRule(const std::string rrule, const DateTime dtstart)
+    RRule::RRule(const std::string& rrule, const DateTime& dtstart)
     : dtstart(dtstart)
     {
         this->freq = Freq::NONE;
@@ -28,7 +28,7 @@ namespace uICAL {
         debug(std::string("RRULE ") + this->str());
     }
 
-    void RRule::parseRRule(const std::string rrule) {
+    void RRule::parseRRule(const std::string& rrule) {
         tokenize(rrule, ';', [&](const std::string part){
             size_t equals = part.find("=");
             const std::string key = part.substr(0, equals);
@@ -91,11 +91,11 @@ namespace uICAL {
         });
     }
 
-    int RRule::parseInt(const std::string value) const {
+    int RRule::parseInt(const std::string& value) const {
         return string_to_int(value);
     }
 
-    std::vector<std::string> RRule::parseArray(const std::string value) const {
+    std::vector<std::string> RRule::parseArray(const std::string& value) const {
         std::vector<std::string> array;
         tokenize(value, ',', [&](const std::string part){
             array.push_back(part);
@@ -103,7 +103,7 @@ namespace uICAL {
         return array;
     }
 
-    RRule::Day_vector RRule::parseByDay(const std::string value) const {
+    RRule::Day_vector RRule::parseByDay(const std::string& value) const {
         Day_vector array;
         tokenize(value, ',', [&](const std::string part){
             int index;
@@ -120,7 +120,7 @@ namespace uICAL {
         return array;
     }
 
-    DateTime::Day RRule::parseDay(const std::string value) const {
+    DateTime::Day RRule::parseDay(const std::string& value) const {
         if (value == "SU") return DateTime::Day::SUN;
         if (value == "MO") return DateTime::Day::MON;
         if (value == "TU") return DateTime::Day::TUE;
@@ -131,7 +131,7 @@ namespace uICAL {
         throw ParseError(std::string("Unknown day name: ") + value);
     }
 
-    DateTime RRule::parseDate(const std::string value) const {
+    DateTime RRule::parseDate(const std::string& value) const {
         return DateTime(value);
     }
 
@@ -173,11 +173,11 @@ namespace uICAL {
         return out.str();
     }
 
-    void RRule::exclude(const DateTime exclude) {
+    void RRule::exclude(const DateTime& exclude) {
         this->excludes.push_back(exclude);
     }
 
-    bool RRule::excluded(const DateTime now) const {
+    bool RRule::excluded(const DateTime& now) const {
         auto it = std::find(this->excludes.begin(), this->excludes.end(), now);
         if (it == this->excludes.end()) {
             return false;

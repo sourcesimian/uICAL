@@ -35,12 +35,12 @@ namespace uICAL {
         }
     }
 
-    void TZMap::add(const std::string id, const std::string name, const std::string tz) {
+    void TZMap::add(const std::string& id, const std::string& name, const std::string& tz) {
         this->id_attrib_map[id].offset = TZ::parseOffset(tz);
         this->id_attrib_map[id].name = name;
     }
 
-    std::string TZMap::findId(const std::string nameOrId) const {
+    std::string TZMap::findId(const std::string& nameOrId) const {
         for (auto i : this->id_attrib_map) {
             if (i.second.name == nameOrId || i.first == nameOrId) {
                 return i.first;
@@ -50,11 +50,11 @@ namespace uICAL {
         return std::string();
     }
 
-    int TZMap::getOffset(const std::string tzId) {
+    int TZMap::getOffset(const std::string& tzId) {
         return this->id_attrib_map[tzId].offset;
     }
 
-    std::string TZMap::getName(const std::string tzId) {
+    std::string TZMap::getName(const std::string& tzId) {
         return this->id_attrib_map[tzId].name;
     }
 

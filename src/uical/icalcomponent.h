@@ -13,12 +13,12 @@ namespace uICAL {
             using vector = std::vector<ptr>;
 
             VComponent(VLine::ptr beginline);
-            //static ptr parse(const std::string ical);
+
             static ptr parse(std::istream& ical);
             static ptr parse(VLineReader::ptr& lines);
 
-            VLine::ptr getPropertyByName(std::string name);
-            vector listComponents(std::string name);
+            VLine::ptr getPropertyByName(const std::string& name);
+            vector listComponents(const std::string& name);
 
             std::string getName();
 

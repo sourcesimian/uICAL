@@ -13,7 +13,6 @@
 
 namespace uICAL {
     class VComponent;
-    //class ICalEventIter;
 
     class ICalEvent {
         public:

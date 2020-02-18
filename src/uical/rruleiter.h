@@ -12,8 +12,8 @@ namespace uICAL {
         public:
             using ptr = std::shared_ptr<RRuleIter>;
 
-            static RRuleIter::ptr init(const RRule::ptr rr, const DateTime begin, const DateTime end);
-            RRuleIter(const RRule::ptr rr, const DateTime begin, const DateTime end);
+            static RRuleIter::ptr init(const RRule::ptr rr, const DateTime& begin, const DateTime& end);
+            RRuleIter(const RRule::ptr rr, const DateTime& begin, const DateTime& end);
 
             bool next();
             DateTime now() const;
@@ -25,14 +25,14 @@ namespace uICAL {
             using sync_f = std::function<void(counters_t::iterator it)>;
 
             bool start();
-            void setupCounters(DateStamp base);
-            bool initCounters(DateStamp base, DateStamp from);
+            void setupCounters(const DateStamp& base);
+            bool initCounters(const DateStamp& base, const DateStamp& from);
             bool nextDate();
             bool nextExclude();
             bool nextNow();
             void setCurrentNow();
             bool resetCascade(counters_t::iterator it, sync_f sync);
-            bool expired(DateTime current) const;
+            bool expired(const DateTime& current) const;
         
             const RRule::ptr rr;
 

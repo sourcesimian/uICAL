@@ -17,9 +17,9 @@ namespace uICAL {
             using ptr = std::shared_ptr<DateTime>;
 
             DateTime();
-            DateTime(const std::string datetime);
-            DateTime(const std::string datetime, const TZMap::ptr& tzmap);
-            DateTime(DateStamp datestamp, const TZ::ptr& tz);
+            DateTime(const std::string& datetime);
+            DateTime(const std::string& datetime, const TZMap::ptr& tzmap);
+            DateTime(const DateStamp& datestamp, const TZ::ptr& tz);
             DateTime(seconds_t epochSeconds);
             DateTime(seconds_t epochSeconds, const TZ::ptr& tz);
 
@@ -53,8 +53,8 @@ namespace uICAL {
             TZ::ptr tz;
 
         protected:
-            void construct(const std::string datetime, const TZMap::ptr& tzmap);
-            void construct(DateStamp ds, const TZ::ptr& tz);
+            void construct(const std::string& datetime, const TZMap::ptr& tzmap);
+            void construct(const DateStamp& ds, const TZ::ptr& tz);
             void assert_awareness(const DateTime& other) const;
 
             EpochTime epochtime;

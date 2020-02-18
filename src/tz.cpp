@@ -24,11 +24,11 @@ namespace uICAL {
         return ptr(new TZ(offsetMins));
     }
 
-    TZ::ptr TZ::init(const std::string tz) {
+    TZ::ptr TZ::init(const std::string& tz) {
         return ptr(new TZ(tz));
     }
 
-    TZ::ptr TZ::init(const std::string tz, const TZMap::ptr& tzmap) {
+    TZ::ptr TZ::init(const std::string& tz, const TZMap::ptr& tzmap) {
         return ptr(new TZ(tz, tzmap));
     }
 
@@ -47,12 +47,12 @@ namespace uICAL {
         this->aware = true;
     }
 
-    TZ::TZ(const std::string tz) {
+    TZ::TZ(const std::string& tz) {
         this->offsetMins = TZ::parseOffset(tz);
         this->aware = true;
     }
 
-    TZ::TZ(const std::string tz, const TZMap::ptr& tzmap)
+    TZ::TZ(const std::string& tz, const TZMap::ptr& tzmap)
     : idmap(tzmap)
     {
         std::string id = this->idmap->findId(tz);
@@ -70,7 +70,7 @@ namespace uICAL {
         return this->aware;
     }
 
-    int TZ::parseOffset(const std::string tz) {
+    int TZ::parseOffset(const std::string& tz) {
         if (tz == "Z") {
             return 0;
         }

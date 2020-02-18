@@ -17,8 +17,6 @@ namespace uICAL {
             void str(std::ostream& out) const;
 
         protected:
-            // std::tuple<unsigned, unsigned, unsigned, unsigned> dhms(seconds_t spanSeconds) const;
-
             seconds_t spanSeconds;
     };
 

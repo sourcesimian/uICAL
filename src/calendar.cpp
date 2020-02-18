@@ -25,20 +25,11 @@ namespace uICAL {
 
         auto events = vcalendar->listComponents("VEVENT");
 
-        // std::cout << "Events: " << events.size() << std::endl;
         for (auto comp : events) {
             ICalEvent::ptr ev = ICalEvent::init(comp, this->tzmap);
             this->events.push_back(ev);
             debug(std::string("Calendar ") + ev->str());
-
-            // std::cout << " - " << std::endl;
-            // std::cout << (*it) << std::endl;
-
-            //std::cout << ev << std::endl;
-            //std::cout << " - - " << std::endl;
-            //std::cout << e << std::endl;
         }
-        // std::cout << "---" << std::endl;
     }
 
     void Calendar::str(std::ostream& out) const {
@@ -55,11 +46,11 @@ namespace uICAL {
         return out;
     }
 
-    CalendarIter::ptr CalendarIter::init(const Calendar::ptr cal, DateTime begin, DateTime end) {
+    CalendarIter::ptr CalendarIter::init(const Calendar::ptr cal, const DateTime& begin, const DateTime& end) {
         return CalendarIter::ptr(new CalendarIter(cal, begin, end));
     }
 
-    CalendarIter::CalendarIter(const Calendar::ptr cal, DateTime begin, DateTime end)
+    CalendarIter::CalendarIter(const Calendar::ptr cal, const DateTime& begin, const DateTime& end)
     : cal(cal)
     {
         if (begin.valid() && end.valid() && end < begin) {
@@ -96,5 +87,4 @@ namespace uICAL {
         }
         return this->currentEntry;
     }
-
 }

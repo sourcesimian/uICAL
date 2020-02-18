@@ -67,7 +67,7 @@ namespace uICAL {
         }
     }
 
-    VLine::ptr VComponent::getPropertyByName(std::string name) {
+    VLine::ptr VComponent::getPropertyByName(const std::string& name) {
         for (auto line : this->lines) {
             if (line->name == name) {
                 return line;
@@ -76,7 +76,7 @@ namespace uICAL {
         return VLine::init();
     }
 
-    VComponent::vector VComponent::listComponents(std::string name) {
+    VComponent::vector VComponent:: listComponents(const std::string& name) {
         VComponent::vector ret;
         for (auto child : this->children) {
             if (child->name == name) {

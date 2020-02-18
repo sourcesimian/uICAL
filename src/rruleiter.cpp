@@ -13,11 +13,11 @@
 #include "uICAL/debug.h"
 
 namespace uICAL {
-    RRuleIter::ptr RRuleIter::init(const RRule::ptr rr, const DateTime begin, const DateTime end) {
+    RRuleIter::ptr RRuleIter::init(const RRule::ptr rr, const DateTime& begin, const DateTime& end) {
         return RRuleIter::ptr(new RRuleIter(rr, begin, end));
     }
 
-    RRuleIter::RRuleIter(const RRule::ptr rr, const DateTime begin, const DateTime end)
+    RRuleIter::RRuleIter(const RRule::ptr rr, const DateTime& begin, const DateTime& end)
     : rr(rr)
     {
         if (begin.valid() && end.valid() && begin > end) {
@@ -113,7 +113,7 @@ namespace uICAL {
         return true;
     }
 
-    bool RRuleIter::expired(DateTime current) const {
+    bool RRuleIter::expired(const DateTime& current) const {
         if (this->until.valid() && current > this->until) {
             return true;
         }
@@ -155,7 +155,7 @@ namespace uICAL {
         this->current_now = DateTime(now, this->rr->dtstart.tz);
     }
 
-    void RRuleIter::setupCounters(DateStamp base) {
+    void RRuleIter::setupCounters(const DateStamp& base) {
         /*
         +----------+--------+--------+-------+-------+------+-------+------+
         |          |SECONDLY|MINUTELY|HOURLY |DAILY  |WEEKLY|MONTHLY|YEARLY|
@@ -298,7 +298,7 @@ namespace uICAL {
         }
     }
 
-    bool RRuleIter::initCounters(DateStamp base, DateStamp begin) {
+    bool RRuleIter::initCounters(const DateStamp& base, const DateStamp& begin) {
         counters_t::iterator it = this->counters.end();
         -- it;
         if(!(*it)->reset(base)) {

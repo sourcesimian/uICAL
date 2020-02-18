@@ -18,7 +18,7 @@ namespace uICAL {
         this->second = 0;
     }
 
-    DateStamp::DateStamp(const std::string datestamp) {
+    DateStamp::DateStamp(const std::string& datestamp) {
         for (;;) {
             try {
                 if (datestamp.length() != 15) {

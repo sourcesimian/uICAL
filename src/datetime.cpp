@@ -14,15 +14,15 @@ namespace uICAL {
         this->tz = TZ::undef();
     }
 
-    DateTime::DateTime(DateStamp ds, const TZ::ptr& tz) {
+    DateTime::DateTime(const DateStamp& ds, const TZ::ptr& tz) {
         this->construct(ds, tz);
     }
 
-    DateTime::DateTime(const std::string datetime) {
+    DateTime::DateTime(const std::string& datetime) {
         this->construct(datetime, TZMap::init());
     }
 
-    DateTime::DateTime(const std::string datetime, const TZMap::ptr& tzmap) {
+    DateTime::DateTime(const std::string& datetime, const TZMap::ptr& tzmap) {
         this->construct(datetime, tzmap);
     }
 
@@ -36,7 +36,7 @@ namespace uICAL {
         this->tz = tz;
     }
 
-    void DateTime::construct(const std::string datetime, const TZMap::ptr& tzmap) {
+    void DateTime::construct(const std::string& datetime, const TZMap::ptr& tzmap) {
         if (datetime.length() < 15)
             throw ValueError(std::string("Bad datetime: \"") + datetime + "\"");
 
@@ -52,7 +52,7 @@ namespace uICAL {
         this->construct(ds, tz);
     }
 
-    void DateTime::construct(DateStamp ds, const TZ::ptr& tz) {
+    void DateTime::construct(const DateStamp& ds, const TZ::ptr& tz) {
         this->epochtime = EpochTime(
             ds.year, ds.month, ds.day, ds.hour, ds.minute, ds.second,
             tz

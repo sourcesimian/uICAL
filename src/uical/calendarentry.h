@@ -15,11 +15,11 @@ namespace uICAL {
             };
 
             using ptr = std::shared_ptr<CalendarEntry>;
-            static ptr init(Type type, std::string summary, DateTime start);
-            static ptr init(Type type, std::string summary, DateTime start, DatePeriod span);
+            static ptr init(Type type, const std::string& summary, const DateTime& start);
+            static ptr init(Type type, const std::string& summary, const DateTime& start, const DatePeriod& span);
 
-            CalendarEntry(Type type, std::string summary, DateTime start);
-            CalendarEntry(Type type, std::string summary, DateTime start, DatePeriod span);
+            CalendarEntry(Type type, const std::string& summary, const DateTime& start);
+            CalendarEntry(Type type, const std::string& summary, const DateTime& start, const DatePeriod& span);
             
             Type type() const;
             const std::string summary() const;

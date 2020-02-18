@@ -7,7 +7,7 @@
 #include "uICAL/util.h"
 
 namespace uICAL {
-    void tokenize(const std::string input, char token, std::function<void (std::string)> cb) {
+    void tokenize(const std::string& input, char token, std::function<void (std::string)> cb) {
         std::istringstream stream(input);
         std::string part;
         while(std::getline(stream, part, token)) {
@@ -15,7 +15,7 @@ namespace uICAL {
         }
     }
 
-    int string_to_int(const std::string input) {
+    int string_to_int(const std::string& input) {
         return atoi(input.c_str());
     }
 
@@ -57,13 +57,13 @@ namespace uICAL {
         }
     }
 
-    void ltrim(std::string &s) {
+    void ltrim(std::string& s) {
         s.erase(s.begin(), std::find_if(s.begin(), s.end(), [](int ch) {
             return !std::isspace(ch);
         }));
     }
 
-    void rtrim(std::string &s) {
+    void rtrim(std::string& s) {
         s.erase(std::find_if(s.rbegin(), s.rend(), [](int ch) {
             return !std::isspace(ch);
         }).base(), s.end());

@@ -14,8 +14,8 @@ namespace uICAL {
             using ptr = std::shared_ptr<TZ>;
 
             static ptr init(int offsetMins);
-            static ptr init(const std::string tz);
-            static ptr init(const std::string tz, const TZMap::ptr& tzmap);
+            static ptr init(const std::string& tz);
+            static ptr init(const std::string& tz, const TZMap::ptr& tzmap);
 
             static ptr undef();
             static ptr unaware();
@@ -23,8 +23,8 @@ namespace uICAL {
             TZ();
             TZ(bool aware);
             TZ(int offsetMins);
-            TZ(const std::string tz);
-            TZ(const std::string tz, const TZMap::ptr& tzmap);
+            TZ(const std::string& tz);
+            TZ(const std::string& tz, const TZMap::ptr& tzmap);
 
             virtual ~TZ() {}
 
@@ -37,7 +37,7 @@ namespace uICAL {
             virtual void str(std::ostream& out) const;
             std::string str() const;
 
-            static int parseOffset(const std::string offset);
+            static int parseOffset(const std::string& offset);
             static void offsetAsString(std::ostream& out, int offsetMins);
         
         protected:

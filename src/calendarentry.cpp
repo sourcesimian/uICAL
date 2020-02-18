@@ -5,21 +5,21 @@
 #include "uICAL/calendarentry.h"
 
 namespace uICAL {
-    CalendarEntry::ptr CalendarEntry::init(Type type, std::string summary, DateTime start) {
+    CalendarEntry::ptr CalendarEntry::init(Type type, const std::string& summary, const DateTime& start) {
         return CalendarEntry::ptr(new CalendarEntry(type, summary, start));
     }
 
-    CalendarEntry::ptr CalendarEntry::init(Type type, std::string summary, DateTime start, DatePeriod span) {
+    CalendarEntry::ptr CalendarEntry::init(Type type, const std::string& summary, const DateTime& start, const DatePeriod& span) {
         return CalendarEntry::ptr(new CalendarEntry(type, summary, start, span));
     }
 
-    CalendarEntry::CalendarEntry(Type type, std::string summary, DateTime start) {
+    CalendarEntry::CalendarEntry(Type type, const std::string& summary, const DateTime& start) {
         this->_type = type;
         this->_summary = summary;
         this->_start = start;
     }
 
-    CalendarEntry::CalendarEntry(Type type, std::string summary, DateTime start, DatePeriod span) {
+    CalendarEntry::CalendarEntry(Type type, const std::string& summary, const DateTime& start, const DatePeriod& span) {
         this->_type = type;
         this->_summary = summary;
         this->_start = start;

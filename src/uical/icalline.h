@@ -10,19 +10,19 @@ namespace uICAL {
             using ptr = std::shared_ptr<VLine>;
 
             static VLine::ptr init();
-            static VLine::ptr init(const std::string line);
+            static VLine::ptr init(const std::string& line);
             VLine();
-            VLine(const std::string line);
+            VLine(const std::string& line);
 
             std::string name;
             std::map<std::string, std::string> params;
             std::string value;
-            std::string getParam(const std::string key);
+            std::string getParam(const std::string& key);
 
             void str(std::ostream& out) const;
 
         private:
-            void readParams(const std::string str);
+            void readParams(const std::string& str);
     };
 
     std::ostream& operator << (std::ostream& out, const VLine::ptr& l);
