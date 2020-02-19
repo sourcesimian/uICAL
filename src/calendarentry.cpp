@@ -2,24 +2,26 @@
 # Copyright (c) 2020 Source Simian  :  https://github.com/sourcesimian/uICAL #
 ############################################################################*/
 #include "uICAL/cppstl.h"
+#include "uICAL/types.h"
+#include "uICAL/error.h"
 #include "uICAL/calendarentry.h"
 
 namespace uICAL {
-    CalendarEntry::ptr CalendarEntry::init(Type type, const std::string& summary, const DateTime& start) {
+    CalendarEntry::ptr CalendarEntry::init(Type type, const string& summary, const DateTime& start) {
         return CalendarEntry::ptr(new CalendarEntry(type, summary, start));
     }
 
-    CalendarEntry::ptr CalendarEntry::init(Type type, const std::string& summary, const DateTime& start, const DatePeriod& span) {
+    CalendarEntry::ptr CalendarEntry::init(Type type, const string& summary, const DateTime& start, const DatePeriod& span) {
         return CalendarEntry::ptr(new CalendarEntry(type, summary, start, span));
     }
 
-    CalendarEntry::CalendarEntry(Type type, const std::string& summary, const DateTime& start) {
+    CalendarEntry::CalendarEntry(Type type, const string& summary, const DateTime& start) {
         this->_type = type;
         this->_summary = summary;
         this->_start = start;
     }
 
-    CalendarEntry::CalendarEntry(Type type, const std::string& summary, const DateTime& start, const DatePeriod& span) {
+    CalendarEntry::CalendarEntry(Type type, const string& summary, const DateTime& start, const DatePeriod& span) {
         this->_type = type;
         this->_summary = summary;
         this->_start = start;
@@ -30,7 +32,7 @@ namespace uICAL {
         return this->_type;
     }
 
-    std::string CalendarEntry::asString(Type type) {
+    string CalendarEntry::asString(Type type) {
         switch(type) {
             case Type::EVENT:
                 return "EVENT";
@@ -40,7 +42,7 @@ namespace uICAL {
         }
     }
 
-    const std::string CalendarEntry::summary() const {
+    const string CalendarEntry::summary() const {
         return this->_summary;
     }
 

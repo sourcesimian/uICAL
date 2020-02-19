@@ -2,17 +2,18 @@
 # Copyright (c) 2020 Source Simian  :  https://github.com/sourcesimian/uICAL #
 ############################################################################*/
 #include "uICAL/cppstl.h"
+#include "uICAL/types.h"
 #include "uICAL/error.h"
 #include "uICAL/rrule.h"
 #include "uICAL/util.h"
 #include "uICAL/debug.h"
 
 namespace uICAL {
-    RRule::ptr RRule::init(const std::string& rrule, const DateTime& dtstart) {
+    RRule::ptr RRule::init(const string& rrule, const DateTime& dtstart) {
         return RRule::ptr(new RRule(rrule, dtstart));
     }
 
-    RRule::RRule(const std::string& rrule, const DateTime& dtstart)
+    RRule::RRule(const string& rrule, const DateTime& dtstart)
     : dtstart(dtstart)
     {
         this->freq = Freq::NONE;
@@ -25,14 +26,14 @@ namespace uICAL {
         else
             this->parseRRule(rrule);
 
-        debug(std::string("RRULE ") + this->str());
+        debug(string("RRULE ") + this->str());
     }
 
-    void RRule::parseRRule(const std::string& rrule) {
-        tokenize(rrule, ';', [&](const std::string part){
+    void RRule::parseRRule(const string& rrule) {
+        tokenize(rrule, ';', [&](const string part){
             size_t equals = part.find("=");
-            const std::string key = part.substr(0, equals);
-            const std::string value = part.substr(equals + 1, std::string::npos);
+            const string key = part.substr(0, equals);
+            const string value = part.substr(equals + 1, string::npos);
 
             if (key == "FREQ") {
                 if      (value == "SECONDLY") this->freq = Freq::SECONDLY;
@@ -43,7 +44,7 @@ namespace uICAL {
                 else if (value == "MONTHLY") this->freq = Freq::MONTHLY;
                 else if (value == "YEARLY") this->freq = Freq::YEARLY;
                 else {
-                    throw ParseError(std::string("Unknonwn RRULE:FREQ type: ") + value);
+                    throw ParseError(string("Unknonwn RRULE:FREQ type: ") + value);
                 }
             }
             else if (key == "WKST") {
@@ -86,26 +87,26 @@ namespace uICAL {
                 this->bySetPos = toVector<int>(value);
             }
             else {
-                throw ParseError(std::string("Unknonwn RRULE key: ") + key);
+                throw ParseError(string("Unknonwn RRULE key: ") + key);
             }
         });
     }
 
-    int RRule::parseInt(const std::string& value) const {
+    int RRule::parseInt(const string& value) const {
         return string_to_int(value);
     }
 
-    std::vector<std::string> RRule::parseArray(const std::string& value) const {
-        std::vector<std::string> array;
-        tokenize(value, ',', [&](const std::string part){
+    std::vector<string> RRule::parseArray(const string& value) const {
+        std::vector<string> array;
+        tokenize(value, ',', [&](const string part){
             array.push_back(part);
         });
         return array;
     }
 
-    RRule::Day_vector RRule::parseByDay(const std::string& value) const {
+    RRule::Day_vector RRule::parseByDay(const string& value) const {
         Day_vector array;
-        tokenize(value, ',', [&](const std::string part){
+        tokenize(value, ',', [&](const string part){
             int index;
             if (part.length() > 2) {
                 index = string_to_int(part.substr(0, part.length() - 2));
@@ -114,13 +115,13 @@ namespace uICAL {
                 index = 0;
             }
 
-            DateTime::Day day = this->parseDay(part.substr(part.length() - 2, std::string::npos));
+            DateTime::Day day = this->parseDay(part.substr(part.length() - 2, string::npos));
             array.push_back(Day_pair(index, day));
         });
         return array;
     }
 
-    DateTime::Day RRule::parseDay(const std::string& value) const {
+    DateTime::Day RRule::parseDay(const string& value) const {
         if (value == "SU") return DateTime::Day::SUN;
         if (value == "MO") return DateTime::Day::MON;
         if (value == "TU") return DateTime::Day::TUE;
@@ -128,10 +129,10 @@ namespace uICAL {
         if (value == "TH") return DateTime::Day::THU;
         if (value == "FR") return DateTime::Day::FRI;
         if (value == "SA") return DateTime::Day::SAT;
-        throw ParseError(std::string("Unknown day name: ") + value);
+        throw ParseError(string("Unknown day name: ") + value);
     }
 
-    DateTime RRule::parseDate(const std::string& value) const {
+    DateTime RRule::parseDate(const string& value) const {
         return DateTime(value);
     }
 
@@ -145,7 +146,7 @@ namespace uICAL {
             case DateTime::Day::SAT:    return "SA";
             case DateTime::Day::SUN:    return "SU";
             default:
-                std::string err("Unknown day index: ");
+                string err("Unknown day index: ");
                 err += (int)day;
                 throw ParseError(err);
         }
@@ -161,13 +162,13 @@ namespace uICAL {
             case Freq::MONTHLY:   return "MONTHLY";
             case Freq::YEARLY:    return "WEEKLY";
             default:
-                std::string err("Unknown frequency index: ");
+                string err("Unknown frequency index: ");
                 err += (int)freq;
                 throw ParseError(err);
         }
     }
 
-    std::string RRule::intAsString(int value) const {
+    string RRule::intAsString(int value) const {
         std::ostringstream out;
         out << value;
         return out.str();
@@ -185,7 +186,7 @@ namespace uICAL {
         return true;
     }
 
-    std::string RRule::str() const {
+    string RRule::str() const {
         std::ostringstream out;
         this->str(out);
         return out.str();

@@ -1,5 +1,6 @@
 #include <iostream>
 
+#include "uICAL/types.h"
 #include "uICAL/error.h"
 
 int main() {

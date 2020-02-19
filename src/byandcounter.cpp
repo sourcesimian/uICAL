@@ -2,9 +2,10 @@
 # Copyright (c) 2020 Source Simian  :  https://github.com/sourcesimian/uICAL #
 ############################################################################*/
 #include "uICAL/cppstl.h"
+#include "uICAL/types.h"
+#include "uICAL/error.h"
 #include "uICAL/util.h"
 #include "uICAL/byandcounter.h"
-#include "uICAL/error.h"
 
 namespace uICAL {
     Counter::ptr ByAndCounter::init(std::vector<Counter::ptr> counters) {

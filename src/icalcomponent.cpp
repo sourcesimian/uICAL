@@ -2,6 +2,7 @@
 # Copyright (c) 2020 Source Simian  :  https://github.com/sourcesimian/uICAL #
 ############################################################################*/
 #include "uICAL/cppstl.h"
+#include "uICAL/types.h"
 #include "uICAL/error.h"
 #include "uICAL/icalcomponent.h"
 #include "uICAL/util.h"
@@ -13,7 +14,7 @@ namespace uICAL {
         this->name = beginline->value;
     }
 
-    std::string VComponent::getName() {
+    string VComponent::getName() {
         return this->name;
     }
 
@@ -35,9 +36,9 @@ namespace uICAL {
         VLine::ptr line = lines->peek();
 
         if (line->name != "BEGIN") {
-            throw ParseError(std::string("BEGIN not found in: ???"));  // TODO
+            throw ParseError(string("BEGIN not found in: ???"));  // TODO
         }        
-        std::string section = line->value;
+        string section = line->value;
         lines->pop();
 
         VComponent::ptr component = std::make_shared<VComponent>(line);
@@ -48,7 +49,7 @@ namespace uICAL {
 
                 if (line->name == "END" && section == section) {
                     lines->pop();
-                    debug(std::string("VCOMPONENT ") + component->getName());
+                    debug(string("VCOMPONENT ") + component->getName());
                     return component;
                 }
 
@@ -67,7 +68,7 @@ namespace uICAL {
         }
     }
 
-    VLine::ptr VComponent::getPropertyByName(const std::string& name) {
+    VLine::ptr VComponent::getPropertyByName(const string& name) {
         for (auto line : this->lines) {
             if (line->name == name) {
                 return line;
@@ -76,7 +77,7 @@ namespace uICAL {
         return VLine::init();
     }
 
-    VComponent::vector VComponent:: listComponents(const std::string& name) {
+    VComponent::vector VComponent:: listComponents(const string& name) {
         VComponent::vector ret;
         for (auto child : this->children) {
             if (child->name == name) {

@@ -2,6 +2,8 @@
 # Copyright (c) 2020 Source Simian  :  https://github.com/sourcesimian/uICAL #
 ############################################################################*/
 #include "uICAL/cppstl.h"
+#include "uICAL/types.h"
+#include "uICAL/error.h"
 #include "uICAL/util.h"
 #include "uICAL/bysetposcounter.h"
 

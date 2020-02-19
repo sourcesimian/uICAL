@@ -2,9 +2,10 @@
 # Copyright (c) 2020 Source Simian  :  https://github.com/sourcesimian/uICAL #
 ############################################################################*/
 #include "uICAL/cppstl.h"
+#include "uICAL/types.h"
+#include "uICAL/error.h"
 #include "uICAL/util.h"
 #include "uICAL/counter.h"
-#include "uICAL/error.h"
 
 namespace uICAL {
 
@@ -54,7 +55,7 @@ namespace uICAL {
         return from.second <= now.second;
     }
 
-    const std::string BySecondCounter::name() const { return "BySecond"; }
+    const string BySecondCounter::name() const { return "BySecond"; }
 
     bool ByMinuteCounter::reset(const DateStamp& base) {
         DateStamp _base = base;
@@ -81,7 +82,7 @@ namespace uICAL {
         return from.minute <= now.minute;
     }
 
-    const std::string ByMinuteCounter::name() const { return "ByMinute"; }
+    const string ByMinuteCounter::name() const { return "ByMinute"; }
 
     Counter::ptr ByHourCounter::init(const values_t values) {
         return Counter::ptr((Counter*)new ByHourCounter(values));
@@ -109,7 +110,7 @@ namespace uICAL {
         return from.hour <= now.hour;
     }
 
-    const std::string ByHourCounter::name() const { return "ByHour"; }
+    const string ByHourCounter::name() const { return "ByHour"; }
 
     Counter::ptr ByMonthDayCounter::init(const values_t values) {
         return Counter::ptr((Counter*)new ByMonthDayCounter(values));
@@ -153,7 +154,7 @@ namespace uICAL {
         return from.day <= now.day;
     }
 
-    const std::string ByMonthDayCounter::name() const { return "ByMonthDay"; }
+    const string ByMonthDayCounter::name() const { return "ByMonthDay"; }
 
     Counter::ptr ByWeekNoCounter::init(const values_t values) {
         return Counter::ptr((Counter*)new ByWeekNoCounter(values));
@@ -174,7 +175,7 @@ namespace uICAL {
         return from.weekNo() <= now.weekNo();
     }
 
-    const std::string ByWeekNoCounter::name() const { return "ByWeekNo"; }
+    const string ByWeekNoCounter::name() const { return "ByWeekNo"; }
 
     Counter::ptr ByMonthCounter::init(const values_t values) {
         return Counter::ptr((Counter*)new ByMonthCounter(values));
@@ -201,7 +202,7 @@ namespace uICAL {
         return from.month <= now.month;
     }
 
-    const std::string ByMonthCounter::name() const { return "ByMonth"; }
+    const string ByMonthCounter::name() const { return "ByMonth"; }
 
     Counter::ptr ByYearDayCounter::init(const values_t values) {
         return Counter::ptr((Counter*)new ByYearDayCounter(values));
@@ -248,7 +249,7 @@ namespace uICAL {
         return from.dayOfYear() == now.dayOfYear();
     }
 
-    const std::string ByYearDayCounter::name() const { return "ByYearDay"; }
+    const string ByYearDayCounter::name() const { return "ByYearDay"; }
 
     void IncCounter::str(std::ostream& out) const {
         out << "<" << this->name() << " " << this->interval << ">";
@@ -264,7 +265,7 @@ namespace uICAL {
         return minute == this->base.minute;
     }
 
-    const std::string SecondInc::name() const { return "SecondInc"; }
+    const string SecondInc::name() const { return "SecondInc"; }
 
     Counter::ptr MinuteInc::init(unsigned interval) {
         return Counter::ptr((Counter*)new MinuteInc(interval));
@@ -282,7 +283,7 @@ namespace uICAL {
         return hour == this->base.hour;
     }
 
-    const std::string MinuteInc::name() const { return "MinuteInc"; }
+    const string MinuteInc::name() const { return "MinuteInc"; }
 
     Counter::ptr HourInc::init(unsigned interval) {
         return Counter::ptr((Counter*)new HourInc(interval));
@@ -301,7 +302,7 @@ namespace uICAL {
         return day == this->base.day;
     }
 
-    const std::string HourInc::name() const { return "HourInc"; }
+    const string HourInc::name() const { return "HourInc"; }
 
     Counter::ptr DayInc::init(unsigned interval) {
         return Counter::ptr((Counter*)new DayInc(interval));
@@ -313,7 +314,7 @@ namespace uICAL {
         return month == this->base.month;
     }
 
-    const std::string DayInc::name() const { return "DayInc"; }
+    const string DayInc::name() const { return "DayInc"; }
 
     Counter::ptr WeekInc::init(unsigned interval, DateTime::Day wkst) {
         return Counter::ptr((Counter*)new WeekInc(interval, wkst));
@@ -332,7 +333,7 @@ namespace uICAL {
         return year == this->base.year;
     }
 
-    const std::string WeekInc::name() const { return "WeekInc"; }
+    const string WeekInc::name() const { return "WeekInc"; }
 
     Counter::ptr MonthInc::init(unsigned interval) {
         return Counter::ptr((Counter*)new MonthInc(interval));
@@ -351,7 +352,7 @@ namespace uICAL {
         return year == this->base.year;
     }
 
-    const std::string MonthInc::name() const { return "MonthInc"; }
+    const string MonthInc::name() const { return "MonthInc"; }
 
     Counter::ptr YearInc::init(unsigned interval) {
         return Counter::ptr((Counter*)new YearInc(interval));
@@ -371,6 +372,6 @@ namespace uICAL {
         return true;
     }
 
-    const std::string YearInc::name() const { return "YearInc"; }
+    const string YearInc::name() const { return "YearInc"; }
 
 }

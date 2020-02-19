@@ -8,7 +8,7 @@
 #include <Arduino.h>
 #define debug(M) \
     do { \
-        Serial.println(String("[debug] ") + std::string(M).c_str()); \
+        Serial.println(String("[debug] ") + string(M).c_str()); \
     } while(0)
 #else
 
@@ -16,7 +16,7 @@
 
 #define debug(M) \
     do { \
-        std::cout << "[debug] " << std::string(M) << std::endl; \
+        std::cout << "[debug] " << string(M) << std::endl; \
     } while(0)
 #endif
 

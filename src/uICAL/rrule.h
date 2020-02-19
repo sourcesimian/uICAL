@@ -14,14 +14,14 @@ namespace uICAL {
         public:
             using ptr = std::shared_ptr<RRule>;
 
-            static RRule::ptr init(const std::string& rrule, const DateTime& dtstart);
-            RRule(const std::string& rrule, const DateTime& dtstart);
+            static RRule::ptr init(const string& rrule, const DateTime& dtstart);
+            RRule(const string& rrule, const DateTime& dtstart);
 
 
             void exclude(const DateTime& exclude);
 
             void str(std::ostream& out) const;
-            std::string str() const;
+            string str() const;
 
             enum class Freq {
                 NONE, SECONDLY, MINUTELY, HOURLY, DAILY, WEEKLY, MONTHLY, YEARLY,
@@ -34,17 +34,17 @@ namespace uICAL {
             using Day_vector = std::vector<Day_pair>;
 
         protected:
-            void parseRRule(const std::string& rrule);
+            void parseRRule(const string& rrule);
 
-            Day_vector parseByDay(const std::string& name) const;
-            int parseInt(const std::string& name) const;
-            std::vector<std::string> parseArray(const std::string& value) const;
-            DateTime::Day parseDay(const std::string& name) const ;
-            DateTime parseDate(const std::string& name) const;
+            Day_vector parseByDay(const string& name) const;
+            int parseInt(const string& name) const;
+            std::vector<string> parseArray(const string& value) const;
+            DateTime::Day parseDay(const string& name) const ;
+            DateTime parseDate(const string& name) const;
 
             const char* dayAsString(DateTime::Day day) const;
             const char* frequencyAsString(Freq freq) const;
-            std::string intAsString(int value) const;
+            string intAsString(int value) const;
 
             bool excluded(const DateTime& now) const;
 

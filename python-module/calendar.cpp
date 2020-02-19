@@ -3,8 +3,9 @@
 ############################################################################*/
 #include <sstream>
 
-#include "uICAL/error.h"
 #include "uICAL/cppstl.h"
+#include "uICAL/types.h"
+#include "uICAL/error.h"
 #include "uICAL/util.h"
 #include "uICAL/calendar.h"
 

@@ -16,7 +16,7 @@ namespace uICAL {
             virtual DateStamp value() const;
 
             virtual bool syncLock(const DateStamp& from, const DateStamp& now) const;
-            virtual const std::string name() const { return "BySetPos"; }
+            virtual const string name() const { return "BySetPos"; }
 
             virtual void str(std::ostream& out) const;
 

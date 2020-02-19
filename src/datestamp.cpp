@@ -3,10 +3,10 @@
 ############################################################################*/
 #include "uICAL/cppstl.h"
 #include "uICAL/types.h"
+#include "uICAL/error.h"
 #include "uICAL/datecalc.h"
 #include "uICAL/datestamp.h"
 #include "uICAL/tz.h"
-#include "uICAL/error.h"
 
 namespace uICAL {
     DateStamp::DateStamp() {
@@ -18,7 +18,7 @@ namespace uICAL {
         this->second = 0;
     }
 
-    DateStamp::DateStamp(const std::string& datestamp) {
+    DateStamp::DateStamp(const string& datestamp) {
         for (;;) {
             try {
                 if (datestamp.length() != 15) {
@@ -41,7 +41,7 @@ namespace uICAL {
             catch (std::out_of_range const &e)
             {}
         }
-        throw ValueError(std::string("Bad datestamp: \"") + datestamp + "\"");
+        throw ValueError(string("Bad datestamp: \"") + datestamp + "\"");
     }
 
     DateStamp::DateStamp(unsigned year, unsigned month, unsigned day, unsigned hour, unsigned minute, unsigned second) {

@@ -2,12 +2,13 @@
 # Copyright (c) 2020 Source Simian  :  https://github.com/sourcesimian/uICAL #
 ############################################################################*/
 #include "uICAL/cppstl.h"
+#include "uICAL/types.h"
+#include "uICAL/error.h"
 #include "uICAL/datecalc.h"
 #include "uICAL/datetime.h"
 #include "uICAL/epochtime.h"
 #include "uICAL/datestamp.h"
 #include "uICAL/dateperiod.h"
-#include "uICAL/error.h"
 
 namespace uICAL {
     DateTime::DateTime() {
@@ -18,11 +19,11 @@ namespace uICAL {
         this->construct(ds, tz);
     }
 
-    DateTime::DateTime(const std::string& datetime) {
+    DateTime::DateTime(const string& datetime) {
         this->construct(datetime, TZMap::init());
     }
 
-    DateTime::DateTime(const std::string& datetime, const TZMap::ptr& tzmap) {
+    DateTime::DateTime(const string& datetime, const TZMap::ptr& tzmap) {
         this->construct(datetime, tzmap);
     }
 
@@ -36,9 +37,9 @@ namespace uICAL {
         this->tz = tz;
     }
 
-    void DateTime::construct(const std::string& datetime, const TZMap::ptr& tzmap) {
+    void DateTime::construct(const string& datetime, const TZMap::ptr& tzmap) {
         if (datetime.length() < 15)
-            throw ValueError(std::string("Bad datetime: \"") + datetime + "\"");
+            throw ValueError(string("Bad datetime: \"") + datetime + "\"");
 
         DateStamp ds(datetime.substr(0, 15));
 
@@ -146,7 +147,7 @@ namespace uICAL {
         this->tz->str(out);
     }
 
-    std::string DateTime::str() const {
+    string DateTime::str() const {
         std::ostringstream out;
         this->str(out);
         return out.str();

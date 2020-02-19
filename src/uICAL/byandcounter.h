@@ -24,7 +24,7 @@ namespace uICAL {
             ByAndCounter(std::vector<Counter::ptr> counters);
             virtual ~ByAndCounter() {};
 
-            virtual const std::string name() const { return "ByAndCounter"; };
+            virtual const string name() const { return "ByAndCounter"; };
             virtual void wrap();
 
             bool findNextCommon();

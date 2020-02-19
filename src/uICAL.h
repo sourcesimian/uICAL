@@ -12,8 +12,8 @@
 #include <string>
 #include <vector>
 
-#include "uICAL/error.h"
 #include "uICAL/types.h"
+#include "uICAL/error.h"
 #include "uICAL/util.h"
 #include "uICAL/icalline.h"
 #include "uICAL/datetime.h"

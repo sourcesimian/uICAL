@@ -1,12 +1,13 @@
 /*############################################################################
 # Copyright (c) 2020 Source Simian  :  https://github.com/sourcesimian/uICAL #
 ############################################################################*/
-#include <sstream>
-
-#include "uICAL/error.h"
 #include "uICAL/cppstl.h"
+#include "uICAL/types.h"
+#include "uICAL/error.h"
 #include "uICAL/util.h"
 #include "uICAL/rruleiter.h"
+
+#include <sstream>
 
 #define PY_SSIZE_T_CLEAN
 #include <Python.h>

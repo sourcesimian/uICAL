@@ -2,6 +2,7 @@
 # Copyright (c) 2020 Source Simian  :  https://github.com/sourcesimian/uICAL #
 ############################################################################*/
 #include "uICAL/cppstl.h"
+#include "uICAL/types.h"
 #include "uICAL/error.h"
 #include "uICAL/util.h"
 #include "uICAL/calendar.h"
@@ -28,7 +29,7 @@ namespace uICAL {
         for (auto comp : events) {
             ICalEvent::ptr ev = ICalEvent::init(comp, this->tzmap);
             this->events.push_back(ev);
-            debug(std::string("Calendar ") + ev->str());
+            debug(string("Calendar ") + ev->str());
         }
     }
 

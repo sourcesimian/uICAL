@@ -2,6 +2,7 @@
 # Copyright (c) 2020 Source Simian  :  https://github.com/sourcesimian/uICAL #
 ############################################################################*/
 #include "uICAL/cppstl.h"
+#include "uICAL/types.h"
 #include "uICAL/error.h"
 #include "uICAL/icalline.h"
 #include "uICAL/util.h"
@@ -12,14 +13,14 @@ namespace uICAL {
         return VLine::ptr(new VLine());
     }
 
-    VLine::ptr VLine::init(const std::string& line) {
+    VLine::ptr VLine::init(const string& line) {
         return VLine::ptr(new VLine(line));
     }
 
     VLine::VLine() {
     }
 
-    VLine::VLine(const std::string& line) {
+    VLine::VLine(const string& line) {
         if(line.empty()) {
             throw ParseError("VLINE is empty");
         }
@@ -27,11 +28,11 @@ namespace uICAL {
         size_t colon = line.find(":");
         size_t semicolon = line.find(";");
 
-        if (colon == std::string::npos) {
-            throw ParseError(std::string("VLINE does not have a ':' \"") + line + "\"");
+        if (colon == string::npos) {
+            throw ParseError(string("VLINE does not have a ':' \"") + line + "\"");
         }
         
-        if (semicolon != std::string::npos && semicolon < colon) {
+        if (semicolon != string::npos && semicolon < colon) {
             this->name = line.substr(0, semicolon);
             this->readParams(line.substr(semicolon + 1, colon - semicolon - 1));
         }
@@ -39,27 +40,27 @@ namespace uICAL {
             this->name = line.substr(0, colon);
         }
         this->value = line.substr(colon + 1, line.length() - colon - 1);
-        debug(std::string("VLINE ") + this->name + " " + this->value);
+        debug(string("VLINE ") + this->name + " " + this->value);
     }
 
-    std::string VLine::getParam(const std::string& key) {
+    string VLine::getParam(const string& key) {
         for (auto param : this->params) {
             if (param.first == key) {
                 return param.second;
             }
         }
-        return std::string("");
+        return string("");
     }
 
-    void VLine::readParams(const std::string& str) {
-        tokenize(str, ';', [&](const std::string token){
+    void VLine::readParams(const string& str) {
+        tokenize(str, ';', [&](const string token){
             size_t equals = token.find("=");
-            if (equals == std::string::npos) {
-                throw ParseError(std::string("\n!BAD PARAM: ") + token);
+            if (equals == string::npos) {
+                throw ParseError(string("\n!BAD PARAM: ") + token);
             }
-            const std::string name = token.substr(0, equals);
-            const std::string value = token.substr(equals + 1, token.length());
-            this->params.insert(std::pair<std::string, std::string>(name, value));
+            const string name = token.substr(0, equals);
+            const string value = token.substr(equals + 1, token.length());
+            this->params.insert(std::pair<string, string>(name, value));
         });
     }
 
@@ -105,7 +106,7 @@ namespace uICAL {
             throw VLineReaderEnd();
         }
         if (this->current.empty()) {
-            std::string token;
+            string token;
             while(std::getline(this->ical, token, '\n')) {
                 rtrim(token);
 

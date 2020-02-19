@@ -20,14 +20,14 @@ namespace uICAL {
             static ptr init(VComponent::ptr& event, const TZMap::ptr& tzmap);
             ICalEvent(VComponent::ptr& event, const TZMap::ptr& tzmap);
 
-            std::string str() const;
+            string str() const;
             void str(std::ostream& out) const;
 
             friend class ICalEventIter;
         private:
             DateTime start;
             DateTime end;
-            std::string summary;
+            string summary;
             RRule::ptr rrule;
     };
 

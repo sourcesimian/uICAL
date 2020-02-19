@@ -22,39 +22,39 @@ namespace uICAL {
     TZMap::TZMap(VComponent& calendar) {
         auto timezones = calendar.listComponents("VTIMEZONE");
         for (auto timezone : timezones) {
-            std::string tzId = timezone->getPropertyByName("TZID")->value;
+            string tzId = timezone->getPropertyByName("TZID")->value;
 
             auto standards = timezone->listComponents("STANDARD");
             for (auto standard : standards) {
 
-                std::string offset = standard->getPropertyByName("TZOFFSETFROM")->value;
-                std::string name = standard->getPropertyByName("TZNAME")->value;
+                string offset = standard->getPropertyByName("TZOFFSETFROM")->value;
+                string name = standard->getPropertyByName("TZNAME")->value;
 
                 this->add(tzId, name, offset);
             }
         }
     }
 
-    void TZMap::add(const std::string& id, const std::string& name, const std::string& tz) {
+    void TZMap::add(const string& id, const string& name, const string& tz) {
         this->id_attrib_map[id].offset = TZ::parseOffset(tz);
         this->id_attrib_map[id].name = name;
     }
 
-    std::string TZMap::findId(const std::string& nameOrId) const {
+    string TZMap::findId(const string& nameOrId) const {
         for (auto i : this->id_attrib_map) {
             if (i.second.name == nameOrId || i.first == nameOrId) {
                 return i.first;
             }
         }
 
-        return std::string();
+        return string();
     }
 
-    int TZMap::getOffset(const std::string& tzId) {
+    int TZMap::getOffset(const string& tzId) {
         return this->id_attrib_map[tzId].offset;
     }
 
-    std::string TZMap::getName(const std::string& tzId) {
+    string TZMap::getName(const string& tzId) {
         return this->id_attrib_map[tzId].name;
     }
 

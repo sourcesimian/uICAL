@@ -4,18 +4,19 @@
 #include <cstdlib>
 
 #include "uICAL/cppstl.h"
+#include "uICAL/types.h"
 #include "uICAL/util.h"
 
 namespace uICAL {
-    void tokenize(const std::string& input, char token, std::function<void (std::string)> cb) {
+    void tokenize(const string& input, char token, std::function<void (string)> cb) {
         std::istringstream stream(input);
-        std::string part;
+        string part;
         while(std::getline(stream, part, token)) {
             cb(part);
         }
     }
 
-    int string_to_int(const std::string& input) {
+    int string_to_int(const string& input) {
         return atoi(input.c_str());
     }
 
@@ -33,7 +34,7 @@ namespace uICAL {
         return *this;
     }
 
-    std::string Joiner::str() const {
+    string Joiner::str() const {
         std::ostringstream ss;
         this->write(ss);
         return ss.str();
@@ -41,7 +42,7 @@ namespace uICAL {
 
     void Joiner::str(std::ostream& out) const {
         bool started = false;
-        for (std::string value : this->values) {
+        for (string value : this->values) {
             if (started) out << this->delim;
             else started = true;
             out << value;
@@ -50,20 +51,20 @@ namespace uICAL {
 
     void Joiner::write(std::ostream& out) const {
         bool started = false;
-        for (std::string value : this->values) {
+        for (string value : this->values) {
             if (started) out << this->delim;
             else started = true;
             out << value;
         }
     }
 
-    void ltrim(std::string& s) {
+    void ltrim(string& s) {
         s.erase(s.begin(), std::find_if(s.begin(), s.end(), [](int ch) {
             return !std::isspace(ch);
         }));
     }
 
-    void rtrim(std::string& s) {
+    void rtrim(string& s) {
         s.erase(std::find_if(s.rbegin(), s.rend(), [](int ch) {
             return !std::isspace(ch);
         }).base(), s.end());

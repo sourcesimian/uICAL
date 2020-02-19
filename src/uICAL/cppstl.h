@@ -11,12 +11,6 @@
 #include <iomanip>
 #include <memory>
 #include <sstream>
-#include <string>
 #include <tuple>
 #include <vector>
 #include <map>
-
-namespace uICAL {
-    using seconds_t = long long int;
-}
-    

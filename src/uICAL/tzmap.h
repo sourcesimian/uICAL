@@ -16,23 +16,23 @@ namespace uICAL {
             TZMap();
             TZMap(VComponent& calendar);
 
-            std::string findId(const std::string& nameOrId) const;
+            string findId(const string& nameOrId) const;
 
-            int getOffset(const std::string& tzId);
-            std::string getName(const std::string& tzId);
+            int getOffset(const string& tzId);
+            string getName(const string& tzId);
 
             void str(std::ostream& out) const;
 
         protected:
-            void add(const std::string& id, const std::string& name, const std::string& tz);
-            int parseOffset(const std::string& offset) const;
+            void add(const string& id, const string& name, const string& tz);
+            int parseOffset(const string& offset) const;
 
             typedef struct {
                 int offset;
-                std::string name;
+                string name;
             } attribs_t;
             
-            std::map<std::string, attribs_t> id_attrib_map;
+            std::map<string, attribs_t> id_attrib_map;
     };
 }
 #endif

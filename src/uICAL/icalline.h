@@ -10,19 +10,19 @@ namespace uICAL {
             using ptr = std::shared_ptr<VLine>;
 
             static VLine::ptr init();
-            static VLine::ptr init(const std::string& line);
+            static VLine::ptr init(const string& line);
             VLine();
-            VLine(const std::string& line);
+            VLine(const string& line);
 
-            std::string name;
-            std::map<std::string, std::string> params;
-            std::string value;
-            std::string getParam(const std::string& key);
+            string name;
+            std::map<string, string> params;
+            string value;
+            string getParam(const string& key);
 
             void str(std::ostream& out) const;
 
         private:
-            void readParams(const std::string& str);
+            void readParams(const string& str);
     };
 
     std::ostream& operator << (std::ostream& out, const VLine::ptr& l);
@@ -51,7 +51,7 @@ namespace uICAL {
             void pop();
         protected:
             std::istream& ical;
-            std::string current;
+            string current;
     };
 
     class VLineReaderEnd {

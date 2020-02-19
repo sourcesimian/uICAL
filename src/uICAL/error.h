@@ -7,55 +7,55 @@
 namespace uICAL {
     class Error {
         public:
-            std::string message;
+            string message;
     };
     
     class ParseError : public Error {
         public:
-            ParseError(std::string m) {
-                this->message = std::string("ParseError: ") + m;
+            ParseError(string m) {
+                this->message = string("ParseError: ") + m;
             }
     };
 
     class ValueError : public Error {
         public:
-            ValueError(std::string m) {
-                this->message = std::string("ValueError: ") + m;
+            ValueError(string m) {
+                this->message = string("ValueError: ") + m;
             }
     };
 
     class NotImplementedError : public Error {
         public:
-            NotImplementedError(std::string m) {
-                this->message = std::string("NotImplementedError: ") + m;
+            NotImplementedError(string m) {
+                this->message = string("NotImplementedError: ") + m;
             }
     };
 
     class ImplementationError : public Error {
         public:
-            ImplementationError(std::string m) {
-                this->message = std::string("ImplementationError: ") + m;
+            ImplementationError(string m) {
+                this->message = string("ImplementationError: ") + m;
             }
     };
 
     class ICalError : public Error {
         public:
-            ICalError(std::string m) {
-                this->message = std::string("ICalError: ") + m;
+            ICalError(string m) {
+                this->message = string("ICalError: ") + m;
             }
     };
 
     class RecurrenceError : public Error {
         public:
-            RecurrenceError(std::string m) {
-                this->message = std::string("RecurrenceError: ") + m;
+            RecurrenceError(string m) {
+                this->message = string("RecurrenceError: ") + m;
             }
     };
 
     class TZAwarenessConflictError : public Error {
         public:
-            TZAwarenessConflictError(std::string m) {
-                this->message = std::string("TZAwarenessConflictError: ") + m;
+            TZAwarenessConflictError(string m) {
+                this->message = string("TZAwarenessConflictError: ") + m;
             }
     };
 

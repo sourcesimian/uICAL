@@ -2,6 +2,7 @@
 # Copyright (c) 2020 Source Simian  :  https://github.com/sourcesimian/uICAL #
 ############################################################################*/
 #include "uICAL/cppstl.h"
+#include "uICAL/types.h"
 #include "uICAL/util.h"
 #include "uICAL/datetime.h"
 #include "uICAL/icalevent.h"
@@ -27,7 +28,7 @@ namespace uICAL {
         this->rrule = RRule::init(rRule->value, this->start);
     }
 
-    std::string ICalEvent::str() const {
+    string ICalEvent::str() const {
         std::ostringstream out;
         this->str(out);
         return out.str();

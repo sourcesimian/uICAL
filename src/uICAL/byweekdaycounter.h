@@ -22,7 +22,7 @@ namespace uICAL {
         protected:
             ByWeekDayCounter(const values_t& values, const RRule::ptr& p);
 
-            virtual const std::string name() const { return "ByWeekDay"; }
+            virtual const string name() const { return "ByWeekDay"; }
             virtual void wrap();
 
             const RRule::ptr& p;

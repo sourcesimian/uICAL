@@ -1,14 +1,18 @@
 /*############################################################################
 # Copyright (c) 2020 Source Simian  :  https://github.com/sourcesimian/uICAL #
 ############################################################################*/
-#ifndef uical_types_h
-#define uical_types_h
-
 #include "uICAL/string.h"
 
+#ifdef ARDUINO
 
 namespace uICAL {
-    using seconds_t = long long int;
-}    
+    using string = String;
+}
+
+#else
+
+namespace uICAL {
+    // Nothing using string
+}
 
 #endif

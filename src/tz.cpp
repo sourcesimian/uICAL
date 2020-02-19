@@ -3,10 +3,10 @@
 ############################################################################*/
 #include "uICAL/cppstl.h"
 #include "uICAL/types.h"
+#include "uICAL/error.h"
 #include "uICAL/tz.h"
 #include "uICAL/epochtime.h"
 #include "uICAL/datestamp.h"
-#include "uICAL/error.h"
 
 namespace uICAL {
     static TZ::ptr UNDEF = TZ::ptr(new TZ());
@@ -24,11 +24,11 @@ namespace uICAL {
         return ptr(new TZ(offsetMins));
     }
 
-    TZ::ptr TZ::init(const std::string& tz) {
+    TZ::ptr TZ::init(const string& tz) {
         return ptr(new TZ(tz));
     }
 
-    TZ::ptr TZ::init(const std::string& tz, const TZMap::ptr& tzmap) {
+    TZ::ptr TZ::init(const string& tz, const TZMap::ptr& tzmap) {
         return ptr(new TZ(tz, tzmap));
     }
 
@@ -47,15 +47,15 @@ namespace uICAL {
         this->aware = true;
     }
 
-    TZ::TZ(const std::string& tz) {
+    TZ::TZ(const string& tz) {
         this->offsetMins = TZ::parseOffset(tz);
         this->aware = true;
     }
 
-    TZ::TZ(const std::string& tz, const TZMap::ptr& tzmap)
+    TZ::TZ(const string& tz, const TZMap::ptr& tzmap)
     : idmap(tzmap)
     {
-        std::string id = this->idmap->findId(tz);
+        string id = this->idmap->findId(tz);
         if (!id.empty()) {
             this->id = id;
             this->aware = true;
@@ -70,7 +70,7 @@ namespace uICAL {
         return this->aware;
     }
 
-    int TZ::parseOffset(const std::string& tz) {
+    int TZ::parseOffset(const string& tz) {
         if (tz == "Z") {
             return 0;
         }
@@ -149,7 +149,7 @@ namespace uICAL {
         TZ::offsetAsString(out, this->offsetMins);
     }
 
-    std::string TZ::str() const {
+    string TZ::str() const {
         std::ostringstream out;
         this->str(out);
         return out.str();

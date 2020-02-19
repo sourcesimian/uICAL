@@ -19,7 +19,7 @@ namespace uICAL {
             virtual DateStamp value() const { return this->base; }
             
             virtual bool syncLock(const DateStamp& from, const DateStamp& now) const = 0;
-            virtual const std::string name() const = 0;
+            virtual const string name() const = 0;
 
             virtual void str(std::ostream& out) const;
 
@@ -78,7 +78,7 @@ namespace uICAL {
             DateStamp value() const;      
 
             virtual bool syncLock(const DateStamp& from, const DateStamp& now) const;
-            virtual const std::string name() const;
+            virtual const string name() const;
     };
 
     class ByMinuteCounter : protected CounterT<unsigned> {
@@ -92,7 +92,7 @@ namespace uICAL {
             virtual DateStamp value() const;      
 
             virtual bool syncLock(const DateStamp& from, const DateStamp& now) const;
-            virtual const std::string name() const;
+            virtual const string name() const;
     };
 
     class ByHourCounter : protected CounterT<unsigned> {
@@ -105,7 +105,7 @@ namespace uICAL {
             virtual DateStamp value() const;      
 
             virtual bool syncLock(const DateStamp& from, const DateStamp& now) const;
-            virtual const std::string name() const;
+            virtual const string name() const;
     };
 
     class ByMonthDayCounter : protected CounterT<int> {
@@ -120,7 +120,7 @@ namespace uICAL {
             virtual bool next();
 
             virtual bool syncLock(const DateStamp& from, const DateStamp& now) const;
-            virtual const std::string name() const;
+            virtual const string name() const;
     };
 
     class ByWeekNoCounter : protected CounterT<unsigned> {
@@ -133,7 +133,7 @@ namespace uICAL {
             virtual DateStamp value() const;
 
             virtual bool syncLock(const DateStamp& from, const DateStamp& now) const;
-            virtual const std::string name() const;
+            virtual const string name() const;
     };
 
     class ByMonthCounter : protected CounterT<unsigned> {
@@ -147,7 +147,7 @@ namespace uICAL {
             virtual DateStamp value() const;      
 
             virtual bool syncLock(const DateStamp& from, const DateStamp& now) const;
-            virtual const std::string name() const;
+            virtual const string name() const;
     };
 
     class ByYearDayCounter : protected CounterT<int> {
@@ -162,7 +162,7 @@ namespace uICAL {
             virtual bool next();
 
             virtual bool syncLock(const DateStamp& from, const DateStamp& now) const;
-            virtual const std::string name() const;
+            virtual const string name() const;
     };
 
     class IncCounter : protected Counter {
@@ -187,7 +187,7 @@ namespace uICAL {
 
             virtual bool next();
 
-            virtual const std::string name() const;
+            virtual const string name() const;
     };
 
     class MinuteInc : protected IncCounter {
@@ -199,7 +199,7 @@ namespace uICAL {
             virtual bool reset(const DateStamp& base);
             virtual bool next();
 
-            virtual const std::string name() const;
+            virtual const string name() const;
     };
 
     class HourInc : protected IncCounter {
@@ -211,7 +211,7 @@ namespace uICAL {
             virtual bool reset(const DateStamp& base);
             virtual bool next();
 
-            virtual const std::string name() const;
+            virtual const string name() const;
     };
 
     class DayInc : protected IncCounter {
@@ -222,7 +222,7 @@ namespace uICAL {
 
             virtual bool next();
 
-            virtual const std::string name() const;
+            virtual const string name() const;
     };
 
     class WeekInc : protected IncCounter {
@@ -234,7 +234,7 @@ namespace uICAL {
             virtual bool reset(const DateStamp& base);
             virtual bool next();
 
-            virtual const std::string name() const;
+            virtual const string name() const;
 
         protected:
             DateTime::Day wkst;
@@ -249,7 +249,7 @@ namespace uICAL {
             virtual bool reset(const DateStamp& base);
             virtual bool next();
 
-            virtual const std::string name() const;
+            virtual const string name() const;
     };
 
     class YearInc : protected IncCounter {
@@ -261,7 +261,7 @@ namespace uICAL {
             virtual bool reset(const DateStamp& base);
             virtual bool next();
 
-            virtual const std::string name() const;
+            virtual const string name() const;
     };
 }
 #endif
