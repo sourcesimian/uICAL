@@ -81,8 +81,8 @@ namespace uICAL {
 
                 // e.g.: +0200
                 sign = tz.at(0);
-                tzH = tz.substr(1, 2).to_int();
-                tzM = tz.substr(3, 2).to_int();
+                tzH = to_int(tz.substr(1, 2));
+                tzM = to_int(tz.substr(3, 2));
 
                 int offset = (tzH * 60) + tzM;
                 if (sign == '-') {
@@ -113,8 +113,8 @@ namespace uICAL {
                 {
                     out << "+";
                 }
-                out << std::setfill('0') << std::setw(2) << offsetMins / 60;
-                out << std::setfill('0') << std::setw(2) << offsetMins % 60;
+                out << fmt(fmt_02d, offsetMins / 60);
+                out << fmt(fmt_02d, offsetMins % 60);
             }
         }
     }

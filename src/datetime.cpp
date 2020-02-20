@@ -136,13 +136,13 @@ namespace uICAL {
     void DateTime::str(std::ostream& out) const {
         auto ymdhms = this->epochtime.ymdhms(this->tz);
 
-        out << std::setfill('0') << std::setw(4) << std::get<0>(ymdhms);
-        out << std::setfill('0') << std::setw(2) << std::get<1>(ymdhms);
-        out << std::setfill('0') << std::setw(2) << std::get<2>(ymdhms);
+        out << fmt("%04d", std::get<0>(ymdhms));
+        out << fmt("%02d", std::get<1>(ymdhms));
+        out << fmt("%02d", std::get<2>(ymdhms));
         out << "T";
-        out << std::setfill('0') << std::setw(2) << std::get<3>(ymdhms);
-        out << std::setfill('0') << std::setw(2) << std::get<4>(ymdhms);
-        out << std::setfill('0') << std::setw(2) << std::get<5>(ymdhms);
+        out << fmt("%02d", std::get<3>(ymdhms));
+        out << fmt("%02d", std::get<4>(ymdhms));
+        out << fmt("%02d", std::get<5>(ymdhms));
 
         this->tz->str(out);
     }

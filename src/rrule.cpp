@@ -93,7 +93,7 @@ namespace uICAL {
     }
 
     int RRule::parseInt(const string& value) const {
-        return value.to_int();
+        return to_int(value);
     }
 
     std::vector<string> RRule::parseArray(const string& value) const {
@@ -109,7 +109,7 @@ namespace uICAL {
         tokenize(value, ',', [&](const string part){
             int index;
             if (part.length() > 2) {
-                index = part.substr(0, part.length() - 2).to_int();
+                index = to_int(part.substr(0, part.length() - 2));
             }
             else{
                 index = 0;

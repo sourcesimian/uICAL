@@ -11,7 +11,7 @@ namespace uICAL {
     void tokenize(const string& input, char token, std::function<void (string)> cb) {
         std::istringstream stream(input.c_str());
         string part;
-        while(part.getline(stream, token)) {
+        while(getline(stream, part, token)) {
             cb(part);
         }
     }
@@ -21,12 +21,14 @@ namespace uICAL {
     }
 
     std::ostringstream& Joiner::out() {
-        return this->current;
+        return this->stream;
     }
 
     Joiner& Joiner::next() {
-        this->values.push_back(this->current);
-        this->current.str("");
+        if (this->stream.tellp() == 0) {
+            this->values.push_back(this->stream.str().c_str());
+            this->stream.seekp(0);
+        }
         return *this;
     }
 
@@ -53,16 +55,4 @@ namespace uICAL {
             out << value;
         }
     }
-
-    // void ltrim(string& s) {
-    //     s.erase(s.begin(), std::find_if(s.begin(), s.end(), [](int ch) {
-    //         return !std::isspace(ch);
-    //     }));
-    // }
-
-    // void rtrim(string& s) {
-    //     s.erase(std::find_if(s.rbegin(), s.rend(), [](int ch) {
-    //         return !std::isspace(ch);
-    //     }).base(), s.end());
-    // }
 }

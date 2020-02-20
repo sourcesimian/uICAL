@@ -107,8 +107,8 @@ namespace uICAL {
         }
         if (this->current.empty()) {
             string token;
-            while(token.getline(this->ical, '\n')) {
-                token.rtrim();
+            while(getline(this->ical, token, '\n')) {
+                rtrim(token);
 
                 if (this->current.empty()) {
                     this->current = token;

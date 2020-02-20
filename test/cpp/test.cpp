@@ -1,4 +1,5 @@
 #include <iostream>
+#include <vector>
 
 #include "uICAL/types.h"
 #include "uICAL/error.h"

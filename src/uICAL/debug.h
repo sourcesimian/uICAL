@@ -16,7 +16,7 @@
 
 #define debug(M) \
     do { \
-        std::cout << "[debug] " << string(M) << std::endl; \
+        std::cout << "[debug] " << string(M) << uICAL::endl; \
     } while(0)
 #endif
 

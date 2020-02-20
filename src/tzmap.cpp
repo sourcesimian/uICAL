@@ -62,7 +62,7 @@ namespace uICAL {
         for (auto i : this->id_attrib_map) {
             out << i.first << " : " << i.second.name << " : ";
             TZ::offsetAsString(out, i.second.offset);
-            out << std::endl;
+            out << uICAL::endl;
         }
     }
 }

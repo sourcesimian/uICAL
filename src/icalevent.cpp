@@ -35,10 +35,10 @@ namespace uICAL {
     }
 
     void ICalEvent::str(std::ostream& out) const {
-        out << "VEVENT: " << this->summary << std::endl;
-        out << " - start: " << this->start << std::endl;
-        out << " - end: " << this->end << std::endl;
-        out << " - rrule: " << this->rrule << std::endl;
+        out << "VEVENT: " << this->summary << uICAL::endl;
+        out << " - start: " << this->start << uICAL::endl;
+        out << " - end: " << this->end << uICAL::endl;
+        out << " - rrule: " << this->rrule << uICAL::endl;
     }
 
     std::ostream& operator << (std::ostream& out, const ICalEvent::ptr& e) {

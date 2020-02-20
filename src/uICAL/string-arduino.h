@@ -5,12 +5,18 @@
 #define uical_string_arduino_h
 
 #include <WString.h>
+
+#include <string>
 #include <sstream>
+#include <iomanip>
 
 namespace uICAL {
-    class string : public String{
+    extern const char* endl;
+
+    class string : public String {
         public:
-            using pos = unsigned int;
+            using size_t = unsigned int;
+            static const size_t npos = -1;
             
             string() : String() {}
             string(const String& b) : String(b) {}
@@ -18,27 +24,30 @@ namespace uICAL {
             string(const StringSumHelper& ssh) : String(ssh) {}
             string(const std::ostringstream& sst) : String(sst.str().c_str()) {}
 
-            string& operator = (const string& st) { *this = st; return *this; }
-
-            string substr(pos from) const { return string(String::substring(from)); }
-            string substr(pos from, pos len) const { return string(String::substring(from, from + len)); }
-
-            int to_int() const { return String::toInt(); }
+            string substr(size_t from) const { return string(String::substring(from)); }
+            string substr(size_t from, size_t len) const { return string(String::substring(from, from + len)); }
 
             bool empty() const { return String::length() == 0; }
 
-            pos find(const char* st) const { return String::indexOf(st); }
+            size_t find(const char* st) const { return String::indexOf(st); }
 
-            static const pos npos = -1;
+            char at(size_t pos) const { return String::charAt(pos); }
 
-            char at(pos pos) const { return String::charAt(pos); }
+            void clear() { *this = ""; }
 
-            bool getline(std::istream& is, char token) { return false; }
+            friend int to_int(const string&);
+            friend bool getline(std::istream& is, char token, string& st);
+            friend void rtrim(string& st);
 
-            void rtrim() { String::trim(); } // NOTE: should be rtrim
+        // protected:
+        //     String s;
     };
 
     std::ostream& operator << (std::ostream& out, const string& st);
+
+    int to_int(const string&);
+    bool getline(std::istream& is, string& st, char token);
+    void rtrim(string& st);
 }
 
 #endif

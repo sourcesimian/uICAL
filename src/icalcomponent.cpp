@@ -98,15 +98,15 @@ namespace uICAL {
     }
     
     void VComponent::str(std::ostream& out) const {
-        out << "BEGIN:" << this->name << std::endl;
+        out << "BEGIN:" << this->name << uICAL::endl;
         for (auto line : this->lines) {
-            out << line << std::endl;
+            out << line << uICAL::endl;
         }
 
         for (auto child : this->children) {
             out << child;
         }
 
-        out << "END:" << this->name << std::endl;
+        out << "END:" << this->name << uICAL::endl;
     }
 }

@@ -1,14 +1,9 @@
 /*############################################################################
 # Copyright (c) 2020 Source Simian  :  https://github.com/sourcesimian/uICAL #
 ############################################################################*/
-#ifndef uical_types_h
-#define uical_types_h
-
 #include "uICAL/string.h"
-#include "uICAL/stream.h"
 
 namespace uICAL {
-    using seconds_t = long long int;
-}    
-
-#endif
+    const char * fmt_04d = "%04d";
+    const char * fmt_02d = "%02d";
+}

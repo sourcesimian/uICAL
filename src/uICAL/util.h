@@ -18,7 +18,7 @@ namespace uICAL {
             void write(std::ostream& out) const;
         private:
             char delim;
-            std::ostringstream current;
+            std::ostringstream stream;
             std::vector<string> values;
     };
 
@@ -32,7 +32,7 @@ namespace uICAL {
     std::vector<I> toVector(const string& value) {
         std::vector<I> v;
         tokenize(value, ',', [&](const string part){
-            v.push_back((I)part.to_int());
+            v.push_back((I)to_int(part));
         });
         return v;
     }

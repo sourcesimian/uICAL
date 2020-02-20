@@ -24,15 +24,15 @@ namespace uICAL {
                 if (datestamp.length() != 15) {
                     break;
                 }
-                this->year = datestamp.substr(0, 4).to_int();
-                this->month = datestamp.substr(4, 2).to_int();
-                this->day = datestamp.substr(6, 2).to_int();
+                this->year = to_int(datestamp.substr(0, 4));
+                this->month = to_int(datestamp.substr(4, 2));
+                this->day = to_int(datestamp.substr(6, 2));
                 if (datestamp.substr(8, 1) != "T") {
                     break;
                 }
-                this->hour = datestamp.substr(9, 2).to_int();
-                this->minute = datestamp.substr(11, 2).to_int();
-                this->second = datestamp.substr(13, 2).to_int();
+                this->hour = to_int(datestamp.substr(9, 2));
+                this->minute = to_int(datestamp.substr(11, 2));
+                this->second = to_int(datestamp.substr(13, 2));
                 this->validate();
                 return;
             }
@@ -120,13 +120,13 @@ namespace uICAL {
     }
 
     void DateStamp::str(std::ostream& out) const {
-        this->year < 9999 ? out << std::setfill('0') << std::setw(4) << this->year : out << "????";
-        this->month > 0 || this->month < 13 ? out << std::setfill('0') << std::setw(2) << this->month : out << "??";
-        this->day > 0 || this->day < 32 ? out << std::setfill('0') << std::setw(2) << this->day : out << "??";
+        this->year < 9999 ? out << fmt(fmt_04d, this->year) : out << "????";
+        this->month > 0 || this->month < 13 ? out << fmt(fmt_02d, this->month) : out << "??";
+        this->day > 0 || this->day < 32 ? out << fmt(fmt_02d, this->day) : out << "??";
         out << "T";
-        this->hour < 24 ? out << std::setfill('0') << std::setw(2) << this->hour : out << "??";
-        this->minute < 60 ? out << std::setfill('0') << std::setw(2) << this->minute : out << "??";;
-        this->second < 60 ? out << std::setfill('0') << std::setw(2) << this->second : out << "??";;
+        this->hour < 24 ? out << fmt(fmt_02d, this->hour) : out << "??";
+        this->minute < 60 ? out << fmt(fmt_02d, this->minute) : out << "??";;
+        this->second < 60 ? out << fmt(fmt_02d, this->second) : out << "??";;
     }
 
     std::ostream& operator << (std::ostream& out, const DateStamp& dt) {

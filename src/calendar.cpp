@@ -34,7 +34,7 @@ namespace uICAL {
     }
 
     void Calendar::str(std::ostream& out) const {
-        out << "CALENDAR" << std::endl;
+        out << "CALENDAR" << uICAL::endl;
     }
 
     std::ostream& operator << (std::ostream& out, const Calendar::ptr& c) {
