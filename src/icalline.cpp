@@ -107,8 +107,8 @@ namespace uICAL {
         }
         if (this->current.empty()) {
             string token;
-            while(std::getline(this->ical, token, '\n')) {
-                rtrim(token);
+            while(token.getline(this->ical, '\n')) {
+                token.rtrim();
 
                 if (this->current.empty()) {
                     this->current = token;

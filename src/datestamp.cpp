@@ -24,15 +24,15 @@ namespace uICAL {
                 if (datestamp.length() != 15) {
                     break;
                 }
-                this->year = std::atoi(datestamp.substr(0, 4).c_str());
-                this->month = std::atoi(datestamp.substr(4, 2).c_str());
-                this->day = std::atoi(datestamp.substr(6, 2).c_str());
+                this->year = datestamp.substr(0, 4).to_int();
+                this->month = datestamp.substr(4, 2).to_int();
+                this->day = datestamp.substr(6, 2).to_int();
                 if (datestamp.substr(8, 1) != "T") {
                     break;
                 }
-                this->hour = std::atoi(datestamp.substr(9, 2).c_str());
-                this->minute = std::atoi(datestamp.substr(11, 2).c_str());
-                this->second = std::atoi(datestamp.substr(13, 2).c_str());
+                this->hour = datestamp.substr(9, 2).to_int();
+                this->minute = datestamp.substr(11, 2).to_int();
+                this->second = datestamp.substr(13, 2).to_int();
                 this->validate();
                 return;
             }
@@ -55,7 +55,7 @@ namespace uICAL {
     }
 
     void DateStamp::validate() const {
-        std::stringstream m;
+        std::ostringstream m;
         for (;;) {
             m << "Invalid ";
             if (this->year < 1970) {
@@ -78,7 +78,7 @@ namespace uICAL {
             }
             return;
         }
-        throw ValueError(m.str());
+        throw ValueError(m);
     }
 
     bool DateStamp::valid() const {

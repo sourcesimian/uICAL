@@ -31,7 +31,7 @@ namespace uICAL {
     string ICalEvent::str() const {
         std::ostringstream out;
         this->str(out);
-        return out.str();
+        return out;
     }
 
     void ICalEvent::str(std::ostream& out) const {

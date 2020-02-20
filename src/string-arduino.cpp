@@ -1,18 +1,14 @@
 /*############################################################################
 # Copyright (c) 2020 Source Simian  :  https://github.com/sourcesimian/uICAL #
 ############################################################################*/
-#include "uICAL/string.h"
-
 #ifdef ARDUINO
 
-namespace uICAL {
-    using string = String;
-}
-
-#else
+#include "uICAL/string-arduino.h"
 
 namespace uICAL {
-    // Nothing using string
+    std::ostream& operator << (std::ostream& out, const string& st) {
+        out << st.c_str();
+        return out;
+    }
 }
-
 #endif

@@ -155,10 +155,10 @@ void test_basic(std::string dtstart, std::string rrule, std::string begin, std::
 
 
 void test_2() {
-    std::string rrule("FREQ=DAILY;COUNT=4");
-    std::string dtstart("19970902T090000");
-    std::string begin("19970902T090000");
-    std::string end("29970902T090000");
+    uICAL::string rrule("FREQ=DAILY;COUNT=4");
+    uICAL::string dtstart("19970902T090000");
+    uICAL::string begin("19970902T090000");
+    uICAL::string end("29970902T090000");
 
     auto rr = uICAL::RRuleIter::init(
         uICAL::RRule::init(rrule, uICAL::DateTime(dtstart, uICAL::TZ::unaware())),

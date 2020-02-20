@@ -9,15 +9,11 @@
 
 namespace uICAL {
     void tokenize(const string& input, char token, std::function<void (string)> cb) {
-        std::istringstream stream(input);
+        std::istringstream stream(input.c_str());
         string part;
-        while(std::getline(stream, part, token)) {
+        while(part.getline(stream, token)) {
             cb(part);
         }
-    }
-
-    int string_to_int(const string& input) {
-        return atoi(input.c_str());
     }
 
     Joiner::Joiner(char delim) {
@@ -29,7 +25,7 @@ namespace uICAL {
     }
 
     Joiner& Joiner::next() {
-        this->values.push_back(this->current.str());
+        this->values.push_back(this->current);
         this->current.str("");
         return *this;
     }
@@ -37,7 +33,7 @@ namespace uICAL {
     string Joiner::str() const {
         std::ostringstream ss;
         this->write(ss);
-        return ss.str();
+        return ss;
     }
 
     void Joiner::str(std::ostream& out) const {
@@ -58,15 +54,15 @@ namespace uICAL {
         }
     }
 
-    void ltrim(string& s) {
-        s.erase(s.begin(), std::find_if(s.begin(), s.end(), [](int ch) {
-            return !std::isspace(ch);
-        }));
-    }
+    // void ltrim(string& s) {
+    //     s.erase(s.begin(), std::find_if(s.begin(), s.end(), [](int ch) {
+    //         return !std::isspace(ch);
+    //     }));
+    // }
 
-    void rtrim(string& s) {
-        s.erase(std::find_if(s.rbegin(), s.rend(), [](int ch) {
-            return !std::isspace(ch);
-        }).base(), s.end());
-    }
+    // void rtrim(string& s) {
+    //     s.erase(std::find_if(s.rbegin(), s.rend(), [](int ch) {
+    //         return !std::isspace(ch);
+    //     }).base(), s.end());
+    // }
 }

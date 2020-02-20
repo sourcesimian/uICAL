@@ -81,8 +81,8 @@ namespace uICAL {
 
                 // e.g.: +0200
                 sign = tz.at(0);
-                tzH = std::atoi(tz.substr(1, 2).c_str());
-                tzM = std::atoi(tz.substr(3, 2).c_str());
+                tzH = tz.substr(1, 2).to_int();
+                tzM = tz.substr(3, 2).to_int();
 
                 int offset = (tzH * 60) + tzM;
                 if (sign == '-') {
@@ -152,7 +152,7 @@ namespace uICAL {
     string TZ::str() const {
         std::ostringstream out;
         this->str(out);
-        return out.str();
+        return out;
     }
 
     std::ostream& operator << (std::ostream& out, const TZ::ptr& tz) {

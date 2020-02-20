@@ -150,7 +150,7 @@ namespace uICAL {
     string DateTime::str() const {
         std::ostringstream out;
         this->str(out);
-        return out.str();
+        return out;
     }
 
     std::ostream& operator << (std::ostream& out, const DateTime& dt) {

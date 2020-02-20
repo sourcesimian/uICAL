@@ -311,7 +311,7 @@ namespace uICAL {
                 if (!(*it)->next()) {
                     std::ostringstream out;
                     out << "Can not seek " << (*it)->name() << " (" << "base: " << base << " from: " << begin << ")";
-                    throw ParseError(out.str());
+                    throw ParseError(out);
                 }
             }
         });

@@ -6,7 +6,6 @@
 
 namespace uICAL {
     void tokenize(const string& input, char token, std::function<void (string)> cb);
-    int string_to_int(const string& input);
 
     class Joiner {
         public:
@@ -33,7 +32,7 @@ namespace uICAL {
     std::vector<I> toVector(const string& value) {
         std::vector<I> v;
         tokenize(value, ',', [&](const string part){
-            v.push_back((I)string_to_int(part));
+            v.push_back((I)part.to_int());
         });
         return v;
     }
@@ -49,8 +48,5 @@ namespace uICAL {
         values.str(out);
         return out;
     }
-
-    void ltrim(string& s);
-    void rtrim(string& s);
 }
 #endif

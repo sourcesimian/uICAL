@@ -93,7 +93,7 @@ namespace uICAL {
     }
 
     int RRule::parseInt(const string& value) const {
-        return string_to_int(value);
+        return value.to_int();
     }
 
     std::vector<string> RRule::parseArray(const string& value) const {
@@ -109,7 +109,7 @@ namespace uICAL {
         tokenize(value, ',', [&](const string part){
             int index;
             if (part.length() > 2) {
-                index = string_to_int(part.substr(0, part.length() - 2));
+                index = part.substr(0, part.length() - 2).to_int();
             }
             else{
                 index = 0;
@@ -171,7 +171,7 @@ namespace uICAL {
     string RRule::intAsString(int value) const {
         std::ostringstream out;
         out << value;
-        return out.str();
+        return out;
     }
 
     void RRule::exclude(const DateTime& exclude) {
@@ -189,7 +189,7 @@ namespace uICAL {
     string RRule::str() const {
         std::ostringstream out;
         this->str(out);
-        return out.str();
+        return out;
     }
 
     void RRule::str(std::ostream& out) const {
