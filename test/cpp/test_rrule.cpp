@@ -107,7 +107,7 @@ void test_basic(std::string dtstart, std::string rrule, std::string begin, std::
             }
             std::ostringstream res;
             uICAL::DateTime now = occ->now();
-            res << now;
+            res << now.as_str();
             results.push_back(res.str());
         }
 
@@ -138,17 +138,17 @@ void test_basic(std::string dtstart, std::string rrule, std::string begin, std::
             }
         }
         if (fail) {
-            std::cout << "FAIL: " << start << " " << rrule << std::endl;
-            std::cout << "  ccc: "; occ->str(std::cout); std::cout << std::endl;
+            std::cout << "FAIL: " << start.as_str() << " " << rrule << std::endl;
+            std::cout << "  ccc: " << occ->as_str() << std::endl;
             std::cout << "  exp: " << exp.str() << std::endl;
             std::cout << "  res: " << res.str() << std::endl;
         }
         else {
-            std::cout << "PASS: " << start << " " << rrule << std::endl;
+            std::cout << "PASS: " << start.as_str() << " " << rrule << std::endl;
         }
     }
     catch (uICAL::Error e) {
-        std::cout << "EXEP: " << start << " " << rrule << std::endl;
+        std::cout << "EXEP: " << start.as_str() << " " << rrule << std::endl;
         std::cout << "  msg: " << e.message << std::endl;
     }
 }
@@ -165,7 +165,7 @@ void test_2() {
         uICAL::DateTime(), uICAL::DateTime());
     while (rr->next())
     {
-        std::cout << rr->now() << std::endl;
+        std::cout << rr->now().as_str() << std::endl;
     }
 
 }

@@ -4,8 +4,8 @@
 #ifndef uical_types_h
 #define uical_types_h
 
-#include "uICAL/string.h"
 #include "uICAL/stream.h"
+#include "uICAL/string.h"
 
 namespace uICAL {
     using seconds_t = long long int;

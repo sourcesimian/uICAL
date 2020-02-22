@@ -4,16 +4,17 @@
 #ifndef uical_epochtime_h
 #define uical_epochtime_h
 
+#include "uICAL/base.h"
 #include "uICAL/tz.h"
 
 namespace uICAL {
 
-    class EpochTime {
+    class EpochTime : public Base {
         public:
             EpochTime();
             EpochTime(unsigned year, unsigned month, unsigned day, unsigned hour, unsigned minute, unsigned second, const TZ::ptr& tz);
             EpochTime(seconds_t seconds);
-            
+
             using ymd_t = std::tuple<unsigned, unsigned, unsigned>;
             using ymdhms_t = std::tuple<unsigned, unsigned, unsigned, unsigned, unsigned, unsigned>;
 
@@ -32,7 +33,7 @@ namespace uICAL {
             // operator bool() const { return this->epochSeconds != (unsigned)-1; }
 
             // EpochTime offset(int seconds) const;
-            void str(std::ostream& out) const;
+            void str(ostream& out) const;
 
             seconds_t epochSeconds;
 
@@ -40,6 +41,6 @@ namespace uICAL {
             static const seconds_t NaN;
     };
 
-    std::ostream& operator << (std::ostream& out, const EpochTime& et);
+    ostream& operator << (ostream& out, const EpochTime& et);
 }
 #endif

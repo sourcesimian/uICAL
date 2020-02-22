@@ -4,10 +4,12 @@
 #ifndef uical_tzinfo_h
 #define uical_tzinfo_h
 
+#include "uICAL/base.h"
+
 namespace uICAL {
     class VComponent;
 
-    class TZMap {
+    class TZMap : public Base {
         public:
             using ptr = std::shared_ptr<TZMap>;
 
@@ -21,7 +23,7 @@ namespace uICAL {
             int getOffset(const string& tzId);
             string getName(const string& tzId);
 
-            void str(std::ostream& out) const;
+            void str(ostream& out) const;
 
         protected:
             void add(const string& id, const string& name, const string& tz);

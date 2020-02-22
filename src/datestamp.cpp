@@ -24,15 +24,15 @@ namespace uICAL {
                 if (datestamp.length() != 15) {
                     break;
                 }
-                this->year = to_int(datestamp.substr(0, 4));
-                this->month = to_int(datestamp.substr(4, 2));
-                this->day = to_int(datestamp.substr(6, 2));
+                this->year = datestamp.substr(0, 4).as_int();
+                this->month = datestamp.substr(4, 2).as_int();
+                this->day = datestamp.substr(6, 2).as_int();
                 if (datestamp.substr(8, 1) != "T") {
                     break;
                 }
-                this->hour = to_int(datestamp.substr(9, 2));
-                this->minute = to_int(datestamp.substr(11, 2));
-                this->second = to_int(datestamp.substr(13, 2));
+                this->hour = datestamp.substr(9, 2).as_int();
+                this->minute = datestamp.substr(11, 2).as_int();
+                this->second = datestamp.substr(13, 2).as_int();
                 this->validate();
                 return;
             }
@@ -55,7 +55,7 @@ namespace uICAL {
     }
 
     void DateStamp::validate() const {
-        std::ostringstream m;
+        ostream m;
         for (;;) {
             m << "Invalid ";
             if (this->year < 1970) {
@@ -119,17 +119,17 @@ namespace uICAL {
         return EpochTime(this->year, this->month, this->day, this->hour, this->minute, this->second, TZ::unaware()).epochSeconds;
     }
 
-    void DateStamp::str(std::ostream& out) const {
-        this->year < 9999 ? out << fmt(fmt_04d, this->year) : out << "????";
-        this->month > 0 || this->month < 13 ? out << fmt(fmt_02d, this->month) : out << "??";
-        this->day > 0 || this->day < 32 ? out << fmt(fmt_02d, this->day) : out << "??";
+    void DateStamp::str(ostream& out) const {
+        this->year < 9999 ? out << string::fmt(fmt_04d, this->year) : out << "????";
+        this->month > 0 || this->month < 13 ? out << string::fmt(fmt_02d, this->month) : out << "??";
+        this->day > 0 || this->day < 32 ? out << string::fmt(fmt_02d, this->day) : out << "??";
         out << "T";
-        this->hour < 24 ? out << fmt(fmt_02d, this->hour) : out << "??";
-        this->minute < 60 ? out << fmt(fmt_02d, this->minute) : out << "??";;
-        this->second < 60 ? out << fmt(fmt_02d, this->second) : out << "??";;
+        this->hour < 24 ? out << string::fmt(fmt_02d, this->hour) : out << "??";
+        this->minute < 60 ? out << string::fmt(fmt_02d, this->minute) : out << "??";;
+        this->second < 60 ? out << string::fmt(fmt_02d, this->second) : out << "??";;
     }
 
-    std::ostream& operator << (std::ostream& out, const DateStamp& dt) {
+    ostream& operator << (ostream& out, const DateStamp& dt) {
         dt.str(out);
         return out;
     }

@@ -309,7 +309,7 @@ namespace uICAL {
         return this->resetCascade(it, [&](counters_t::iterator it) {
             while (!(*it)->syncLock(begin, (*it)->value())) {
                 if (!(*it)->next()) {
-                    std::ostringstream out;
+                    ostream out;
                     out << "Can not seek " << (*it)->name() << " (" << "base: " << base << " from: " << begin << ")";
                     throw ParseError(out);
                 }
@@ -368,7 +368,7 @@ namespace uICAL {
         return true;
     }
 
-    void RRuleIter::str(std::ostream& out) const {
+    void RRuleIter::str(ostream& out) const {
         Joiner counters(',');
         for (auto counter : this->counters) {
             counter->str(counters.out());
@@ -377,7 +377,7 @@ namespace uICAL {
         counters.str(out);
     }
 
-    std::ostream& operator << (std::ostream& out, const RRuleIter::ptr& r) {
+    ostream& operator << (ostream& out, const RRuleIter::ptr& r) {
         r->str(out);
         return out;
     }

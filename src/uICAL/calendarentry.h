@@ -4,11 +4,12 @@
 #ifndef uical_calendarentry_h
 #define uical_calendarentry_h
 
+#include "uICAL/base.h"
 #include "uICAL/datetime.h"
 #include "uICAL/dateperiod.h"
 
 namespace uICAL {
-    class CalendarEntry {
+    class CalendarEntry : public Base {
         public:
             enum class Type {
                 NONE, EVENT,
@@ -20,13 +21,13 @@ namespace uICAL {
 
             CalendarEntry(Type type, const string& summary, const DateTime& start);
             CalendarEntry(Type type, const string& summary, const DateTime& start, const DatePeriod& span);
-            
+
             Type type() const;
             const string summary() const;
             DateTime start() const;
             DateTime end() const;
 
-            void str(std::ostream& out) const;
+            void str(ostream& out) const;
 
             static string asString(Type type);
 
@@ -37,7 +38,7 @@ namespace uICAL {
             DatePeriod _span;
     };
 
-    std::ostream& operator << (std::ostream& out, const CalendarEntry::ptr& e);
+    ostream& operator << (ostream& out, const CalendarEntry::ptr& e);
 }
 
 #endif

@@ -69,11 +69,11 @@ namespace uICAL {
         return this->epochSeconds != other.epochSeconds;
     }
 
-    void EpochTime::str(std::ostream& out) const {
+    void EpochTime::str(ostream& out) const {
         out << this->epochSeconds;
     }
 
-    std::ostream& operator << (std::ostream& out, const EpochTime& et) {
+    ostream& operator << (ostream& out, const EpochTime& et) {
         et.str(out);
         return out;
     }

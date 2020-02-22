@@ -30,7 +30,7 @@ namespace uICAL {
     }
 
     void RRule::parseRRule(const string& rrule) {
-        tokenize(rrule, ';', [&](const string part){
+        rrule.tokenize(';', [&](const string part){
             size_t equals = part.find("=");
             const string key = part.substr(0, equals);
             const string value = part.substr(equals + 1, string::npos);
@@ -93,12 +93,12 @@ namespace uICAL {
     }
 
     int RRule::parseInt(const string& value) const {
-        return to_int(value);
+        return value.as_int();
     }
 
     std::vector<string> RRule::parseArray(const string& value) const {
         std::vector<string> array;
-        tokenize(value, ',', [&](const string part){
+        value.tokenize(',', [&](const string part){
             array.push_back(part);
         });
         return array;
@@ -106,10 +106,10 @@ namespace uICAL {
 
     RRule::Day_vector RRule::parseByDay(const string& value) const {
         Day_vector array;
-        tokenize(value, ',', [&](const string part){
+        value.tokenize(',', [&](const string part){
             int index;
             if (part.length() > 2) {
-                index = to_int(part.substr(0, part.length() - 2));
+                index = part.substr(0, part.length() - 2).as_int();
             }
             else{
                 index = 0;
@@ -169,7 +169,7 @@ namespace uICAL {
     }
 
     string RRule::intAsString(int value) const {
-        std::ostringstream out;
+        ostream out;
         out << value;
         return out;
     }
@@ -186,13 +186,7 @@ namespace uICAL {
         return true;
     }
 
-    string RRule::str() const {
-        std::ostringstream out;
-        this->str(out);
-        return out;
-    }
-
-    void RRule::str(std::ostream& out) const {
+    void RRule::str(ostream& out) const {
         out << "RRULE:";
 
         Joiner values(';');
@@ -222,7 +216,8 @@ namespace uICAL {
                 days.next();
             }
 
-            values.out() << "BYDAY=" << days.str();
+            values.out() << "BYDAY=";
+            days.str(values.out());
             values.next();
         }
 
@@ -274,17 +269,17 @@ namespace uICAL {
         values.str(out);
     }
 
-    std::ostream& operator << (std::ostream& out, const RRule::ptr& r) {
+    ostream& operator << (ostream& out, const RRule::ptr& r) {
         r->str(out);
         return out;
     }
 
-    std::ostream& operator << (std::ostream& out, const RRule& r) {
+    ostream& operator << (ostream& out, const RRule& r) {
         r.str(out);
         return out;
     }
 
-    std::ostream& operator << (std::ostream& out, const RRule::Day_pair& dp) {
+    ostream& operator << (ostream& out, const RRule::Day_pair& dp) {
         int idx;
         DateTime::Day day;
         unpack(dp, idx, day);

@@ -4,7 +4,7 @@
 #ifndef uical_icalevent_h
 #define uical_icalevent_h
 
-#include "uICAL/datetime.h"
+#include "uICAL/base.h"
 #include "uICAL/tzmap.h"
 #include "uICAL/rruleiter.h"
 #include "uICAL/icalcomponent.h"
@@ -13,15 +13,15 @@
 
 namespace uICAL {
     class VComponent;
+    class DateTime;
 
-    class ICalEvent {
+    class ICalEvent : public Base {
         public:
             using ptr = std::shared_ptr<ICalEvent>;
             static ptr init(VComponent::ptr& event, const TZMap::ptr& tzmap);
             ICalEvent(VComponent::ptr& event, const TZMap::ptr& tzmap);
 
-            string str() const;
-            void str(std::ostream& out) const;
+            void str(ostream& out) const;
 
             friend class ICalEventIter;
         private:
@@ -31,8 +31,8 @@ namespace uICAL {
             RRule::ptr rrule;
     };
 
-    std::ostream& operator << (std::ostream& out, const ICalEvent::ptr& e);
-    std::ostream& operator << (std::ostream& out, const ICalEvent& e);
+    ostream& operator << (ostream& out, const ICalEvent::ptr& e);
+    ostream& operator << (ostream& out, const ICalEvent& e);
 
     class ICalEventIter {
         public:

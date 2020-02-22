@@ -16,13 +16,13 @@ namespace uICAL {
 
             virtual DateStamp value() const;
 
-            virtual void str(std::ostream& out) const;
+            virtual void str(ostream& out) const;
 
             virtual bool syncLock(const DateStamp& from, const DateStamp& now) const;
 
         protected:
             ByAndCounter(std::vector<Counter::ptr> counters);
-            virtual ~ByAndCounter() {};
+            virtual ~ByAndCounter() = default;
 
             virtual const string name() const { return "ByAndCounter"; };
             virtual void wrap();

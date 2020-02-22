@@ -19,7 +19,7 @@ namespace uICAL {
         return this->spanSeconds;
     }
 
-    void DatePeriod::str(std::ostream& out) const {
+    void DatePeriod::str(ostream& out) const {
         auto dhms = to_dhms(this->spanSeconds);
 
         out << "P";
@@ -30,7 +30,7 @@ namespace uICAL {
         if (std::get<3>(dhms)) out << std::get<3>(dhms) << "S";
     }
 
-    std::ostream& operator << (std::ostream& out, const DatePeriod& ds) {
+    ostream& operator << (ostream& out, const DatePeriod& ds) {
         ds.str(out);
         return out;
     }

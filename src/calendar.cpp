@@ -14,11 +14,11 @@
 #include "uICAL/debug.h"
 
 namespace uICAL {
-    Calendar::ptr Calendar::init(std::istream& ical) {
+    Calendar::ptr Calendar::init(istream& ical) {
         return Calendar::ptr(new Calendar(ical));
     }
 
-    Calendar::Calendar(std::istream& ical)
+    Calendar::Calendar(istream& ical)
     {
         auto vcalendar = uICAL::VComponent::parse(ical);
 
@@ -33,16 +33,16 @@ namespace uICAL {
         }
     }
 
-    void Calendar::str(std::ostream& out) const {
+    void Calendar::str(ostream& out) const {
         out << "CALENDAR" << uICAL::endl;
     }
 
-    std::ostream& operator << (std::ostream& out, const Calendar::ptr& c) {
+    ostream& operator << (ostream& out, const Calendar::ptr& c) {
         c->str(out);
         return out;
     }
     
-    std::ostream& operator << (std::ostream& out, const Calendar& c) {
+    ostream& operator << (ostream& out, const Calendar& c) {
         c.str(out);
         return out;
     }

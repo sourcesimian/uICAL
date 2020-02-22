@@ -58,7 +58,7 @@ namespace uICAL {
         return this->id_attrib_map[tzId].name;
     }
 
-    void TZMap::str(std::ostream& out) const {
+    void TZMap::str(ostream& out) const {
         for (auto i : this->id_attrib_map) {
             out << i.first << " : " << i.second.name << " : ";
             TZ::offsetAsString(out, i.second.offset);

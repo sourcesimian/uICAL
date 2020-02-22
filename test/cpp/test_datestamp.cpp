@@ -15,8 +15,8 @@ void cmp_datestamp(const std::string test, uICAL::DateStamp res, uICAL::DateStam
 
     if (res != exp) {
         std::cout << "FAIL: " << test << std::endl;
-        std::cout << " res: " << res << std::endl;
-        std::cout << " exp: " << exp << std::endl;
+        std::cout << " res: " << res.as_str() << std::endl;
+        std::cout << " exp: " << exp.as_str() << std::endl;
     }
 }
 
@@ -58,11 +58,11 @@ void test_datestamp_weekNo() {
         DateTime::Day d = dt.dayOfWeek();
         unsigned w = dt.weekNo();
         if (dayOfWeek != DateTime::Day::NONE && d != dayOfWeek)
-            std::cout << dt << " = " << (unsigned)d << " " << "{{" << (unsigned)dayOfWeek << "}}" << std::endl;
+            std::cout << dt.as_str() << " = " << (unsigned)d << " " << "{{" << (unsigned)dayOfWeek << "}}" << std::endl;
         else if (w != weekNo)
-            std::cout << dt << " = " << w << " " << "[" << weekNo << "]" << std::endl;
+            std::cout << dt.as_str() << " = " << w << " " << "[" << weekNo << "]" << std::endl;
         else
-            std::cout << dt << " = " << w << std::endl;
+            std::cout << dt.as_str() << " = " << w << std::endl;
 
     };
 

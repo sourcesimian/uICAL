@@ -4,17 +4,18 @@
 #ifndef uical_datestamp_h
 #define uical_datestamp_h
 
+#include "uICAL/base.h"
 #include "uICAL/datetime.h"
 #include "uICAL/epochtime.h"
 
 namespace uICAL {
-    class DateStamp {
+    class DateStamp : public Base {
         public:
             DateStamp();
             DateStamp(const string& datestamp);
             DateStamp(unsigned year, unsigned month, unsigned day, unsigned hour, unsigned minute, unsigned second);
 
-            void str(std::ostream& out) const;
+            void str(ostream& out) const;
 
             unsigned year;
             unsigned month;
@@ -58,7 +59,7 @@ namespace uICAL {
             DateTime::Day getWeekDay(unsigned days) const;
     };
     
-    std::ostream& operator << (std::ostream& out, const DateStamp& dt);
+    ostream& operator << (ostream& out, const DateStamp& dt);
 
 }
 #endif

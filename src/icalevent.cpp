@@ -28,25 +28,19 @@ namespace uICAL {
         this->rrule = RRule::init(rRule->value, this->start);
     }
 
-    string ICalEvent::str() const {
-        std::ostringstream out;
-        this->str(out);
-        return out;
-    }
-
-    void ICalEvent::str(std::ostream& out) const {
+    void ICalEvent::str(ostream& out) const {
         out << "VEVENT: " << this->summary << uICAL::endl;
         out << " - start: " << this->start << uICAL::endl;
         out << " - end: " << this->end << uICAL::endl;
         out << " - rrule: " << this->rrule << uICAL::endl;
     }
 
-    std::ostream& operator << (std::ostream& out, const ICalEvent::ptr& e) {
+    ostream& operator << (ostream& out, const ICalEvent::ptr& e) {
         e->str(out);
         return out;
     }
 
-    std::ostream& operator << (std::ostream& out, const ICalEvent& e) {
+    ostream& operator << (ostream& out, const ICalEvent& e) {
         e.str(out);
         return out;
     }

@@ -5,6 +5,7 @@
 #define uical_datetime_h
 
 #include "uICAL/types.h"
+#include "uICAL/base.h"
 #include "uICAL/epochtime.h"
 #include "uICAL/tz.h"
 
@@ -12,7 +13,7 @@ namespace uICAL {
     class DateStamp;
     class DatePeriod;
     
-    class DateTime {
+    class DateTime : public Base {
         public:
             using ptr = std::shared_ptr<DateTime>;
 
@@ -23,8 +24,7 @@ namespace uICAL {
             DateTime(seconds_t epochSeconds);
             DateTime(seconds_t epochSeconds, const TZ::ptr& tz);
 
-            void str(std::ostream& out) const;
-            string str() const;
+            void str(ostream& out) const;
 
             bool valid() const;
             
@@ -60,7 +60,7 @@ namespace uICAL {
             EpochTime epochtime;
     };
 
-    std::ostream& operator << (std::ostream& out, const DateTime& dt);
-    std::ostream& operator << (std::ostream& out, const DateTime::Day& day);
+    ostream& operator << (ostream& out, const DateTime& dt);
+    ostream& operator << (ostream& out, const DateTime::Day& day);
 }
 #endif

@@ -45,7 +45,7 @@ namespace uICAL {
         return this->counter->syncLock(from, now);
     }
     
-    void BySetPosCounter::str(std::ostream& out) const {
+    void BySetPosCounter::str(ostream& out) const {
         this->counter->str(out);
         out << "[" << this->values << "]";
     }

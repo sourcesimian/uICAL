@@ -4,16 +4,17 @@
 #ifndef uical_calendar_h
 #define uical_calendar_h
 
+#include "uICAL/base.h"
 #include "uICAL/icalevent.h"
 
 namespace uICAL {
-    class Calendar {
+    class Calendar : public Base {
         public:
             using ptr = std::shared_ptr<Calendar>;
-            static ptr init(std::istream& ical);
-            Calendar(std::istream& ical);
-            
-            void str(std::ostream& out) const;
+            static ptr init(istream& ical);
+            Calendar(istream& ical);
+
+            void str(ostream& out) const;
 
             TZMap::ptr tzmap;
 
@@ -23,8 +24,8 @@ namespace uICAL {
             events_t events;
     };
 
-    std::ostream& operator << (std::ostream& out, const Calendar::ptr& c);
-    std::ostream& operator << (std::ostream& out, const Calendar& c);
+    ostream& operator << (ostream& out, const Calendar::ptr& c);
+    ostream& operator << (ostream& out, const Calendar& c);
 
     class CalendarIter {
         public:

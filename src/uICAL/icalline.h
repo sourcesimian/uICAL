@@ -4,8 +4,10 @@
 #ifndef uical_icalline_h
 #define uical_icalline_h
 
+#include "uICAL/base.h"
+
 namespace uICAL {
-    class VLine {
+    class VLine : public Base {
         public:
             using ptr = std::shared_ptr<VLine>;
 
@@ -19,20 +21,20 @@ namespace uICAL {
             string value;
             string getParam(const string& key);
 
-            void str(std::ostream& out) const;
+            void str(ostream& out) const;
 
         private:
             void readParams(const string& str);
     };
 
-    std::ostream& operator << (std::ostream& out, const VLine::ptr& l);
-    std::ostream& operator << (std::ostream& out, const VLine& l);
+    ostream& operator << (ostream& out, const VLine::ptr& l);
+    ostream& operator << (ostream& out, const VLine& l);
 
     class VLineReader {
         public:
             using ptr = std::shared_ptr<VLineReader>;
 
-            VLineReader(); // TODO
+            VLineReader();
             virtual ~VLineReader() {};
             virtual const VLine::ptr peek() = 0;
             virtual void pop() = 0;
@@ -45,12 +47,12 @@ namespace uICAL {
 
     class VLineReaderStream : public VLineReader {
         public:
-            VLineReaderStream(std::istream& ical); // TODO
+            VLineReaderStream(istream& ical);
             virtual ~VLineReaderStream() {};
             const VLine::ptr peek();
             void pop();
         protected:
-            std::istream& ical;
+            istream& ical;
             string current;
     };
 

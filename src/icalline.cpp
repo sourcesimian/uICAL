@@ -53,7 +53,7 @@ namespace uICAL {
     }
 
     void VLine::readParams(const string& str) {
-        tokenize(str, ';', [&](const string token){
+        str.tokenize(';', [&](const string token){
             size_t equals = token.find("=");
             if (equals == string::npos) {
                 throw ParseError(string("\n!BAD PARAM: ") + token);
@@ -64,17 +64,17 @@ namespace uICAL {
         });
     }
 
-    std::ostream& operator << (std::ostream& out, const VLine::ptr& l) {
+    ostream& operator << (ostream& out, const VLine::ptr& l) {
         l->str(out);
         return out;
     }
 
-    std::ostream& operator << (std::ostream& out, const VLine& l) {
+    ostream& operator << (ostream& out, const VLine& l) {
         l.str(out);
         return out;
     }
 
-    void VLine::str(std::ostream& out) const {
+    void VLine::str(ostream& out) const {
         out << this->name;
         if (this->params.size()) {
             for (auto kv : this->params) {
@@ -95,7 +95,7 @@ namespace uICAL {
         return ret;
     }
 
-    VLineReaderStream::VLineReaderStream(std::istream& ical)
+    VLineReaderStream::VLineReaderStream(istream& ical)
     : ical(ical)
     {
         this->current.clear();
@@ -107,8 +107,8 @@ namespace uICAL {
         }
         if (this->current.empty()) {
             string token;
-            while(getline(this->ical, token, '\n')) {
-                rtrim(token);
+            while(token.readtoken(this->ical, '\n')) {
+                token.rtrim();
 
                 if (this->current.empty()) {
                     this->current = token;

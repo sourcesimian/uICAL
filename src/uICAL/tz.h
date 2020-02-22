@@ -4,12 +4,13 @@
 #ifndef uical_tz_h
 #define uical_tz_h
 
+#include "uICAL/base.h"
 #include "uICAL/tzmap.h"
 
 namespace uICAL {
     class DateStamp;
 
-    class TZ {
+    class TZ : public Base {
         public:
             using ptr = std::shared_ptr<TZ>;
 
@@ -26,19 +27,16 @@ namespace uICAL {
             TZ(const string& tz);
             TZ(const string& tz, const TZMap::ptr& tzmap);
 
-            virtual ~TZ() {}
-
-            virtual seconds_t toUTC(seconds_t timestamp) const;
-            virtual seconds_t fromUTC(seconds_t timestamp) const;
+            seconds_t toUTC(seconds_t timestamp) const;
+            seconds_t fromUTC(seconds_t timestamp) const;
 
             bool is_aware() const;
             int offset() const;
 
-            virtual void str(std::ostream& out) const;
-            string str() const;
+            void str(ostream& out) const;
 
             static int parseOffset(const string& offset);
-            static void offsetAsString(std::ostream& out, int offsetMins);
+            static void offsetAsString(ostream& out, int offsetMins);
         
         protected:
             bool aware;
@@ -49,6 +47,6 @@ namespace uICAL {
             string id;
     };
     
-    std::ostream& operator << (std::ostream& out, const TZ::ptr& tz);
+    ostream& operator << (ostream& out, const TZ::ptr& tz);
 }
 #endif

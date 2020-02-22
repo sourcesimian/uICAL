@@ -4,24 +4,23 @@
 #ifndef uical_rrule_h
 #define uical_rrule_h
 
+#include "uICAL/base.h"
 #include "uICAL/types.h"
 #include "uICAL/datetime.h"
 #include "uICAL/datestamp.h"
 #include "uICAL/tz.h"
 
 namespace uICAL {
-    class RRule {
+    class RRule : public Base {
         public:
             using ptr = std::shared_ptr<RRule>;
 
             static RRule::ptr init(const string& rrule, const DateTime& dtstart);
             RRule(const string& rrule, const DateTime& dtstart);
 
-
             void exclude(const DateTime& exclude);
 
-            void str(std::ostream& out) const;
-            string str() const;
+            void str(ostream& out) const;
 
             enum class Freq {
                 NONE, SECONDLY, MINUTELY, HOURLY, DAILY, WEEKLY, MONTHLY, YEARLY,
@@ -68,9 +67,9 @@ namespace uICAL {
             std::vector<DateTime> excludes;
     };
 
-    std::ostream& operator << (std::ostream& out, const RRule::ptr& e);
-    std::ostream& operator << (std::ostream& out, const RRule& e);
+    ostream& operator << (ostream& out, const RRule::ptr& e);
+    ostream& operator << (ostream& out, const RRule& e);
 
-    std::ostream& operator << (std::ostream& out, const RRule::Day_pair& dp);
+    ostream& operator << (ostream& out, const RRule::Day_pair& dp);
 }
 #endif

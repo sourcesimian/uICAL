@@ -4,15 +4,17 @@
 #ifndef uical_bycounter_h
 #define uical_bycounter_h
 
+#include "uICAL/types.h"
+#include "uICAL/base.h"
 #include "uICAL/datestamp.h"
 
 namespace uICAL {
-    class Counter {
+    class Counter : public Base {
         public:
             using ptr = std::shared_ptr<Counter>;
 
             Counter() {}
-            virtual ~Counter() {}
+            virtual ~Counter() = default;
 
             virtual bool reset(const DateStamp& base);
             virtual bool next() { return true; }
@@ -21,7 +23,7 @@ namespace uICAL {
             virtual bool syncLock(const DateStamp& from, const DateStamp& now) const = 0;
             virtual const string name() const = 0;
 
-            virtual void str(std::ostream& out) const;
+            virtual void str(ostream& out) const;
 
         protected:
             virtual void wrap() = 0;
@@ -42,7 +44,7 @@ namespace uICAL {
             using it_t = typename values_t::const_iterator;
 
         public:
-            virtual ~CounterT() {}
+            virtual ~CounterT() = default;
 
             virtual bool next() {
                 ++ this->it;
@@ -53,7 +55,7 @@ namespace uICAL {
                 return true;
             }
 
-            virtual void str(std::ostream& out) const {
+            virtual void str(ostream& out) const {
                 out << "<" << this->name() << " " << this->values << ">";
             }
 
@@ -169,7 +171,7 @@ namespace uICAL {
         public:
             IncCounter(unsigned interval) : interval(interval) {}
 
-            virtual void str(std::ostream& out) const;
+            virtual void str(ostream& out) const;
 
             virtual bool syncLock(const DateStamp& from, const DateStamp& now) const { std::ignore = from; std::ignore = now; return true; }
 

@@ -5,11 +5,8 @@
 #define uical_h
 
 #include <functional>
-#include <iostream>
 #include <map>
 #include <memory>
-#include <sstream>
-#include <string>
 #include <vector>
 
 #include "uICAL/types.h"

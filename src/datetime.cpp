@@ -91,7 +91,7 @@ namespace uICAL {
 
     void DateTime::assert_awareness(const DateTime& other) const {
         if (this->tz->is_aware() != other.tz->is_aware()) {
-            throw TZAwarenessConflictError(this->str() + this->tz->str() + " <> " + other.str() + other.tz->str());
+            throw TZAwarenessConflictError(this->as_str() + this->tz->as_str() + " <> " + other.as_str() + other.tz->as_str());
         }
     }
 
@@ -133,27 +133,21 @@ namespace uICAL {
         return this->epochtime == other.epochtime;
     }
 
-    void DateTime::str(std::ostream& out) const {
+    void DateTime::str(ostream& out) const {
         auto ymdhms = this->epochtime.ymdhms(this->tz);
 
-        out << fmt("%04d", std::get<0>(ymdhms));
-        out << fmt("%02d", std::get<1>(ymdhms));
-        out << fmt("%02d", std::get<2>(ymdhms));
+        out << string::fmt(fmt_04d, std::get<0>(ymdhms));
+        out << string::fmt(fmt_02d, std::get<1>(ymdhms));
+        out << string::fmt(fmt_02d, std::get<2>(ymdhms));
         out << "T";
-        out << fmt("%02d", std::get<3>(ymdhms));
-        out << fmt("%02d", std::get<4>(ymdhms));
-        out << fmt("%02d", std::get<5>(ymdhms));
+        out << string::fmt(fmt_02d, std::get<3>(ymdhms));
+        out << string::fmt(fmt_02d, std::get<4>(ymdhms));
+        out << string::fmt(fmt_02d, std::get<5>(ymdhms));
 
         this->tz->str(out);
     }
 
-    string DateTime::str() const {
-        std::ostringstream out;
-        this->str(out);
-        return out;
-    }
-
-    std::ostream& operator << (std::ostream& out, const DateTime& dt) {
+    ostream& operator << (ostream& out, const DateTime& dt) {
         dt.str(out);
         return out;
     }
@@ -180,7 +174,7 @@ namespace uICAL {
         return DateTime::Day( ((int)today + days - 1) % 7 + 1 );
     }
 
-    std::ostream& operator << (std::ostream& out, const DateTime::Day& day) {
+    ostream& operator << (ostream& out, const DateTime::Day& day) {
         if (day == DateTime::Day::MON) out << "MO";
         else if (day == DateTime::Day::TUE) out << "TU";
         else if (day == DateTime::Day::WED) out << "WE";

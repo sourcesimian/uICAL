@@ -5,20 +5,20 @@
 #define uical_util_h
 
 namespace uICAL {
-    void tokenize(const string& input, char token, std::function<void (string)> cb);
-
     class Joiner {
         public:
             Joiner(char delim);
-            std::ostringstream& out();
+
+            ostream& out();
             Joiner& next();
 
-            string str() const;
-            void str(std::ostream& out) const;
-            void write(std::ostream& out) const;
+            // string str() const;
+            void str(ostream& out) const;
+            void write(ostream& out) const;
+
         private:
             char delim;
-            std::ostringstream stream;
+            ostream stm;
             std::vector<string> values;
     };
 
@@ -31,14 +31,14 @@ namespace uICAL {
     template <typename I>
     std::vector<I> toVector(const string& value) {
         std::vector<I> v;
-        tokenize(value, ',', [&](const string part){
-            v.push_back((I)to_int(part));
+        value.tokenize(',', [&](const string part){
+            v.push_back((I)part.as_int());
         });
         return v;
     }
 
     template <typename I>
-    std::ostream& operator << (std::ostream& out, const std::vector<I> &ia) {
+    ostream& operator << (ostream& out, const std::vector<I> &ia) {
         Joiner values(',');
         
         for (I value : ia) {

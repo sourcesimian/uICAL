@@ -81,8 +81,8 @@ namespace uICAL {
 
                 // e.g.: +0200
                 sign = tz.at(0);
-                tzH = to_int(tz.substr(1, 2));
-                tzM = to_int(tz.substr(3, 2));
+                tzH = tz.substr(1, 2).as_int();
+                tzM = tz.substr(3, 2).as_int();
 
                 int offset = (tzH * 60) + tzM;
                 if (sign == '-') {
@@ -98,7 +98,7 @@ namespace uICAL {
         throw ValueError("Bad timezone: \"" + tz + "\"");
     }
 
-    void TZ::offsetAsString(std::ostream& out, int offsetMins) {
+    void TZ::offsetAsString(ostream& out, int offsetMins) {
         if (offsetMins != -1) {
             if (offsetMins == 0) {
                 out << "Z";
@@ -113,8 +113,8 @@ namespace uICAL {
                 {
                     out << "+";
                 }
-                out << fmt(fmt_02d, offsetMins / 60);
-                out << fmt(fmt_02d, offsetMins % 60);
+                out << string::fmt(fmt_02d, offsetMins / 60);
+                out << string::fmt(fmt_02d, offsetMins % 60);
             }
         }
     }
@@ -136,7 +136,7 @@ namespace uICAL {
         return timestamp + (this->offset() * 60);
     }
 
-    void TZ::str(std::ostream& out) const {
+    void TZ::str(ostream& out) const {
         if (!this->id.empty()) {
             out << this->idmap->getName(this->id);
             return;
@@ -149,13 +149,7 @@ namespace uICAL {
         TZ::offsetAsString(out, this->offsetMins);
     }
 
-    string TZ::str() const {
-        std::ostringstream out;
-        this->str(out);
-        return out;
-    }
-
-    std::ostream& operator << (std::ostream& out, const TZ::ptr& tz) {
+    ostream& operator << (ostream& out, const TZ::ptr& tz) {
         tz->str(out);
         return out;
     }

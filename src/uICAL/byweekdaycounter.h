@@ -21,6 +21,7 @@ namespace uICAL {
 
         protected:
             ByWeekDayCounter(const values_t& values, const RRule::ptr& p);
+            virtual ~ByWeekDayCounter() = default;
 
             virtual const string name() const { return "ByWeekDay"; }
             virtual void wrap();

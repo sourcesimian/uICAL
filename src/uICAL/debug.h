@@ -6,6 +6,7 @@
 #ifdef ARDUINO
 
 #include <Arduino.h>
+
 #define debug(M) \
     do { \
         Serial.println(String("[debug] ") + string(M).c_str()); \

@@ -15,7 +15,7 @@ namespace uICAL {
         return true;
     }
 
-    void Counter::str(std::ostream& out) const {
+    void Counter::str(ostream& out) const {
         out << "<" << this->name() << ">";
     }
 
@@ -251,7 +251,7 @@ namespace uICAL {
 
     const string ByYearDayCounter::name() const { return "ByYearDay"; }
 
-    void IncCounter::str(std::ostream& out) const {
+    void IncCounter::str(ostream& out) const {
         out << "<" << this->name() << " " << this->interval << ">";
     }
 

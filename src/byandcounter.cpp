@@ -83,7 +83,7 @@ namespace uICAL {
         return this->current->value();
     }
             
-    void ByAndCounter::str(std::ostream& out) const {
+    void ByAndCounter::str(ostream& out) const {
         Joiner values(',');
         for (auto counter : this->counters) {
             counter->str(values.out());

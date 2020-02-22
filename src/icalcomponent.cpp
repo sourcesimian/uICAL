@@ -26,7 +26,7 @@ namespace uICAL {
         this->children.push_back(component);
     }
 
-    VComponent::ptr VComponent::parse(std::istream& ical) {
+    VComponent::ptr VComponent::parse(istream& ical) {
         VLineReader::ptr lines = std::make_shared<VLineReaderStream>(ical);
         VComponent::ptr comp = VComponent::parse(lines);
         return comp;
@@ -87,17 +87,17 @@ namespace uICAL {
         return ret;
     }
 
-    std::ostream& operator << (std::ostream& out, const VComponent::ptr& c) {
+    ostream& operator << (ostream& out, const VComponent::ptr& c) {
         c->str(out);
         return out;
     }
 
-    std::ostream& operator << (std::ostream& out, const VComponent& c) {
+    ostream& operator << (ostream& out, const VComponent& c) {
         c.str(out);
         return out;
     }
     
-    void VComponent::str(std::ostream& out) const {
+    void VComponent::str(ostream& out) const {
         out << "BEGIN:" << this->name << uICAL::endl;
         for (auto line : this->lines) {
             out << line << uICAL::endl;

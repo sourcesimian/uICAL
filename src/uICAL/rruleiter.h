@@ -4,11 +4,12 @@
 #ifndef uical_rruleiter_h
 #define uical_rruleiter_h
 
+#include "uICAL/base.h"
 #include "uICAL/counter.h"
 #include "uICAL/rrule.h"
 
 namespace uICAL {
-    class RRuleIter {
+    class RRuleIter : public Base {
         public:
             using ptr = std::shared_ptr<RRuleIter>;
 
@@ -18,7 +19,7 @@ namespace uICAL {
             bool next();
             DateTime now() const;
 
-            void str(std::ostream& out) const;
+            void str(ostream& out) const;
 
         protected:
             using counters_t = std::vector<Counter::ptr>;
@@ -46,6 +47,6 @@ namespace uICAL {
             DateTime current_now;
     };
 
-    std::ostream& operator << (std::ostream& out, const RRuleIter::ptr& e);
+    ostream& operator << (ostream& out, const RRuleIter::ptr& e);
 }
 #endif

@@ -5,10 +5,11 @@
 #define uical_bysetpos_h
 
 #include "uICAL/counter.h"
-#include "uICAL/datestamp.h"
 
 namespace uICAL {
-   class BySetPosCounter : protected CounterT<int> {
+    class DateStamp;
+
+    class BySetPosCounter : protected CounterT<int> {
         public:
             static Counter::ptr init(Counter::ptr counter, const values_t& values);
 
@@ -18,10 +19,11 @@ namespace uICAL {
             virtual bool syncLock(const DateStamp& from, const DateStamp& now) const;
             virtual const string name() const { return "BySetPos"; }
 
-            virtual void str(std::ostream& out) const;
+            virtual void str(ostream& out) const;
 
         protected:
             BySetPosCounter(Counter::ptr counter, const values_t& values);
+            virtual ~BySetPosCounter() = default;
 
             Counter::ptr counter;
             std::vector<DateStamp> results;

@@ -54,13 +54,13 @@ namespace uICAL {
         return this->_start + this->_span;
     }
 
-    void CalendarEntry::str(std::ostream& out) const {
+    void CalendarEntry::str(ostream& out) const {
         out << "Calendar " << this->asString(this->_type) << ": " << this->_summary << uICAL::endl;
-        out << " - start: " << this->_start << endl;
-        out << " - span: " << this->_span << endl;
+        out << " - start: " << this->_start << uICAL::endl;
+        out << " - span: " << this->_span << uICAL::endl;
     }
 
-    std::ostream& operator << (std::ostream& out, const CalendarEntry::ptr& ce) {
+    ostream& operator << (ostream& out, const CalendarEntry::ptr& ce) {
         ce->str(out);
         return out;
     }

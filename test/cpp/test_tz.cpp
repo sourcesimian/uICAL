@@ -5,7 +5,10 @@
 #include <list>
 
 void test_tz1() {
-    std::ifstream input(std::string("test/data/ical2.txt"));
+    std::cout << "TEST: tz1" << std::endl;
+
+    // std::ifstream input(std::string("test/data/ical2.txt"));
+    uICAL::istream input("foo");  // TODO: fix
 
     auto vcalendar = uICAL::VComponent::parse(input);
 
@@ -37,12 +40,12 @@ void test_tz1() {
         auto tz = uICAL::TZ::init("Z");
         auto dt = uICAL::DateTime(ds, tz);
 
-        std::cout << ds << std::endl;
-        std::cout << dt.datestamp() << std::endl;
+        std::cout << ds.as_str() << std::endl;
+        std::cout << dt.datestamp().as_str() << std::endl;
         std::cout << "--" << std::endl;
 
         for (auto tz : tzList) {
-            std::cout << dt.datestamp(tz) << " " << tz << std::endl;    
+            std::cout << dt.datestamp(tz).as_str() << " " << tz->as_str() << std::endl;    
         }
     }
 }
