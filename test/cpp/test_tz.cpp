@@ -7,8 +7,8 @@
 void test_tz1() {
     std::cout << "TEST: tz1" << std::endl;
 
-    // std::ifstream input(std::string("test/data/ical2.txt"));
-    uICAL::istream input("foo");  // TODO: fix
+    std::ifstream finput(std::string("test/data/ical2.txt"));
+    uICAL::istream_stl input(finput);
 
     auto vcalendar = uICAL::VComponent::parse(input);
 

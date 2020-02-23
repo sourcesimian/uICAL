@@ -48,12 +48,66 @@ namespace uICAL {
         return ret;
     }
 
-    istream::istream(const char* st)
-    {}
+    #ifdef ARDUINO
 
-    bool istream::readuntil(string& st, char delim) {
-        std::ignore = st;
-        std::ignore = delim;
-        return false;
-    }
+        istream_String::istream_String(const String& st)
+        : st(st)
+        , pos(0)
+        {}
+
+        char istream_String::peek() const {
+            return this->st.charAt(this->pos);
+        }
+
+        char istream_String::get() {
+            return this->st.charAt(this->pos++);
+        }
+
+        bool istream_String::eof() const {
+            return this->pos >= this->st.length();
+        }
+
+        bool istream_String::readuntil(string& st, char delim) {
+            if (this->eof()) {
+                return false;
+            }
+
+            size_t index = this->st.indexOf(delim, this->pos);
+            if (index == -1) {
+                st = this->st.substring(this->pos);
+                this->pos = this->st.length();
+            }
+            else {
+                st = this->st.substring(this->pos, index);
+                this->pos = index + 1;
+            }
+            return true;
+        }
+
+    #else
+
+        istream_stl::istream_stl(std::istream& istm)
+        : istm(istm)
+        {}
+
+        char istream_stl::peek() const {
+            return this->istm.peek();
+        }
+
+        char istream_stl::get() {
+            return this->istm.get();
+        }
+
+        bool istream_stl::eof() const {
+            return this->istm.eof();
+        }
+
+        bool istream_stl::readuntil(string& st, char delim) {
+            if (std::getline(this->istm, st, delim)) {
+                return true;
+            }
+            return false;
+        }
+
+    #endif
 }

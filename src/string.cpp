@@ -16,6 +16,7 @@ namespace uICAL {
         if (this->empty()) {
             return;
         }
+
         char pattern[2];
         pattern[0] = delim;
         pattern[1] = 0;
@@ -31,8 +32,8 @@ namespace uICAL {
         }
     }
 
-    bool string::readtoken(istream& is, char delim) {
-        return is.readuntil(*this, delim);
+    bool string::readfrom(istream& istm, char delim) {
+        return istm.readuntil(*this, delim);
     }
 
     #ifdef ARDUINO

@@ -49,7 +49,7 @@ namespace uICAL {
 
                 int as_int() const;
                 void rtrim();
-                bool readtoken(istream& is, char delim);
+                bool readfrom(istream& istm, char delim);
                 void tokenize(char delim, std::function<void (string)> cb) const;
         };
 
@@ -76,7 +76,7 @@ namespace uICAL {
 
                 int as_int() const;
                 void rtrim();
-                bool readtoken(istream& is, char delim);
+                bool readfrom(istream& is, char delim);
                 void tokenize(char delim, std::function<void (string)> cb) const;
         };
 

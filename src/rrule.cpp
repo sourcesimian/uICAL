@@ -33,7 +33,7 @@ namespace uICAL {
         rrule.tokenize(';', [&](const string part){
             size_t equals = part.find("=");
             const string key = part.substr(0, equals);
-            const string value = part.substr(equals + 1, string::npos);
+            const string value = part.substr(equals + 1);
 
             if (key == "FREQ") {
                 if      (value == "SECONDLY") this->freq = Freq::SECONDLY;
@@ -44,7 +44,7 @@ namespace uICAL {
                 else if (value == "MONTHLY") this->freq = Freq::MONTHLY;
                 else if (value == "YEARLY") this->freq = Freq::YEARLY;
                 else {
-                    throw ParseError(string("Unknonwn RRULE:FREQ type: ") + value);
+                    throw ParseError(string("Unknown RRULE:FREQ type: ") + value);
                 }
             }
             else if (key == "WKST") {
@@ -87,7 +87,7 @@ namespace uICAL {
                 this->bySetPos = toVector<int>(value);
             }
             else {
-                throw ParseError(string("Unknonwn RRULE key: ") + key);
+                throw ParseError(string("Unknown RRULE key: ") + key);
             }
         });
     }
