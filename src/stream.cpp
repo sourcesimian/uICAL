@@ -73,7 +73,7 @@ namespace uICAL {
             }
 
             size_t index = this->st.indexOf(delim, this->pos);
-            if (index == -1) {
+            if (index == (size_t)-1) {
                 st = this->st.substring(this->pos);
                 this->pos = this->st.length();
             }

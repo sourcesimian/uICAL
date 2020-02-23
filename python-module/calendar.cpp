@@ -8,6 +8,7 @@
 #include "uICAL/error.h"
 #include "uICAL/util.h"
 #include "uICAL/calendar.h"
+#include "uICAL/stream.h"
 
 #define PY_SSIZE_T_CLEAN
 #include <Python.h>
@@ -58,7 +59,8 @@ namespace uical_python {
                 return -1;
             }
 
-            std::istringstream inp(ical);
+            std::istringstream _ical(ical);
+            uICAL::istream_stl inp(_ical);
             uICAL::Calendar::ptr cal = uICAL::Calendar::init(inp);
 
             uICAL::DateTime calBegin;
