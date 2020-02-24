@@ -19,10 +19,15 @@ class uICALRelay {
         uICALRelay(getTimestamp_t getUnixTimeStamp,
                    getUrl_t httpGet);
 
+        void begin();
+
         unsigned loop();
         void updateCalendar();
         unsigned updateGates();
         void wait(unsigned sleep);
+
+        void statusLed(bool state);
+        void statusLedToggle();
 
     protected:
         static const Gate gates[];

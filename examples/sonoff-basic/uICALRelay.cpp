@@ -9,7 +9,9 @@
 uICALRelay::uICALRelay(getTimestamp_t getUnixTimeStamp, getUrl_t httpGet) {
     this->getUnixTimeStamp = getUnixTimeStamp;
     this->httpGet = httpGet;
+}
 
+void uICALRelay::begin() {
     for (this->gateCount=0; this->gateCount<100; this->gateCount++) {
         if (!this->gates[this->gateCount].name) {
             break;
@@ -20,12 +22,21 @@ uICALRelay::uICALRelay(getTimestamp_t getUnixTimeStamp, getUrl_t httpGet) {
     digitalWrite(this->pushButtonPin, HIGH);
 
     pinMode(this->statusLedPin, OUTPUT);
-    digitalWrite(this->statusLedPin, LOW);
+    digitalWrite(this->statusLedPin, HIGH);
 
     for (int i=0; i<this->gateCount; i++) {
         digitalWrite(this->gates[i].pin, LOW);
         pinMode(this->gates[i].pin, OUTPUT);
     }
+}
+
+void uICALRelay::statusLed(bool state) {
+    digitalWrite(this->statusLedPin, !state);
+}
+
+void uICALRelay::statusLedToggle() {
+    uint8_t state = digitalRead(this->statusLedPin);
+    digitalWrite(this->statusLedPin, !state);
 }
 
 unsigned uICALRelay::loop() {
@@ -35,9 +46,8 @@ unsigned uICALRelay::loop() {
 }
 
 void uICALRelay::updateCalendar() {
-    bool led = digitalRead(this->statusLedPin);
     Serial.println("# Updating calendar");
-    digitalWrite(this->statusLedPin, !led);
+    digitalWrite(this->statusLedPin, LOW);
 
     String payload = this->httpGet(ICAL_URL);
 
@@ -54,7 +64,7 @@ void uICALRelay::updateCalendar() {
     else {
         Serial.println((String)"! Failed fetching calendar ");
     }
-    digitalWrite(this->statusLedPin, led);
+    digitalWrite(this->statusLedPin, HIGH);
 }
 
 unsigned uICALRelay::updateGates() {

@@ -26,7 +26,7 @@ namespace uICAL {
         else
             this->parseRRule(rrule);
 
-        debug(string("RRULE ") + this->str());
+        debug(string("RRULE ") + this->as_str());
     }
 
     void RRule::parseRRule(const string& rrule) {

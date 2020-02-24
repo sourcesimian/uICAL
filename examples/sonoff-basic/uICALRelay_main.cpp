@@ -1,12 +1,13 @@
 /*############################################################################
 # Copyright (c) 2020 Source Simian  :  https://github.com/sourcesimian/uICAL #
 ############################################################################*/
-#include <Arduino.h>
 
 #if defined(ARDUINO_ARCH_ESP8266)
     #include <ESP8266WiFi.h>
     #include <ESP8266HTTPClient.h>
+    #include <WiFiClientSecureBearSSL.h>
 #else
+    #include <Arduino.h>
     #include <WiFi.h>
     #include <HTTPClient.h>
 #endif
@@ -24,6 +25,8 @@ extern const char* g_wifi_pass;
 WiFiUDP ntpUDP;
 EasyNTPClient g_ntpClient(ntpUDP, NTP_HOST, 0); // UTC
 
+unsigned startTimeStamp;
+
 unsigned getUnixTimeStamp();
 String httpGet(const char* url);
 
@@ -31,8 +34,14 @@ uICALRelay relay(getUnixTimeStamp, httpGet);
 
 
 void setup_serial() {
-    Serial.begin(9600);
+    Serial.begin(115200);
+    for (int i=0; i<60; i++) {
+        relay.statusLedToggle();
+        delay(100);
+    }
+    relay.statusLed(true);
     delay(4000);
+    relay.statusLed(false);
     Serial.println("~~~");
 }
 
@@ -47,9 +56,11 @@ void setup_wifi() {
     Serial.print(String("Waiting for WiFi (") + g_wifi_ssid + ") ");
     while (!wifiIsUp()) {
         Serial.print(".");
-        delay(1000);
+        relay.statusLedToggle();
+        delay(500);
     }
     Serial.println(" Connected");
+    relay.statusLed(false);
 }
 
 
@@ -62,26 +73,66 @@ void setup_ntp() {
     ntpUDP.begin(123);
 
     Serial.print("Waiting for NTP ");
-    while(getUnixTimeStamp() == 0) {
+    while((startTimeStamp = getUnixTimeStamp()) == 0) {
         Serial.print(".");
+        relay.statusLedToggle();
         delay(1000);
     }
-    Serial.println(" Done");
+    Serial.println((String)" Done: " + startTimeStamp);
+    relay.statusLed(false);
 }
 
+#if defined(ARDUINO_ARCH_ESP8266)
 
-String httpGet(const char* url) {
-    HTTPClient http;
-    http.begin(url);
-    int httpCode = http.GET();
-    if (httpCode < 0) {
-        return String();
+    String httpGet(const char* url) {
+        String payload;
+        relay.statusLed(true);
+
+        std::unique_ptr<BearSSL::WiFiClientSecure> client(new BearSSL::WiFiClientSecure);
+        client->setInsecure();
+
+        Serial.print("[HTTPS] begin...\n");
+        HTTPClient https;
+        if (https.begin(*client, url)) {
+            int httpCode = https.GET();
+
+            if (httpCode > 0) {
+                Serial.printf("[HTTPS] GET... code: %d\n", httpCode);
+
+                if (httpCode == HTTP_CODE_OK) {
+                    payload = https.getString();
+                }
+            } else {
+                Serial.printf("[HTTPS] GET... failed, error: %s\n", https.errorToString(httpCode).c_str());
+            }
+            https.end();
+        } else {
+            Serial.printf("[HTTPS] Unable to connect\n");
+        }
+        relay.statusLed(false);
+        return payload;
     }
-    return http.getString();
-}
+
+#else
+
+    String httpGet(const char* url) {
+        relay.statusLed(true);
+        HTTPClient http;
+        http.begin(url);
+        int httpCode = http.GET();
+        relay.statusLed(false);
+        if (httpCode < 0) {
+            return String();
+        }
+        return http.getString();
+    }
+
+#endif
 
 
-void setup(){
+void setup() {
+    relay.begin();
+
     setup_serial();
     setup_wifi();
     setup_ntp();
@@ -89,5 +140,8 @@ void setup(){
 
 
 void loop() {
+    Serial.println("Loop: BEGIN");
     relay.wait(relay.loop());
+
+    Serial.println((String)"Uptime: " + (getUnixTimeStamp() -   startTimeStamp) + "s");
 }

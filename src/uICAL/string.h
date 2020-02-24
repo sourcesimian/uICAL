@@ -42,8 +42,12 @@ namespace uICAL {
 
                 template<typename... Args>
                 static string fmt(const char* fmt, Args... args) {
-                    char buf[10];
+                    char buf[40];
+                    memset(buf, 0, 40);
                     sprintf(buf, fmt, args...);
+                    if (buf[39] != 0) {
+                        throw_implementationError("string::format buffer overflow");
+                    }
                     return string(buf);
                 }
 
@@ -51,6 +55,9 @@ namespace uICAL {
                 void rtrim();
                 bool readfrom(istream& istm, char delim);
                 void tokenize(char delim, std::function<void (string)> cb) const;
+
+            protected:
+                static void throw_implementationError(const char* msg);
         };
 
     #else
@@ -69,8 +76,12 @@ namespace uICAL {
 
                 template<typename... Args>
                 static string fmt(const char* fmt, Args... args) {
-                    char buf[10];
+                    char buf[40];
+                    memset(buf, 0, 40);
                     sprintf(buf, fmt, args...);
+                    if (buf[39] != 0) {
+                        throw_implementationError("string::format buffer overflow");
+                    }
                     return string(buf);
                 }
 
@@ -78,6 +89,9 @@ namespace uICAL {
                 void rtrim();
                 bool readfrom(istream& is, char delim);
                 void tokenize(char delim, std::function<void (string)> cb) const;
+
+            protected:
+                static void throw_implementationError(const char* msg);
         };
 
     #endif

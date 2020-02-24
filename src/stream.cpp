@@ -23,8 +23,23 @@ namespace uICAL {
         return *this;
     }
 
+    ostream& ostream::operator <<(char ch) {
+        this->strings.push_back(string::fmt("%c", ch));
+        return *this;
+    }
+
+    ostream& ostream::operator <<(int i) {
+        this->strings.push_back(string::fmt("%d", i));
+        return *this;
+    }
+
     ostream& ostream::operator <<(unsigned int i) {
         this->strings.push_back(string::fmt("%u", i));
+        return *this;
+    }
+
+    ostream& ostream::operator <<(long long int i) {
+        this->strings.push_back(string::fmt("%lld", i));
         return *this;
     }
 

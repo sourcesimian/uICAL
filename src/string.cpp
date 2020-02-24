@@ -4,6 +4,7 @@
 #include "uICAL/cppstl.h"
 #include "uICAL/stream.h"
 #include "uICAL/string.h"
+#include "uICAL/error.h"
 
 //#include <iostream>
 
@@ -34,6 +35,10 @@ namespace uICAL {
 
     bool string::readfrom(istream& istm, char delim) {
         return istm.readuntil(*this, delim);
+    }
+
+    void string::throw_implementationError(const char* msg) {
+        throw ImplementationError(msg);
     }
 
     #ifdef ARDUINO

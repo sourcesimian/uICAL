@@ -12,7 +12,6 @@ namespace uICAL {
             ostream& out();
             Joiner& next();
 
-            // string str() const;
             void str(ostream& out) const;
             void write(ostream& out) const;
 

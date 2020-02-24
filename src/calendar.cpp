@@ -29,7 +29,7 @@ namespace uICAL {
         for (auto comp : events) {
             ICalEvent::ptr ev = ICalEvent::init(comp, this->tzmap);
             this->events.push_back(ev);
-            debug(string("Calendar ") + ev->str());
+            debug(string("Calendar ") + ev->as_str());
         }
     }
 
