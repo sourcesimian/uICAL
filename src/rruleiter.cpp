@@ -11,7 +11,7 @@
 #include "uICAL/error.h"
 #include "uICAL/rruleiter.h"
 #include "uICAL/rrule.h"
-#include "uICAL/debug.h"
+#include "uICAL/logging.h"
 
 namespace uICAL {
     RRuleIter::ptr RRuleIter::init(const RRule::ptr rr, const DateTime& begin, const DateTime& end) {

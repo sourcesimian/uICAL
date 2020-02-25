@@ -11,7 +11,7 @@
 #include "uICAL/icalline.h"
 #include "uICAL/tzmap.h"
 #include "uICAL/calendarentry.h"
-#include "uICAL/debug.h"
+#include "uICAL/logging.h"
 
 namespace uICAL {
     Calendar::ptr Calendar::init(istream& ical) {
@@ -30,7 +30,7 @@ namespace uICAL {
         for (auto comp : events) {
             ICalEvent::ptr ev = ICalEvent::init(comp, this->tzmap);
             this->events.push_back(ev);
-            debug(string("Calendar ") + ev->as_str());
+            log_trace("Calendar %s", ev->as_str());
         }
         this->_valid = true;
     }

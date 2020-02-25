@@ -6,7 +6,7 @@
 #include "uICAL/error.h"
 #include "uICAL/rrule.h"
 #include "uICAL/util.h"
-#include "uICAL/debug.h"
+#include "uICAL/logging.h"
 
 namespace uICAL {
     RRule::ptr RRule::init(const string& rrule, const DateTime& dtstart) {
@@ -26,7 +26,7 @@ namespace uICAL {
         else
             this->parseRRule(rrule);
 
-        debug(string("RRULE ") + this->as_str());
+        log_trace("RRULE %s", this->as_str());
     }
 
     void RRule::parseRRule(const string& rrule) {

@@ -6,7 +6,7 @@
 #include "uICAL/error.h"
 #include "uICAL/icalline.h"
 #include "uICAL/util.h"
-#include "uICAL/debug.h"
+#include "uICAL/logging.h"
 
 namespace uICAL {
     VLine::ptr VLine::init() {
@@ -40,7 +40,7 @@ namespace uICAL {
             this->name = line.substr(0, colon);
         }
         this->value = line.substr(colon + 1, line.length() - colon - 1);
-        debug(string("VLINE ") + this->name + " " + this->value);
+        log_trace("VLINE %s %s", this->name.c_str(), this->value.c_str());
     }
 
     string VLine::getParam(const string& key) {

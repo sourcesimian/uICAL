@@ -112,13 +112,13 @@ void setup_ntp() {
         relay.statusLed(true);
         HTTPClient http;
         http.begin(url);
-        
+        http.getStream().flush();
         int httpCode = http.GET();
         Serial.printf("[HTTPS] GET... code: %d\n", httpCode);
         if (httpCode > 0) {
+            String length = http.getStream().readStringUntil('\n');
             setStream(http.getStream());
         }
-
         relay.statusLed(false);
     }
 
@@ -156,7 +156,7 @@ void readStream(Stream& stm) {
 void loop() {
     Serial.println("Loop: BEGIN");
     
-    updateCalendar(relay.icalURL, readStream);
+    updateCalendar(relay.icalURL, relay_updateCalendar);
     unsigned unixTimeStamp = getUnixTimeStamp();
     relay.wait(relay.updateGates(unixTimeStamp));
 

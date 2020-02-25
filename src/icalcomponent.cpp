@@ -6,7 +6,7 @@
 #include "uICAL/error.h"
 #include "uICAL/icalcomponent.h"
 #include "uICAL/util.h"
-#include "uICAL/debug.h"
+#include "uICAL/logging.h"
 
 namespace uICAL {
 
@@ -49,7 +49,7 @@ namespace uICAL {
 
                 if (line->name == "END" && section == section) {
                     lines->pop();
-                    debug(string("VCOMPONENT ") + component->getName());
+                    log_trace("VCOMPONENT %s", component->getName());
                     return component;
                 }
 
