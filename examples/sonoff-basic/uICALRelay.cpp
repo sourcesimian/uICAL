@@ -6,11 +6,6 @@
 #include "uICALRelay.h"
 #include "uICALRelay_config.h"
 
-uICALRelay::uICALRelay(getTimestamp_t getUnixTimeStamp, getUrl_t httpGet) {
-    this->getUnixTimeStamp = getUnixTimeStamp;
-    this->httpGet = httpGet;
-}
-
 void uICALRelay::begin() {
     for (this->gateCount=0; this->gateCount<100; this->gateCount++) {
         if (!this->gates[this->gateCount].name) {
@@ -39,49 +34,35 @@ void uICALRelay::statusLedToggle() {
     digitalWrite(this->statusLedPin, !state);
 }
 
-unsigned uICALRelay::loop() {
-    this->updateCalendar();
-    unsigned sleep = this->updateGates();
-    return sleep;
-}
+void uICALRelay::updateCalendar(Stream& stm) {
+    try {
+        uICAL::istream_Stream istm(stm);
+        uICAL::Calendar::ptr cal = this->cal = uICAL::Calendar::init(istm);
 
-void uICALRelay::updateCalendar() {
-    Serial.println("# Updating calendar");
-    digitalWrite(this->statusLedPin, LOW);
-
-    String payload = this->httpGet(ICAL_URL);
-
-    if (payload.length()) {
-        uICAL::istream_String inp(payload);
-        try {
-            this->cal = uICAL::Calendar::init(inp);
-        }
-        catch (uICAL::Error ex) {
-            Serial.println("! Failed loading calendar");
-            Serial.println(ex.message);
+        if (cal->valid()) {
+            this->cal = cal;
         }
     }
-    else {
-        Serial.println((String)"! Failed fetching calendar ");
+    catch (uICAL::Error ex) {
+        Serial.println("! Failed loading calendar");
+        Serial.println(ex.message);
     }
-    digitalWrite(this->statusLedPin, HIGH);
 }
 
-unsigned uICALRelay::updateGates() {
-  unsigned sleep = POLL_PERIOD;
+unsigned uICALRelay::updateGates(unsigned unixTimeStamp) {
+  unsigned sleep = this->pollPeriod;
 
   if (!this->cal) {
     return sleep / 10;
   }
 
-  unsigned long unixTime = this->getUnixTimeStamp();
-  if (unixTime == 0) {
+  if (unixTimeStamp == 0) {
     Serial.println("No NTP fix");
     return sleep / 10;
   }
-  uICAL::DateTime now(unixTime);  
-  uICAL::DateTime calBegin(unixTime);
-  uICAL::DateTime calEnd(unixTime + POLL_PERIOD);
+  uICAL::DateTime now(unixTimeStamp);  
+  uICAL::DateTime calBegin(unixTimeStamp);
+  uICAL::DateTime calEnd(unixTimeStamp + this->pollPeriod);
 
   try { 
     uICAL::CalendarIter::ptr calIt = uICAL::CalendarIter::init(this->cal, calBegin, calEnd);

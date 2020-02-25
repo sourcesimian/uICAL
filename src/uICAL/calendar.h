@@ -14,6 +14,7 @@ namespace uICAL {
             static ptr init(istream& ical);
             Calendar(istream& ical);
 
+            bool valid() const;
             void str(ostream& out) const;
 
             TZMap::ptr tzmap;
@@ -22,6 +23,7 @@ namespace uICAL {
         protected:
             using events_t = std::vector<ICalEvent::ptr>;
             events_t events;
+            bool _valid;
     };
 
     ostream& operator << (ostream& out, const Calendar::ptr& c);

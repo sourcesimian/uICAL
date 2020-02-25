@@ -65,6 +65,33 @@ namespace uICAL {
 
     #ifdef ARDUINO
 
+        istream_Stream::istream_Stream(Stream& stm)
+        : stm(stm)
+        {}
+
+        char istream_Stream::peek() const {
+            int ch = this->stm.peek();
+            return ch;
+        }
+
+        char istream_Stream::get() {
+            int ch = this->stm.read();
+            return ch;
+        }
+
+        bool istream_Stream::readuntil(string& st, char delim) {
+            size_t len = 81;
+            char buf[len];
+
+            size_t read = this->stm.readBytesUntil(delim, buf, len-1);
+            if (read > 0) {
+                buf[read] = 0;
+                st = buf;
+                return true;
+            }
+            return false;
+        }
+
         istream_String::istream_String(const String& st)
         : st(st)
         , pos(0)
@@ -78,12 +105,8 @@ namespace uICAL {
             return this->st.charAt(this->pos++);
         }
 
-        bool istream_String::eof() const {
-            return this->pos >= this->st.length();
-        }
-
         bool istream_String::readuntil(string& st, char delim) {
-            if (this->eof()) {
+            if (this->pos >= this->st.length()) {
                 return false;
             }
 
@@ -111,10 +134,6 @@ namespace uICAL {
 
         char istream_stl::get() {
             return this->istm.get();
-        }
-
-        bool istream_stl::eof() const {
-            return this->istm.eof();
         }
 
         bool istream_stl::readuntil(string& st, char delim) {

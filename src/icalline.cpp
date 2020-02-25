@@ -102,9 +102,6 @@ namespace uICAL {
     }
 
     const VLine::ptr VLineReaderStream::peek() {
-        if (this->ical.eof()) {
-            throw VLineReaderEnd();
-        }
         if (this->current.empty()) {
             string token;
             while(token.readfrom(this->ical, '\n')) {

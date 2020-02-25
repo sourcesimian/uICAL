@@ -7,7 +7,9 @@
 
 #ifdef ARDUINO
 
-    #include <Arduino.h>
+    //#include <Arduino.h>
+    #include <WString.h>
+    #include <Stream.h>
 
 #else
 
@@ -44,7 +46,6 @@ namespace uICAL {
 
             virtual char peek() const = 0;
             virtual char get() = 0;
-            virtual bool eof() const = 0;
 
             virtual bool readuntil(string& st, char delim) = 0;
         protected:
@@ -52,13 +53,25 @@ namespace uICAL {
 
     #ifdef ARDUINO
 
-        class istream_String : public istream {
+        class istream_Stream : public istream {
             public:
-                istream_String(const String& istm);
+                istream_Stream(Stream& istm);
 
                 char peek() const;
                 char get();
-                bool eof() const;
+
+                bool readuntil(string& st, char delim);
+
+            protected:
+                Stream& stm;
+        };
+
+        class istream_String : public istream {
+            public:
+                istream_String(const String& st);
+
+                char peek() const;
+                char get();
 
                 bool readuntil(string& st, char delim);
 
@@ -75,7 +88,6 @@ namespace uICAL {
 
                 char peek() const;
                 char get();
-                bool eof() const;
 
                 bool readuntil(string& st, char delim);
 

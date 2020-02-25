@@ -19,6 +19,7 @@ namespace uICAL {
     }
 
     Calendar::Calendar(istream& ical)
+    : _valid(false)
     {
         auto vcalendar = uICAL::VComponent::parse(ical);
 
@@ -31,6 +32,11 @@ namespace uICAL {
             this->events.push_back(ev);
             debug(string("Calendar ") + ev->as_str());
         }
+        this->_valid = true;
+    }
+
+    bool Calendar::valid() const {
+        return this->_valid;
     }
 
     void Calendar::str(ostream& out) const {

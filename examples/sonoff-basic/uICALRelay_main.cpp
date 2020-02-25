@@ -27,10 +27,7 @@ EasyNTPClient g_ntpClient(ntpUDP, NTP_HOST, 0); // UTC
 
 unsigned startTimeStamp;
 
-unsigned getUnixTimeStamp();
-String httpGet(const char* url);
-
-uICALRelay relay(getUnixTimeStamp, httpGet);
+uICALRelay relay;
 
 
 void setup_serial() {
@@ -84,7 +81,7 @@ void setup_ntp() {
 
 #if defined(ARDUINO_ARCH_ESP8266)
 
-    String httpGet(const char* url) {
+    void updateCalendar(const char* url, std::function<void (Stream&)> setStream) {
         String payload;
         relay.statusLed(true);
 
@@ -98,10 +95,7 @@ void setup_ntp() {
 
             if (httpCode > 0) {
                 Serial.printf("[HTTPS] GET... code: %d\n", httpCode);
-
-                if (httpCode == HTTP_CODE_OK) {
-                    payload = https.getString();
-                }
+                setStream(https.getStream());
             } else {
                 Serial.printf("[HTTPS] GET... failed, error: %s\n", https.errorToString(httpCode).c_str());
             }
@@ -110,21 +104,22 @@ void setup_ntp() {
             Serial.printf("[HTTPS] Unable to connect\n");
         }
         relay.statusLed(false);
-        return payload;
     }
 
 #else
 
-    String httpGet(const char* url) {
+    void updateCalendar(const char* url, std::function<void (Stream&)> setStream) {
         relay.statusLed(true);
         HTTPClient http;
         http.begin(url);
+        
         int httpCode = http.GET();
-        relay.statusLed(false);
-        if (httpCode < 0) {
-            return String();
+        Serial.printf("[HTTPS] GET... code: %d\n", httpCode);
+        if (httpCode > 0) {
+            setStream(http.getStream());
         }
-        return http.getString();
+
+        relay.statusLed(false);
     }
 
 #endif
@@ -138,10 +133,32 @@ void setup() {
     setup_ntp();
 }
 
+void relay_updateCalendar(Stream& stm) {
+    relay.updateCalendar(stm);
+}
+
+void readStream(Stream& stm) {
+    size_t len = 81;
+    char buf[len];
+    
+    for (;;) {
+        size_t read = stm.readBytesUntil('\r', buf, len-1);
+        if (read > 0) {
+            buf[read] = 0;
+            Serial.print(buf);
+        }
+        else {
+            break;
+        }
+    }
+}
 
 void loop() {
     Serial.println("Loop: BEGIN");
-    relay.wait(relay.loop());
+    
+    updateCalendar(relay.icalURL, readStream);
+    unsigned unixTimeStamp = getUnixTimeStamp();
+    relay.wait(relay.updateGates(unixTimeStamp));
 
     Serial.println((String)"Uptime: " + (getUnixTimeStamp() -   startTimeStamp) + "s");
 }
