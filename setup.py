@@ -13,7 +13,7 @@ _DEBUG_LEVEL = 1
 
 extra_compile_args = ["-std=c++11", "-Wall", "-Wextra"]
 if _DEBUG:
-    extra_compile_args += ["-g3", "-O0", "-DDEBUG=%s" % _DEBUG_LEVEL, "-UNDEBUG"]
+    extra_compile_args += ["-g3", "-O0", "-DDEBUG=%s" % _DEBUG_LEVEL, "-UNDEBUG", "-DUICAL_LOG_LEVEL=5"]
 else:
     extra_compile_args += ["-DNDEBUG", "-O3"]
 

@@ -5,15 +5,18 @@
 #define uical_logging_h
 
 #if defined(UICAL_LOG_LEVEL)
-    #if (UICAL_LOG_LEVEL > 0)
+    #if UICAL_LOG_LEVEL > 0
         #if defined(ARDUINO)
-            #include <Arduino.h>
+        #else
+            #include <stdio.h>
+            #include <cstring>
         #endif
     #endif
 #endif
-    
+
 
 namespace uICAL {
+    #define UICAL_LOGGING_MAX_LEN 256
     #define UICAL_LOG_LEVEL_ERROR 1
     #define UICAL_LOG_LEVEL_WARN  2
     #define UICAL_LOG_LEVEL_INFO  3
@@ -21,11 +24,11 @@ namespace uICAL {
     #define UICAL_LOG_LEVEL_TRACE 5
 
     #if (!defined(UICAL_LOG_LEVEL) || UICAL_LOG_LEVEL == 0)
-        #define log_error(...)  (void)0
-        #define log_warn(...)   (void)0
-        #define log_info(...)   (void)0
-        #define log_debug(...)  (void)0
-        #define log_trace(...)  (void)0
+        #define log_error(...)   (void)0
+        #define log_warning(...) (void)0
+        #define log_info(...)    (void)0
+        #define log_debug(...)   (void)0
+        #define log_trace(...)   (void)0
     #else
         enum class _logging_level {
             error = UICAL_LOG_LEVEL_ERROR,
@@ -44,13 +47,20 @@ namespace uICAL {
 
         template<typename... Args>
         void _logging_msg(_logging_level level,
-                            const char* file, int lineNo, const char* func,
-                            const char *fmt, Args... args) {
-            const int max = 255;
+                          const char* file, int lineNo, const char* func,
+                          const char* fmt, Args... args) {
+            const int max = UICAL_LOGGING_MAX_LEN;
             char buf[max];
-            int n = snprintf(buf, max-1, "[uICAL:%c] [%s:%d] %s(): ", _logging_level_str(level)[0], file, lineNo, func);
-            snprintf(buf + n, max-1-n, fmt, args...);
-            _logging_handler(buf);
+            int n = snprintf(buf, max-1, "[uICAL:%s] [%s:%d] %s(): ", _logging_level_str(level), file, lineNo, func);
+            n += snprintf(buf + n, max-1-n, fmt, args...);
+            if (n > (max-3)) {
+                strcpy(buf+(max-3), " ~");
+            }
+            #if !defined(UICAL_LOG_HANDLER)
+                _logging_handler(buf);
+            #else
+                UICAL_LOG_HANDLER(buf);
+            #endif
         }
 
         #define __FILENAME__ (strrchr(__FILE__, '/') ? strrchr(__FILE__, '/') + 1 : __FILE__)

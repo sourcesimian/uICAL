@@ -87,14 +87,16 @@ void setup_ntp() {
 
         std::unique_ptr<BearSSL::WiFiClientSecure> client(new BearSSL::WiFiClientSecure);
         client->setInsecure();
+        //client->setFingerprint(fp);
 
-        Serial.print("[HTTPS] begin...\n");
+        //Serial.print("[HTTPS] begin...\n");
         HTTPClient https;
         if (https.begin(*client, url)) {
             int httpCode = https.GET();
 
             if (httpCode > 0) {
-                Serial.printf("[HTTPS] GET... code: %d\n", httpCode);
+                //Serial.printf("[HTTPS] GET... code: %d\n", httpCode);
+                String length = https.getStream().readStringUntil('\n');
                 setStream(https.getStream());
             } else {
                 Serial.printf("[HTTPS] GET... failed, error: %s\n", https.errorToString(httpCode).c_str());

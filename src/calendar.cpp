@@ -30,7 +30,7 @@ namespace uICAL {
         for (auto comp : events) {
             ICalEvent::ptr ev = ICalEvent::init(comp, this->tzmap);
             this->events.push_back(ev);
-            log_trace("Calendar %s", ev->as_str());
+            log_trace("Found %s", ev->as_str().c_str());
         }
         this->_valid = true;
     }
@@ -61,6 +61,7 @@ namespace uICAL {
     : cal(cal)
     {
         if (begin.valid() && end.valid() && end < begin) {
+            log_error("Begin and end describe a negative range: %s -> %s", begin.as_str().c_str(), end.as_str().c_str());
             throw ValueError("Begin and end describe a negative range");
         }
 
@@ -90,6 +91,7 @@ namespace uICAL {
 
     CalendarEntry::ptr CalendarIter::current() const {
         if (! this->currentEntry) {
+            log_warning("%s", "No more entries");
             throw RecurrenceError("No more entries");
         }
         return this->currentEntry;

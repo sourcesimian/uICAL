@@ -22,7 +22,8 @@ class uICALRelay {
         void statusLed(bool state);
         void statusLedToggle();
 
-        static const char icalURL[];
+        static const char* hostFingerprint;
+        static const char* icalURL;
 
     protected:
         static const int pollPeriod;

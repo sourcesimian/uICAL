@@ -49,7 +49,7 @@ namespace uICAL {
 
                 if (line->name == "END" && section == section) {
                     lines->pop();
-                    log_trace("VCOMPONENT %s", component->getName());
+                    log_trace("VCOMPONENT %s", component->getName().c_str());
                     return component;
                 }
 

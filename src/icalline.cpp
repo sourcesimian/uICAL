@@ -22,6 +22,7 @@ namespace uICAL {
 
     VLine::VLine(const string& line) {
         if(line.empty()) {
+            log_error("%s", "VLINE is empty");
             throw ParseError("VLINE is empty");
         }
 
@@ -29,6 +30,7 @@ namespace uICAL {
         size_t semicolon = line.find(";");
 
         if (colon == string::npos) {
+            log_error("VLINE does not have a ':' \"%s\"", line.c_str());
             throw ParseError(string("VLINE does not have a ':' \"") + line + "\"");
         }
         
@@ -56,7 +58,8 @@ namespace uICAL {
         str.tokenize(';', [&](const string token){
             size_t equals = token.find("=");
             if (equals == string::npos) {
-                throw ParseError(string("\n!BAD PARAM: ") + token);
+                log_error("Bad param: \"%s\"", token.c_str());
+                throw ParseError(string("Bad param: ") + token);
             }
             const string name = token.substr(0, equals);
             const string value = token.substr(equals + 1, token.length());

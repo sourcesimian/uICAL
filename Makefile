@@ -1,5 +1,5 @@
 CXX		  := clang++
-CXX_FLAGS := -Wall -Wextra -std=c++11 -g
+CXX_FLAGS := -Wall -Wextra -std=c++11 -g -DUICAL_LOG_LEVEL=5
 CXX_GCOV := -fprofile-arcs -ftest-coverage
 
 BIN		:= build/bin
