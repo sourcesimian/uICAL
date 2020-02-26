@@ -59,9 +59,4 @@ namespace uICAL {
         out << " - start: " << this->_start << uICAL::endl;
         out << " - span: " << this->_span << uICAL::endl;
     }
-
-    ostream& operator << (ostream& out, const CalendarEntry::ptr& ce) {
-        ce->str(out);
-        return out;
-    }
 }

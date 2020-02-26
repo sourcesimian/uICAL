@@ -37,8 +37,6 @@ namespace uICAL {
             DateTime _start;
             DatePeriod _span;
     };
-
-    ostream& operator << (ostream& out, const CalendarEntry::ptr& e);
 }
 
 #endif

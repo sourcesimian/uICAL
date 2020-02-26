@@ -148,9 +148,4 @@ namespace uICAL {
             return;
         TZ::offsetAsString(out, this->offsetMins);
     }
-
-    ostream& operator << (ostream& out, const TZ::ptr& tz) {
-        tz->str(out);
-        return out;
-    }
 }

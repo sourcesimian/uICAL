@@ -60,7 +60,6 @@ namespace uICAL {
             EpochTime epochtime;
     };
 
-    ostream& operator << (ostream& out, const DateTime& dt);
     ostream& operator << (ostream& out, const DateTime::Day& day);
 }
 #endif

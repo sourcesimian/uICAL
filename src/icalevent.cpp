@@ -9,11 +9,11 @@
 #include "uICAL/icalcomponent.h"
 
 namespace uICAL {
-    ICalEvent::ptr ICalEvent::init(VComponent::ptr& event, const TZMap::ptr& tzmap) {
+    ICalEvent::ptr ICalEvent::init(const VComponent::ptr& event, const TZMap::ptr& tzmap) {
         return ptr(new ICalEvent(event, tzmap));
     }
 
-    ICalEvent::ICalEvent(VComponent::ptr& event, const TZMap::ptr& tzmap) {
+    ICalEvent::ICalEvent(const VComponent::ptr& event, const TZMap::ptr& tzmap) {
 
         VLine::ptr dtStart = event->getPropertyByName("DTSTART");
         VLine::ptr dtEnd = event->getPropertyByName("DTEND");
@@ -32,17 +32,7 @@ namespace uICAL {
         out << "VEVENT: " << this->summary << uICAL::endl;
         out << " - start: " << this->start << uICAL::endl;
         out << " - end: " << this->end << uICAL::endl;
-        out << " - rrule: " << this->rrule << uICAL::endl;
-    }
-
-    ostream& operator << (ostream& out, const ICalEvent::ptr& e) {
-        e->str(out);
-        return out;
-    }
-
-    ostream& operator << (ostream& out, const ICalEvent& e) {
-        e.str(out);
-        return out;
+        out << " - rrule: " << *this->rrule << uICAL::endl;
     }
 
     ICalEventIter::ptr ICalEventIter::init(const ICalEvent::ptr ice, DateTime begin, DateTime end) {

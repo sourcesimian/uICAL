@@ -40,7 +40,5 @@ namespace uICAL {
         protected:
             static const seconds_t NaN;
     };
-
-    ostream& operator << (ostream& out, const EpochTime& et);
 }
 #endif

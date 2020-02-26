@@ -129,11 +129,6 @@ namespace uICAL {
         this->second < 60 ? out << string::fmt(fmt_02d, this->second) : out << "??";;
     }
 
-    ostream& operator << (ostream& out, const DateStamp& dt) {
-        dt.str(out);
-        return out;
-    }
-
     DateTime::Day DateStamp::dayOfWeek() const {
         auto days = days_from_civil(this->year, this->month, this->day);
         unsigned weekday = weekday_from_days(days);

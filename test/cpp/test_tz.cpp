@@ -7,10 +7,13 @@
 void test_tz1() {
     std::cout << "TEST: tz1" << std::endl;
 
-    std::ifstream finput(std::string("test/data/ical2.txt"));
-    uICAL::istream_stl input(finput);
+    std::ifstream input(std::string("test/data/ical2.txt"));
+    uICAL::istream_stl ical(input);
 
-    auto vcalendar = uICAL::VComponent::parse(input);
+    uICAL::VLineStream lines(ical);
+    uICAL::VComponentStream components(lines);
+
+    auto vcalendar = components.next();
 
     auto tzmap = uICAL::TZMap::init(*vcalendar.get());
 

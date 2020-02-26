@@ -42,7 +42,11 @@ namespace uICAL {
             this->name = line.substr(0, colon);
         }
         this->value = line.substr(colon + 1, line.length() - colon - 1);
-        log_trace("VLINE %s %s", this->name.c_str(), this->value.c_str());
+        log_trace("VLINE %s", this->as_str().c_str());
+    }
+
+    bool VLine::empty() const {
+        return this->name.empty();
     }
 
     string VLine::getParam(const string& key) {
@@ -67,16 +71,6 @@ namespace uICAL {
         });
     }
 
-    ostream& operator << (ostream& out, const VLine::ptr& l) {
-        l->str(out);
-        return out;
-    }
-
-    ostream& operator << (ostream& out, const VLine& l) {
-        l.str(out);
-        return out;
-    }
-
     void VLine::str(ostream& out) const {
         out << this->name;
         if (this->params.size()) {
@@ -88,47 +82,16 @@ namespace uICAL {
         out << ":" << this->value;
     }
 
-    VLineReader::VLineReader() {
-        this->line = 0;
-    }
-
-    const VLine::ptr VLineReader::next() {
-        VLine::ptr ret = this->peek();
-        this->pop();
-        return ret;
-    }
-
-    VLineReaderStream::VLineReaderStream(istream& ical)
+    VLineStream::VLineStream(istream& ical)
     : ical(ical)
-    {
-        this->current.clear();
-    }
+    {}
 
-    const VLine::ptr VLineReaderStream::peek() {
-        if (this->current.empty()) {
-            string token;
-            while(token.readfrom(this->ical, '\n')) {
-                token.rtrim();
-
-                if (this->current.empty()) {
-                    this->current = token;
-                }
-                else {
-                    this->current += token;
-                }
-                this->line ++;
-                if (this->ical.peek() != ' ') {
-                    break;
-                }
-                else {
-                    this->ical.get();
-                }
-            }
+    const VLine::ptr VLineStream::next() {
+        string line;
+        if(line.readfrom(this->ical, '\n')) {
+            line.rtrim();
+            return VLine::init(line);
         }
-        return VLine::init(this->current);
-    }
-
-    void VLineReaderStream::pop() {
-        this->current.clear();
+        return VLine::init();
     }
 }

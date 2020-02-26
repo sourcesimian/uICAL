@@ -46,7 +46,5 @@ namespace uICAL {
             const TZMap::ptr idmap;
             string id;
     };
-    
-    ostream& operator << (ostream& out, const TZ::ptr& tz);
 }
 #endif

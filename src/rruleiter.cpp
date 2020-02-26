@@ -376,9 +376,4 @@ namespace uICAL {
         }
         counters.str(out);
     }
-
-    ostream& operator << (ostream& out, const RRuleIter::ptr& r) {
-        r->str(out);
-        return out;
-    }
 }

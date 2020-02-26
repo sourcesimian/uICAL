@@ -67,9 +67,6 @@ namespace uICAL {
             std::vector<DateTime> excludes;
     };
 
-    ostream& operator << (ostream& out, const RRule::ptr& e);
-    ostream& operator << (ostream& out, const RRule& e);
-
     ostream& operator << (ostream& out, const RRule::Day_pair& dp);
 }
 #endif

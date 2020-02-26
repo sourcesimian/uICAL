@@ -58,8 +58,5 @@ namespace uICAL {
             void validate() const;
             DateTime::Day getWeekDay(unsigned days) const;
     };
-    
-    ostream& operator << (ostream& out, const DateStamp& dt);
-
 }
 #endif

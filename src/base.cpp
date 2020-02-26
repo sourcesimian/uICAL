@@ -12,4 +12,9 @@ namespace uICAL {
         this->str(stm);
         return stm;
     }
+
+    ostream& operator << (ostream& out, const Base& b) {
+        b.str(out);
+        return out;
+    }
 }

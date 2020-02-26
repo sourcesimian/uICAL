@@ -7,9 +7,13 @@
 #if defined(UICAL_LOG_LEVEL)
     #if UICAL_LOG_LEVEL > 0
         #if defined(ARDUINO)
+            #include <stdio.h>
+            #include <cstring>
+            #include <tuple>
         #else
             #include <stdio.h>
             #include <cstring>
+            #include <tuple>
         #endif
     #endif
 #endif

@@ -20,8 +20,6 @@ namespace uICAL {
         protected:
             seconds_t spanSeconds;
     };
-
-    ostream& operator << (ostream& out, const DatePeriod& ds);
 }
 
 #endif

@@ -21,7 +21,10 @@ namespace uICAL {
     Calendar::Calendar(istream& ical)
     : _valid(false)
     {
-        auto vcalendar = uICAL::VComponent::parse(ical);
+        VLineStream lines(ical);
+        VComponentStream components(lines);
+
+        VComponent::ptr vcalendar = components.next();
 
         this->tzmap = TZMap::init(*vcalendar.get());
 
@@ -41,16 +44,6 @@ namespace uICAL {
 
     void Calendar::str(ostream& out) const {
         out << "CALENDAR" << uICAL::endl;
-    }
-
-    ostream& operator << (ostream& out, const Calendar::ptr& c) {
-        c->str(out);
-        return out;
-    }
-    
-    ostream& operator << (ostream& out, const Calendar& c) {
-        c.str(out);
-        return out;
     }
 
     CalendarIter::ptr CalendarIter::init(const Calendar::ptr cal, const DateTime& begin, const DateTime& end) {

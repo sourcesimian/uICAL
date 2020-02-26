@@ -72,9 +72,4 @@ namespace uICAL {
     void EpochTime::str(ostream& out) const {
         out << this->epochSeconds;
     }
-
-    ostream& operator << (ostream& out, const EpochTime& et) {
-        et.str(out);
-        return out;
-    }
 }

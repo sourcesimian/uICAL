@@ -269,16 +269,6 @@ namespace uICAL {
         values.str(out);
     }
 
-    ostream& operator << (ostream& out, const RRule::ptr& r) {
-        r->str(out);
-        return out;
-    }
-
-    ostream& operator << (ostream& out, const RRule& r) {
-        r.str(out);
-        return out;
-    }
-
     ostream& operator << (ostream& out, const RRule::Day_pair& dp) {
         int idx;
         DateTime::Day day;

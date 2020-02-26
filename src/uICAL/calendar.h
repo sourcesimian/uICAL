@@ -26,9 +26,6 @@ namespace uICAL {
             bool _valid;
     };
 
-    ostream& operator << (ostream& out, const Calendar::ptr& c);
-    ostream& operator << (ostream& out, const Calendar& c);
-
     class CalendarIter {
         public:
             using ptr = std::shared_ptr<CalendarIter>;

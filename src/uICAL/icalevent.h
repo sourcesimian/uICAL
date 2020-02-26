@@ -18,8 +18,8 @@ namespace uICAL {
     class ICalEvent : public Base {
         public:
             using ptr = std::shared_ptr<ICalEvent>;
-            static ptr init(VComponent::ptr& event, const TZMap::ptr& tzmap);
-            ICalEvent(VComponent::ptr& event, const TZMap::ptr& tzmap);
+            static ptr init(const VComponent::ptr& event, const TZMap::ptr& tzmap);
+            ICalEvent(const VComponent::ptr& event, const TZMap::ptr& tzmap);
 
             void str(ostream& out) const;
 
@@ -30,9 +30,6 @@ namespace uICAL {
             string summary;
             RRule::ptr rrule;
     };
-
-    ostream& operator << (ostream& out, const ICalEvent::ptr& e);
-    ostream& operator << (ostream& out, const ICalEvent& e);
 
     class ICalEventIter {
         public:

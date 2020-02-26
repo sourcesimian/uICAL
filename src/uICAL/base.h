@@ -14,6 +14,8 @@ namespace uICAL {
             virtual void str(ostream& stm) const = 0;
             string as_str() const;
     };
+
+    ostream& operator << (ostream& out, const Base& b);
 }
 
 #endif

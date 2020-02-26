@@ -46,7 +46,5 @@ namespace uICAL {
 
             DateTime current_now;
     };
-
-    ostream& operator << (ostream& out, const RRuleIter::ptr& e);
 }
 #endif

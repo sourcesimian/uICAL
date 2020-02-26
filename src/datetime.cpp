@@ -147,11 +147,6 @@ namespace uICAL {
         this->tz->str(out);
     }
 
-    ostream& operator << (ostream& out, const DateTime& dt) {
-        dt.str(out);
-        return out;
-    }
-
     unsigned DateTime::daysUntil(DateTime::Day today, DateTime::Day then) {
         return ((int)today <= (int)then ? 0 : 7) + (int)then - (int)today;
     }

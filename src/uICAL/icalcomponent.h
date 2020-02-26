@@ -8,33 +8,46 @@
 #include "uICAL/icalline.h"
 
 namespace uICAL {
+    class VComponentStream;
+
     class VComponent : public Base {
         public:
             using ptr = std::shared_ptr<VComponent>;
-            using vector = std::vector<ptr>;
+            static ptr init();
+            static ptr init(VLine::ptr beginline);
 
+            VComponent();
             VComponent(VLine::ptr beginline);
 
-            static ptr parse(istream& ical);
-            static ptr parse(VLineReader::ptr& lines);
+            bool empty() const;
+
+            const string& getName() const;
 
             VLine::ptr getPropertyByName(const string& name);
+            using vector = std::vector<ptr>;
             vector listComponents(const string& name);
-
-            string getName();
 
             void str(ostream& out) const;
 
         protected:
-            void addLine(VLine::ptr line);
-            void addComponent(VComponent::ptr component);
-
             string name;
             std::vector<VLine::ptr> lines;
             std::vector<VComponent::ptr> children;
+
+            friend VComponentStream;
     };
 
-    ostream& operator << (ostream& out, const VComponent::ptr& c);
-    ostream& operator << (ostream& out, const VComponent& c);
+
+    class VComponentStream {
+        public:
+            VComponentStream(VLineStream& stm);
+
+            VComponent::ptr next();
+
+        protected:
+            void load(VComponent::ptr comp);
+            VLineStream& stm;
+    };
+
 }
 #endif

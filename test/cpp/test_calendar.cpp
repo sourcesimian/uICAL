@@ -4,10 +4,10 @@
 #include <fstream>
 
 void test_cal1() {
-    std::ifstream finput(std::string("test/data/ical1.txt"));
-    uICAL::istream_stl input(finput);
+    std::ifstream input(std::string("test/data/ical1.txt"));
+    uICAL::istream_stl ical(input);
 
-    auto cal = uICAL::Calendar::init(input);
+    auto cal = uICAL::Calendar::init(ical);
     std::cout << cal->tzmap->as_str();
 
     auto calIt = uICAL::CalendarIter::init(cal,
