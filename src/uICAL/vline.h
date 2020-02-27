@@ -27,18 +27,5 @@ namespace uICAL {
         private:
             void readParams(const string& str);
     };
-
-    class VLineStream {
-        public:
-            using ptr = std::shared_ptr<VLineStream>;
-
-            VLineStream(istream& ical);
-            // const VLine::ptr peek();
-            // void pop();
-            const VLine::ptr next();
-        protected:
-            istream& ical;
-            // string current;
-    };
 }
 #endif

@@ -5,19 +5,13 @@
 #define uical_component_h
 
 #include "uICAL/base.h"
-#include "uICAL/icalline.h"
+#include "uICAL/vline.h"
 
 namespace uICAL {
-    class VComponentStream;
 
-    class VComponent : public Base {
+    class VObject : public Base {
         public:
-            using ptr = std::shared_ptr<VComponent>;
-            static ptr init();
-            static ptr init(VLine::ptr beginline);
-
-            VComponent();
-            VComponent(VLine::ptr beginline);
+            using ptr = std::shared_ptr<VObject>;
 
             bool empty() const;
 
@@ -30,24 +24,16 @@ namespace uICAL {
             void str(ostream& out) const;
 
         protected:
+            static ptr init();
+            static ptr init(VLine::ptr beginline);
+
+            VComponent();
+            VComponent(VLine::ptr beginline);
+
             string name;
             std::vector<VLine::ptr> lines;
             std::vector<VComponent::ptr> children;
 
             friend VComponentStream;
     };
-
-
-    class VComponentStream {
-        public:
-            VComponentStream(VLineStream& stm);
-
-            VComponent::ptr next();
-
-        protected:
-            void load(VComponent::ptr comp);
-            VLineStream& stm;
-    };
-
 }
-#endif

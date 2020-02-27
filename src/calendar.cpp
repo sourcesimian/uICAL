@@ -6,9 +6,11 @@
 #include "uICAL/error.h"
 #include "uICAL/util.h"
 #include "uICAL/calendar.h"
-#include "uICAL/icalevent.h"
-#include "uICAL/icalcomponent.h"
-#include "uICAL/icalline.h"
+#include "uICAL/vevent.h"
+#include "uICAL/vcomponent.h"
+#include "uICAL/vcomponentstream.h"
+#include "uICAL/vline.h"
+#include "uICAL/vlinestream.h"
 #include "uICAL/tzmap.h"
 #include "uICAL/calendarentry.h"
 #include "uICAL/logging.h"
@@ -19,7 +21,6 @@ namespace uICAL {
     }
 
     Calendar::Calendar(istream& ical)
-    : _valid(false)
     {
         VLineStream lines(ical);
         VComponentStream components(lines);
@@ -31,15 +32,10 @@ namespace uICAL {
         auto events = vcalendar->listComponents("VEVENT");
 
         for (auto comp : events) {
-            ICalEvent::ptr ev = ICalEvent::init(comp, this->tzmap);
+            VEvent::ptr ev = VEvent::init(comp, this->tzmap);
             this->events.push_back(ev);
             log_trace("Found %s", ev->as_str().c_str());
         }
-        this->_valid = true;
-    }
-
-    bool Calendar::valid() const {
-        return this->_valid;
     }
 
     void Calendar::str(ostream& out) const {
@@ -59,7 +55,7 @@ namespace uICAL {
         }
 
         for (auto ev : this->cal->events) {
-            ICalEventIter::ptr evIt = ICalEventIter::init(ev, begin, end);
+            VEventIter::ptr evIt = VEventIter::init(ev, begin, end);
 
             if (evIt->next()) {  // Initialise and filter
                 this->events.push_back(evIt);

@@ -7,7 +7,7 @@
 #include "uICAL/base.h"
 #include "uICAL/tzmap.h"
 #include "uICAL/rruleiter.h"
-#include "uICAL/icalcomponent.h"
+#include "uICAL/vcomponent.h"
 #include "uICAL/calendarentry.h"
 
 
@@ -15,15 +15,15 @@ namespace uICAL {
     class VComponent;
     class DateTime;
 
-    class ICalEvent : public Base {
+    class VEvent : public VComponent {
         public:
-            using ptr = std::shared_ptr<ICalEvent>;
+            using ptr = std::shared_ptr<VEvent>;
             static ptr init(const VComponent::ptr& event, const TZMap::ptr& tzmap);
-            ICalEvent(const VComponent::ptr& event, const TZMap::ptr& tzmap);
+            VEvent(const VComponent::ptr& event, const TZMap::ptr& tzmap);
 
             void str(ostream& out) const;
 
-            friend class ICalEventIter;
+            friend class VEventIter;
         private:
             DateTime start;
             DateTime end;
@@ -31,23 +31,23 @@ namespace uICAL {
             RRule::ptr rrule;
     };
 
-    class ICalEventIter {
+    class VEventIter {
         public:
-            using ptr = std::shared_ptr<ICalEventIter>;
-            static ptr init(const ICalEvent::ptr ice, DateTime begin, DateTime end);
-            ICalEventIter(const ICalEvent::ptr ice, DateTime begin, DateTime end);
+            using ptr = std::shared_ptr<VEventIter>;
+            static ptr init(const VEvent::ptr ice, DateTime begin, DateTime end);
+            VEventIter(const VEvent::ptr ice, DateTime begin, DateTime end);
 
             bool next();
             DateTime now() const;
             CalendarEntry::ptr entry() const;
 
-            friend bool operator < (const ICalEventIter::ptr& a, const ICalEventIter::ptr& b);
+            friend bool operator < (const VEventIter::ptr& a, const VEventIter::ptr& b);
         private:
-            const ICalEvent::ptr ice;
+            const VEvent::ptr ice;
             RRuleIter::ptr rrule;
             DateTime range_begin;
     };
 
-    bool operator < (const ICalEventIter::ptr& a, const ICalEventIter::ptr& b);
+    bool operator < (const VEventIter::ptr& a, const VEventIter::ptr& b);
 }
 #endif

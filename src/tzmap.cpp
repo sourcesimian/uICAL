@@ -3,7 +3,7 @@
 ############################################################################*/
 #include "uICAL/cppstl.h"
 #include "uICAL/types.h"
-#include "uICAL/icalcomponent.h"
+#include "uICAL/vcomponent.h"
 #include "uICAL/tzmap.h"
 #include "uICAL/tz.h"
 

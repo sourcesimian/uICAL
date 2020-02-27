@@ -5,7 +5,7 @@
 #define uical_calendar_h
 
 #include "uICAL/base.h"
-#include "uICAL/icalevent.h"
+#include "uICAL/vevent.h"
 
 namespace uICAL {
     class Calendar : public Base {
@@ -14,16 +14,14 @@ namespace uICAL {
             static ptr init(istream& ical);
             Calendar(istream& ical);
 
-            bool valid() const;
             void str(ostream& out) const;
 
             TZMap::ptr tzmap;
 
             friend class CalendarIter;
         protected:
-            using events_t = std::vector<ICalEvent::ptr>;
+            using events_t = std::vector<VEvent::ptr>;
             events_t events;
-            bool _valid;
     };
 
     class CalendarIter {
@@ -38,7 +36,7 @@ namespace uICAL {
         protected:
             const Calendar::ptr cal;
 
-            using events_t = std::vector<ICalEventIter::ptr>;
+            using events_t = std::vector<VEventIter::ptr>;
             events_t events;
 
             CalendarEntry::ptr currentEntry;

@@ -16,6 +16,12 @@ namespace uICAL {
     };
 
     ostream& operator << (ostream& out, const Base& b);
+
+    template<typename T>
+    ostream& operator << (ostream& out, const std::shared_ptr<T>& b) {
+        b->str(out);
+        return out;
+    }
 }
 
 #endif

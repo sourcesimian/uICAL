@@ -1,5 +1,8 @@
 #include "uICAL.h"
 
+#include "uICAL/vcomponentstream.h"
+
+
 #include <iostream>
 #include <fstream>
 #include <list>

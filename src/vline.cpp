@@ -4,7 +4,7 @@
 #include "uICAL/cppstl.h"
 #include "uICAL/types.h"
 #include "uICAL/error.h"
-#include "uICAL/icalline.h"
+#include "uICAL/vline.h"
 #include "uICAL/util.h"
 #include "uICAL/logging.h"
 
@@ -80,18 +80,5 @@ namespace uICAL {
             }
         }
         out << ":" << this->value;
-    }
-
-    VLineStream::VLineStream(istream& ical)
-    : ical(ical)
-    {}
-
-    const VLine::ptr VLineStream::next() {
-        string line;
-        if(line.readfrom(this->ical, '\n')) {
-            line.rtrim();
-            return VLine::init(line);
-        }
-        return VLine::init();
     }
 }
