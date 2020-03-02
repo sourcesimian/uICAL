@@ -5,6 +5,7 @@
 #include "uICAL/types.h"
 #include "uICAL/error.h"
 #include "uICAL/util.h"
+#include "uICAL/logging.h"
 #include "uICAL/counter.h"
 
 namespace uICAL {
@@ -19,29 +20,29 @@ namespace uICAL {
         out << "<" << this->name() << ">";
     }
 
-    bool operator > (const Counter::ptr& a, const Counter::ptr& b) {
+    bool operator > (const Counter_ptr& a, const Counter_ptr& b) {
         return a->value() > b->value();
     }
 
-    bool operator < (const Counter::ptr& a, const Counter::ptr& b) {
+    bool operator < (const Counter_ptr& a, const Counter_ptr& b) {
         return a->value() < b->value();
     }
 
-    bool operator <= (const Counter::ptr& a, const Counter::ptr& b) {
+    bool operator <= (const Counter_ptr& a, const Counter_ptr& b) {
         return a->value() <= b->value();
     }
 
-    bool operator == (const Counter::ptr& a, const Counter::ptr& b) {
+    bool operator == (const Counter_ptr& a, const Counter_ptr& b) {
         return a->value() == b->value();
     }
 
-    Counter::ptr BySecondCounter::init(const values_t values) {
-        return Counter::ptr((Counter*)new BySecondCounter(values));
+    Counter_ptr BySecondCounter::init(const values_t values) {
+        return Counter_ptr((Counter*)new BySecondCounter(values));
     }
 
-    Counter::ptr BySecondCounter::init(const value_t value) {
+    Counter_ptr BySecondCounter::init(const value_t value) {
         values_t values{value};
-        return Counter::ptr((Counter*)new BySecondCounter(values));
+        return Counter_ptr((Counter*)new BySecondCounter(values));
     }
 
     DateStamp BySecondCounter::value() const {
@@ -63,13 +64,13 @@ namespace uICAL {
         return CounterT::reset(_base);
     }
 
-    Counter::ptr ByMinuteCounter::init(const values_t values) {
-        return Counter::ptr((Counter*)new ByMinuteCounter(values));
+    Counter_ptr ByMinuteCounter::init(const values_t values) {
+        return Counter_ptr((Counter*)new ByMinuteCounter(values));
     }
 
-    Counter::ptr ByMinuteCounter::init(const value_t value) {
+    Counter_ptr ByMinuteCounter::init(const value_t value) {
         values_t values{value};
-        return Counter::ptr((Counter*)new ByMinuteCounter(values));
+        return Counter_ptr((Counter*)new ByMinuteCounter(values));
     }
 
     DateStamp ByMinuteCounter::value() const {
@@ -84,13 +85,13 @@ namespace uICAL {
 
     const string ByMinuteCounter::name() const { return "ByMinute"; }
 
-    Counter::ptr ByHourCounter::init(const values_t values) {
-        return Counter::ptr((Counter*)new ByHourCounter(values));
+    Counter_ptr ByHourCounter::init(const values_t values) {
+        return Counter_ptr((Counter*)new ByHourCounter(values));
     }
 
-    Counter::ptr ByHourCounter::init(const value_t value) {
+    Counter_ptr ByHourCounter::init(const value_t value) {
         values_t values{value};
-        return Counter::ptr((Counter*)new ByHourCounter(values));
+        return Counter_ptr((Counter*)new ByHourCounter(values));
     }
 
     bool ByHourCounter::reset(const DateStamp& base) {
@@ -112,13 +113,13 @@ namespace uICAL {
 
     const string ByHourCounter::name() const { return "ByHour"; }
 
-    Counter::ptr ByMonthDayCounter::init(const values_t values) {
-        return Counter::ptr((Counter*)new ByMonthDayCounter(values));
+    Counter_ptr ByMonthDayCounter::init(const values_t values) {
+        return Counter_ptr((Counter*)new ByMonthDayCounter(values));
     }
 
-    Counter::ptr ByMonthDayCounter::init(const value_t value) {
+    Counter_ptr ByMonthDayCounter::init(const value_t value) {
         values_t values{value};
-        return Counter::ptr((Counter*)new ByMonthDayCounter(values));
+        return Counter_ptr((Counter*)new ByMonthDayCounter(values));
     }
 
     bool ByMonthDayCounter::reset(const DateStamp& base) {
@@ -156,13 +157,13 @@ namespace uICAL {
 
     const string ByMonthDayCounter::name() const { return "ByMonthDay"; }
 
-    Counter::ptr ByWeekNoCounter::init(const values_t values) {
-        return Counter::ptr((Counter*)new ByWeekNoCounter(values));
+    Counter_ptr ByWeekNoCounter::init(const values_t values) {
+        return Counter_ptr((Counter*)new ByWeekNoCounter(values));
     }
 
-    Counter::ptr ByWeekNoCounter::init(const value_t value) {
+    Counter_ptr ByWeekNoCounter::init(const value_t value) {
         values_t values{value};
-        return Counter::ptr((Counter*)new ByWeekNoCounter(values));
+        return Counter_ptr((Counter*)new ByWeekNoCounter(values));
     }
 
     DateStamp ByWeekNoCounter::value() const {
@@ -177,13 +178,13 @@ namespace uICAL {
 
     const string ByWeekNoCounter::name() const { return "ByWeekNo"; }
 
-    Counter::ptr ByMonthCounter::init(const values_t values) {
-        return Counter::ptr((Counter*)new ByMonthCounter(values));
+    Counter_ptr ByMonthCounter::init(const values_t values) {
+        return Counter_ptr((Counter*)new ByMonthCounter(values));
     }
 
-    Counter::ptr ByMonthCounter::init(const value_t value) {
+    Counter_ptr ByMonthCounter::init(const value_t value) {
         values_t values{value};
-        return Counter::ptr((Counter*)new ByMonthCounter(values));
+        return Counter_ptr((Counter*)new ByMonthCounter(values));
     }
 
     bool ByMonthCounter::reset(const DateStamp& base) {
@@ -204,13 +205,13 @@ namespace uICAL {
 
     const string ByMonthCounter::name() const { return "ByMonth"; }
 
-    Counter::ptr ByYearDayCounter::init(const values_t values) {
-        return Counter::ptr((Counter*)new ByYearDayCounter(values));
+    Counter_ptr ByYearDayCounter::init(const values_t values) {
+        return Counter_ptr((Counter*)new ByYearDayCounter(values));
     }
 
-    Counter::ptr ByYearDayCounter::init(const value_t value) {
+    Counter_ptr ByYearDayCounter::init(const value_t value) {
         values_t values{value};
-        return Counter::ptr((Counter*)new ByYearDayCounter(values));
+        return Counter_ptr((Counter*)new ByYearDayCounter(values));
     }
 
     bool ByYearDayCounter::reset(const DateStamp& base) {
@@ -255,8 +256,8 @@ namespace uICAL {
         out << "<" << this->name() << " " << this->interval << ">";
     }
 
-    Counter::ptr SecondInc::init(unsigned interval) {
-        return Counter::ptr((Counter*)new SecondInc(interval));
+    Counter_ptr SecondInc::init(unsigned interval) {
+        return Counter_ptr((Counter*)new SecondInc(interval));
     }
 
     bool SecondInc::next() {
@@ -267,8 +268,8 @@ namespace uICAL {
 
     const string SecondInc::name() const { return "SecondInc"; }
 
-    Counter::ptr MinuteInc::init(unsigned interval) {
-        return Counter::ptr((Counter*)new MinuteInc(interval));
+    Counter_ptr MinuteInc::init(unsigned interval) {
+        return Counter_ptr((Counter*)new MinuteInc(interval));
     }
 
     bool MinuteInc::reset(const DateStamp& base) {
@@ -285,8 +286,8 @@ namespace uICAL {
 
     const string MinuteInc::name() const { return "MinuteInc"; }
 
-    Counter::ptr HourInc::init(unsigned interval) {
-        return Counter::ptr((Counter*)new HourInc(interval));
+    Counter_ptr HourInc::init(unsigned interval) {
+        return Counter_ptr((Counter*)new HourInc(interval));
     }
 
     bool HourInc::reset(const DateStamp& base) {
@@ -304,8 +305,8 @@ namespace uICAL {
 
     const string HourInc::name() const { return "HourInc"; }
 
-    Counter::ptr DayInc::init(unsigned interval) {
-        return Counter::ptr((Counter*)new DayInc(interval));
+    Counter_ptr DayInc::init(unsigned interval) {
+        return Counter_ptr((Counter*)new DayInc(interval));
     }
 
     bool DayInc::next() {
@@ -316,8 +317,8 @@ namespace uICAL {
 
     const string DayInc::name() const { return "DayInc"; }
 
-    Counter::ptr WeekInc::init(unsigned interval, DateTime::Day wkst) {
-        return Counter::ptr((Counter*)new WeekInc(interval, wkst));
+    Counter_ptr WeekInc::init(unsigned interval, DateTime::Day wkst) {
+        return Counter_ptr((Counter*)new WeekInc(interval, wkst));
     }
 
     bool WeekInc::reset(const DateStamp& base) {
@@ -335,8 +336,8 @@ namespace uICAL {
 
     const string WeekInc::name() const { return "WeekInc"; }
 
-    Counter::ptr MonthInc::init(unsigned interval) {
-        return Counter::ptr((Counter*)new MonthInc(interval));
+    Counter_ptr MonthInc::init(unsigned interval) {
+        return Counter_ptr((Counter*)new MonthInc(interval));
     }
 
     bool MonthInc::reset(const DateStamp& base) {
@@ -354,8 +355,8 @@ namespace uICAL {
 
     const string MonthInc::name() const { return "MonthInc"; }
 
-    Counter::ptr YearInc::init(unsigned interval) {
-        return Counter::ptr((Counter*)new YearInc(interval));
+    Counter_ptr YearInc::init(unsigned interval) {
+        return Counter_ptr((Counter*)new YearInc(interval));
     }
 
     bool YearInc::reset(const DateStamp& base) {

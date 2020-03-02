@@ -1,8 +1,5 @@
 #include "uICAL.h"
 
-#include "uICAL/vcomponentstream.h"
-
-
 #include <iostream>
 #include <fstream>
 #include <list>
@@ -13,37 +10,32 @@ void test_tz1() {
     std::ifstream input(std::string("test/data/ical2.txt"));
     uICAL::istream_stl ical(input);
 
-    uICAL::VLineStream lines(ical);
-    uICAL::VComponentStream components(lines);
-
-    auto vcalendar = components.next();
-
-    auto tzmap = uICAL::TZMap::init(*vcalendar.get());
-
+    uICAL::TZMap_ptr tzmap = uICAL::new_ptr<uICAL::TZMap>();
+    auto vcalendar = uICAL::Calendar::load(ical, tzmap);
     {
         auto ds = uICAL::DateStamp("20191105T175555");
 
-        std::list<uICAL::TZ::ptr> tzList;
-        
-        tzList.push_back(uICAL::TZ::init("NZDT", tzmap));
-        tzList.push_back(uICAL::TZ::init("Pacific/Auckland", tzmap));
+        std::list<uICAL::TZ_ptr> tzList;
 
-        tzList.push_back(uICAL::TZ::init("CET", tzmap));
-        tzList.push_back(uICAL::TZ::init("Europe/Paris", tzmap));
+        tzList.push_back(uICAL::new_ptr<uICAL::TZ>("NZDT", tzmap));
+        tzList.push_back(uICAL::new_ptr<uICAL::TZ>("Pacific/Auckland", tzmap));
 
-        tzList.push_back(uICAL::TZ::init("EST", tzmap));
-        tzList.push_back(uICAL::TZ::init("America/New_York", tzmap));
+        tzList.push_back(uICAL::new_ptr<uICAL::TZ>("CET", tzmap));
+        tzList.push_back(uICAL::new_ptr<uICAL::TZ>("Europe/Paris", tzmap));
 
-        tzList.push_back(uICAL::TZ::init("CST", tzmap));
-        tzList.push_back(uICAL::TZ::init("America/Chicago", tzmap));
+        tzList.push_back(uICAL::new_ptr<uICAL::TZ>("EST", tzmap));
+        tzList.push_back(uICAL::new_ptr<uICAL::TZ>("America/New_York", tzmap));
 
-        tzList.push_back(uICAL::TZ::init("MST", tzmap));
-        tzList.push_back(uICAL::TZ::init("America/Phoenix", tzmap));
+        tzList.push_back(uICAL::new_ptr<uICAL::TZ>("CST", tzmap));
+        tzList.push_back(uICAL::new_ptr<uICAL::TZ>("America/Chicago", tzmap));
 
-        tzList.push_back(uICAL::TZ::init("PST", tzmap));
-        tzList.push_back(uICAL::TZ::init("America/Los_Angeles", tzmap));
+        tzList.push_back(uICAL::new_ptr<uICAL::TZ>("MST", tzmap));
+        tzList.push_back(uICAL::new_ptr<uICAL::TZ>("America/Phoenix", tzmap));
 
-        auto tz = uICAL::TZ::init("Z");
+        tzList.push_back(uICAL::new_ptr<uICAL::TZ>("PST", tzmap));
+        tzList.push_back(uICAL::new_ptr<uICAL::TZ>("America/Los_Angeles", tzmap));
+
+        auto tz = uICAL::new_ptr<uICAL::TZ>("Z");
         auto dt = uICAL::DateTime(ds, tz);
 
         std::cout << ds.as_str() << std::endl;
@@ -51,7 +43,7 @@ void test_tz1() {
         std::cout << "--" << std::endl;
 
         for (auto tz : tzList) {
-            std::cout << dt.datestamp(tz).as_str() << " " << tz->as_str() << std::endl;    
+            std::cout << dt.datestamp(tz).as_str() << " " << tz->as_str() << std::endl;
         }
     }
 }

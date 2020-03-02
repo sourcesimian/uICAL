@@ -4,46 +4,35 @@
 #include "uICAL/cppstl.h"
 #include "uICAL/types.h"
 #include "uICAL/error.h"
-#include "uICAL/vcomponent.h"
 #include "uICAL/util.h"
 #include "uICAL/logging.h"
+#include "uICAL/vline.h"
+#include "uICAL/vobject.h"
 
 namespace uICAL {
+    VObject::VObject()
+    {}
 
-    VComponent::ptr VComponent::init() {
-        return VComponent::ptr(new VComponent());
-    }
-
-    VComponent::ptr VComponent::init(VLine::ptr beginline) {
-        return VComponent::ptr(new VComponent(beginline));
-    }
-
-    VComponent::VComponent() {
-    }
-
-    VComponent::VComponent(VLine::ptr beginline) {
-        this->name = beginline->value;
-    }
-
-    bool VComponent::empty() const {
+    bool VObject::empty() const {
         return this->name.empty();
     }
 
-    const string& VComponent::getName() const {
+    const string& VObject::getName() const {
         return this->name;
     }
 
-    VLine::ptr VComponent::getPropertyByName(const string& name) {
+
+    VLine_ptr VObject::getPropertyByName(const string& name) const {
         for (auto line : this->lines) {
             if (line->name == name) {
                 return line;
             }
         }
-        return VLine::init();
+        return new_ptr<VLine>();
     }
 
-    VComponent::vector VComponent::listComponents(const string& name) {
-        VComponent::vector ret;
+    VObject::vector VObject::listObjects(const string& name) const {
+        VObject::vector ret;
         for (auto child : this->children) {
             if (child->name == name) {
                 ret.push_back(child);
@@ -52,7 +41,7 @@ namespace uICAL {
         return ret;
     }
 
-    void VComponent::str(ostream& out) const {
+    void VObject::str(ostream& out) const {
         out << "BEGIN:" << this->name << uICAL::endl;
         for (auto line : this->lines) {
             line->str(out);

@@ -8,14 +8,14 @@
 #include "uICAL/byandcounter.h"
 
 namespace uICAL {
-    Counter::ptr ByAndCounter::init(std::vector<Counter::ptr> counters) {
+    Counter_ptr ByAndCounter::init(std::vector<Counter_ptr> counters) {
         if (counters.size() < 2) {
             return counters.front();
         }
-        return Counter::ptr((Counter*)new ByAndCounter(counters));
+        return Counter_ptr((Counter*)new ByAndCounter(counters));
     }
 
-    ByAndCounter::ByAndCounter(std::vector<Counter::ptr> counters) 
+    ByAndCounter::ByAndCounter(std::vector<Counter_ptr> counters)
     : counters(counters)
     {
         if (this->counters.size() < 2) {
@@ -58,7 +58,7 @@ namespace uICAL {
             }
         }
         for (;;) {
-            Counter::ptr min = *std::min_element(this->counters.begin(), this->counters.end());
+            Counter_ptr min = *std::min_element(this->counters.begin(), this->counters.end());
 
             bool notEqual = false;
             for (auto counter : this->counters) {
@@ -82,7 +82,7 @@ namespace uICAL {
     DateStamp ByAndCounter::value() const {
         return this->current->value();
     }
-            
+
     void ByAndCounter::str(ostream& out) const {
         Joiner values(',');
         for (auto counter : this->counters) {

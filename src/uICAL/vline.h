@@ -1,18 +1,14 @@
 /*############################################################################
 # Copyright (c) 2020 Source Simian  :  https://github.com/sourcesimian/uICAL #
 ############################################################################*/
-#ifndef uical_icalline_h
-#define uical_icalline_h
+#ifndef uical_vline_h
+#define uical_vline_h
 
 #include "uICAL/base.h"
 
 namespace uICAL {
     class VLine : public Base {
         public:
-            using ptr = std::shared_ptr<VLine>;
-
-            static VLine::ptr init();
-            static VLine::ptr init(const string& line);
             VLine();
             VLine(const string& line);
 

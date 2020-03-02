@@ -4,32 +4,29 @@
 #ifndef uical_datetime_h
 #define uical_datetime_h
 
-#include "uICAL/types.h"
 #include "uICAL/base.h"
 #include "uICAL/epochtime.h"
-#include "uICAL/tz.h"
 
 namespace uICAL {
     class DateStamp;
     class DatePeriod;
-    
+    class TZ;
+
     class DateTime : public Base {
         public:
-            using ptr = std::shared_ptr<DateTime>;
-
             DateTime();
             DateTime(const string& datetime);
-            DateTime(const string& datetime, const TZMap::ptr& tzmap);
-            DateTime(const DateStamp& datestamp, const TZ::ptr& tz);
+            DateTime(const string& datetime, const TZMap_ptr& tzmap);
+            DateTime(const DateStamp& datestamp, const TZ_ptr& tz);
             DateTime(seconds_t epochSeconds);
-            DateTime(seconds_t epochSeconds, const TZ::ptr& tz);
+            DateTime(seconds_t epochSeconds, const TZ_ptr& tz);
 
             void str(ostream& out) const;
 
             bool valid() const;
-            
+
             DateStamp datestamp() const;
-            DateStamp datestamp(const TZ::ptr& tz) const;
+            DateStamp datestamp(const TZ_ptr& tz) const;
 
             enum class Day {
                 NONE, MON, TUE, WED, THU, FRI, SAT, SUN
@@ -50,11 +47,11 @@ namespace uICAL {
             bool operator <= (const DateTime& dt) const;
             bool operator == (const DateTime& dt) const;
 
-            TZ::ptr tz;
+            TZ_ptr tz;
 
         protected:
-            void construct(const string& datetime, const TZMap::ptr& tzmap);
-            void construct(const DateStamp& ds, const TZ::ptr& tz);
+            void construct(const string& datetime, const TZMap_ptr& tzmap);
+            void construct(const DateStamp& ds, const TZ_ptr& tz);
             void assert_awareness(const DateTime& other) const;
 
             EpochTime epochtime;

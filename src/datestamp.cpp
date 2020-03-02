@@ -143,12 +143,12 @@ namespace uICAL {
         return (DateTime::Day)weekday;
     }
 
-    unsigned DateStamp::weekNo() const {        
+    unsigned DateStamp::weekNo() const {
         auto getWeekNo = [](unsigned weekdayFirst, unsigned yearDayIndex) {
             if (weekdayFirst <= 4) return (weekdayFirst + yearDayIndex - 1) / 7 + 1;
             else return (weekdayFirst + yearDayIndex - 1) / 7;
         };
-        
+
         unsigned days = days_from_civil(this->year, this->month, this->day);
         unsigned daysFirst = days_from_civil(this->year, 1, 1);
         unsigned weekdayFirst = (unsigned)this->getWeekDay(daysFirst);

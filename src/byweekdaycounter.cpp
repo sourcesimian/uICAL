@@ -5,21 +5,22 @@
 #include "uICAL/types.h"
 #include "uICAL/error.h"
 #include "uICAL/util.h"
+#include "uICAL/rrule.h"
 #include "uICAL/byweekdaycounter.h"
 
 namespace uICAL {
     const unsigned ByWeekDayCounter::no_offset = 400;
 
-    Counter::ptr ByWeekDayCounter::init(const values_t& values, const RRule::ptr& p) {
-        return Counter::ptr((Counter*)new ByWeekDayCounter(values, p));
+    Counter_ptr ByWeekDayCounter::init(const values_t& values, const RRule_ptr& p) {
+        return Counter_ptr((Counter*)new ByWeekDayCounter(values, p));
     }
 
-    Counter::ptr ByWeekDayCounter::init(const value_t value, const RRule::ptr& p) {
+    Counter_ptr ByWeekDayCounter::init(const value_t value, const RRule_ptr& p) {
         values_t values{value};
-        return Counter::ptr((Counter*)new ByWeekDayCounter(values, p));
+        return Counter_ptr((Counter*)new ByWeekDayCounter(values, p));
     }
 
-    ByWeekDayCounter::ByWeekDayCounter(const values_t& values, const RRule::ptr& p)
+    ByWeekDayCounter::ByWeekDayCounter(const values_t& values, const RRule_ptr& p)
     : CounterT(values)
     , p(p)
     {

@@ -5,6 +5,8 @@
 #include "uICAL/types.h"
 #include "uICAL/error.h"
 #include "uICAL/util.h"
+#include "uICAL/datestamp.h"
+#include "uICAL/rrule.h"
 #include "uICAL/rruleiter.h"
 
 #include <sstream>
@@ -64,7 +66,7 @@ namespace uical_python {
             }
 
             uICAL::DateTime dt = uICAL::DateTime(std::string(dtstart));
-            uICAL::RRule::ptr rr = uICAL::RRule::init(std::string(rrule), dt);
+            uICAL::RRule_ptr rr = uICAL::new_ptr<uICAL::RRule>(std::string(rrule), dt);
             
             uICAL::DateTime rrBegin;
             uICAL::DateTime rrEnd;
@@ -75,7 +77,7 @@ namespace uical_python {
                 rrEnd = uICAL::DateTime(std::string(PyUnicode_AsUTF8(end)));
             }
 
-            self->rrule = uICAL::RRuleIter::init(rr, rrBegin, rrEnd);
+            self->rrule = uICAL::new_ptr<uICAL::RRuleIter>(rr, rrBegin, rrEnd);
 
             if (exclude) {
                 if (PyList_Check(exclude)) {

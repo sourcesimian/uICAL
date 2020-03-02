@@ -4,22 +4,17 @@
 #ifndef uical_stream_h
 #define uical_stream_h
 
-
 #ifdef ARDUINO
-
     //#include <Arduino.h>
     #include <WString.h>
     #include <Stream.h>
-
 #else
-
     #include <istream>
-
 #endif
 
 namespace uICAL {
     class string;
-    
+
     class ostream {
         public:
             ostream& operator <<(const ostream& stm);
@@ -96,6 +91,5 @@ namespace uICAL {
         };
 
     #endif
-}    
-
+}
 #endif

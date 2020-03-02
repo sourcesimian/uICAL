@@ -32,7 +32,7 @@ class uICALRelay {
         static const uint8_t pushButtonPin;
 
         int gateCount;
-        uICAL::Calendar::ptr cal;
+        uICAL::Calendar_ptr cal;
 };
 
 #endif

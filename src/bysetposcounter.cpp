@@ -8,14 +8,14 @@
 #include "uICAL/bysetposcounter.h"
 
 namespace uICAL {
-    Counter::ptr BySetPosCounter::init(Counter::ptr counter, const values_t& values) {
+    Counter_ptr BySetPosCounter::init(Counter_ptr counter, const values_t& values) {
         if (values.size()) {
-            return Counter::ptr((Counter*)new BySetPosCounter(counter, values));
+            return Counter_ptr((Counter*)new BySetPosCounter(counter, values));
         }
         return counter;
     }
 
-    BySetPosCounter::BySetPosCounter(Counter::ptr counter, const values_t& values)
+    BySetPosCounter::BySetPosCounter(Counter_ptr counter, const values_t& values)
     : CounterT(values), counter(counter)
     {}
 
@@ -44,7 +44,7 @@ namespace uICAL {
     bool BySetPosCounter::syncLock(const DateStamp& from, const DateStamp& now) const {
         return this->counter->syncLock(from, now);
     }
-    
+
     void BySetPosCounter::str(ostream& out) const {
         this->counter->str(out);
         out << "[" << this->values << "]";

@@ -5,13 +5,14 @@
 #define uical_byweekdaycounter_h
 
 #include "uICAL/counter.h"
-#include "uICAL/rrule.h"
 
 namespace uICAL {
+    class RRule;
+
     class ByWeekDayCounter : protected CounterT<RRule::Day_pair> {
         public:
-            static Counter::ptr init(const values_t& values, const RRule::ptr& r);
-            static Counter::ptr init(const value_t value, const RRule::ptr& r);
+            static Counter_ptr init(const values_t& values, const RRule_ptr& r);
+            static Counter_ptr init(const value_t value, const RRule_ptr& r);
 
             virtual bool reset(const DateStamp& start);
             virtual DateStamp value() const;
@@ -20,13 +21,13 @@ namespace uICAL {
             virtual bool syncLock(const DateStamp& from, const DateStamp& now) const;
 
         protected:
-            ByWeekDayCounter(const values_t& values, const RRule::ptr& p);
+            ByWeekDayCounter(const values_t& values, const RRule_ptr& p);
             virtual ~ByWeekDayCounter() = default;
 
             virtual const string name() const { return "ByWeekDay"; }
             virtual void wrap();
 
-            const RRule::ptr& p;
+            const RRule_ptr& p;
 
             RRule::Day_vector byIndexedDay;
             RRule::Day_vector::const_iterator itIndex;

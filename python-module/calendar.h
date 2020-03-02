@@ -7,7 +7,7 @@
 namespace uical_python {
     typedef struct {
         PyObject_HEAD
-        uICAL::CalendarIter::ptr calendar;
+        uICAL::CalendarIter_ptr calendar;
     } CalendarObject;
 
     bool PyInit_Calendar(PyObject* module);

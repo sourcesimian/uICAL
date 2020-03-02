@@ -4,19 +4,11 @@
 #include "uICAL/cppstl.h"
 #include "uICAL/types.h"
 #include "uICAL/error.h"
-#include "uICAL/vline.h"
 #include "uICAL/util.h"
 #include "uICAL/logging.h"
+#include "uICAL/vline.h"
 
 namespace uICAL {
-    VLine::ptr VLine::init() {
-        return VLine::ptr(new VLine());
-    }
-
-    VLine::ptr VLine::init(const string& line) {
-        return VLine::ptr(new VLine(line));
-    }
-
     VLine::VLine() {
     }
 
@@ -33,7 +25,7 @@ namespace uICAL {
             log_error("VLINE does not have a ':' \"%s\"", line.c_str());
             throw ParseError(string("VLINE does not have a ':' \"") + line + "\"");
         }
-        
+
         if (semicolon != string::npos && semicolon < colon) {
             this->name = line.substr(0, semicolon);
             this->readParams(line.substr(semicolon + 1, colon - semicolon - 1));

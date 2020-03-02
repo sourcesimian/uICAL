@@ -7,7 +7,7 @@
 namespace uical_python {
     typedef struct {
         PyObject_HEAD
-        uICAL::RRuleIter::ptr rrule;
+        uICAL::RRuleIter_ptr rrule;
     } RRuleObject;
 
     bool PyInit_RRule(PyObject* module);

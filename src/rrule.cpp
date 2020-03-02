@@ -4,15 +4,11 @@
 #include "uICAL/cppstl.h"
 #include "uICAL/types.h"
 #include "uICAL/error.h"
-#include "uICAL/rrule.h"
 #include "uICAL/util.h"
 #include "uICAL/logging.h"
+#include "uICAL/rrule.h"
 
 namespace uICAL {
-    RRule::ptr RRule::init(const string& rrule, const DateTime& dtstart) {
-        return RRule::ptr(new RRule(rrule, dtstart));
-    }
-
     RRule::RRule(const string& rrule, const DateTime& dtstart)
     : dtstart(dtstart)
     {
@@ -190,7 +186,7 @@ namespace uICAL {
         out << "RRULE:";
 
         Joiner values(';');
-        
+
         values.out() << "FREQ=" << + this->frequencyAsString(this->freq);
         values.next();
 

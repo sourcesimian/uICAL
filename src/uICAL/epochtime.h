@@ -5,23 +5,23 @@
 #define uical_epochtime_h
 
 #include "uICAL/base.h"
-#include "uICAL/tz.h"
 
 namespace uICAL {
+    class TZ;
 
     class EpochTime : public Base {
         public:
             EpochTime();
-            EpochTime(unsigned year, unsigned month, unsigned day, unsigned hour, unsigned minute, unsigned second, const TZ::ptr& tz);
+            EpochTime(unsigned year, unsigned month, unsigned day, unsigned hour, unsigned minute, unsigned second, const TZ_ptr& tz);
             EpochTime(seconds_t seconds);
 
             using ymd_t = std::tuple<unsigned, unsigned, unsigned>;
             using ymdhms_t = std::tuple<unsigned, unsigned, unsigned, unsigned, unsigned, unsigned>;
 
             bool valid() const;
-            
-            ymd_t ymd(const TZ::ptr tz) const;
-            ymdhms_t ymdhms(const TZ::ptr tz) const;
+
+            ymd_t ymd(const TZ_ptr tz) const;
+            ymdhms_t ymdhms(const TZ_ptr tz) const;
 
             seconds_t operator - (const EpochTime& other) const;
 

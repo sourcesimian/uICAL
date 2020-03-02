@@ -9,42 +9,44 @@
 #include "uICAL/epochtime.h"
 #include "uICAL/datestamp.h"
 #include "uICAL/dateperiod.h"
+#include "uICAL/tz.h"
+#include "uICAL/tzmap.h"
 
 namespace uICAL {
     DateTime::DateTime() {
         this->tz = TZ::undef();
     }
 
-    DateTime::DateTime(const DateStamp& ds, const TZ::ptr& tz) {
+    DateTime::DateTime(const DateStamp& ds, const TZ_ptr& tz) {
         this->construct(ds, tz);
     }
 
     DateTime::DateTime(const string& datetime) {
-        this->construct(datetime, TZMap::init());
+        this->construct(datetime, new_ptr<TZMap>());
     }
 
-    DateTime::DateTime(const string& datetime, const TZMap::ptr& tzmap) {
+    DateTime::DateTime(const string& datetime, const TZMap_ptr& tzmap) {
         this->construct(datetime, tzmap);
     }
 
     DateTime::DateTime(seconds_t epochSeconds) {
         this->epochtime = EpochTime(epochSeconds);
-        this->tz = TZ::init("Z");
+        this->tz = new_ptr<TZ>("Z");
     }
 
-    DateTime::DateTime(seconds_t epochSeconds, const TZ::ptr& tz) {
+    DateTime::DateTime(seconds_t epochSeconds, const TZ_ptr& tz) {
         this->epochtime = EpochTime(epochSeconds);
         this->tz = tz;
     }
 
-    void DateTime::construct(const string& datetime, const TZMap::ptr& tzmap) {
+    void DateTime::construct(const string& datetime, const TZMap_ptr& tzmap) {
         if (datetime.length() < 15)
             throw ValueError(string("Bad datetime: \"") + datetime + "\"");
 
         DateStamp ds(datetime.substr(0, 15));
 
         if (datetime.length() > 15) {
-            this->tz = TZ::init(datetime.substr(15), tzmap);
+            this->tz = new_ptr<TZ>(datetime.substr(15), tzmap);
         }
         else {
             this->tz = TZ::unaware();
@@ -53,7 +55,7 @@ namespace uICAL {
         this->construct(ds, tz);
     }
 
-    void DateTime::construct(const DateStamp& ds, const TZ::ptr& tz) {
+    void DateTime::construct(const DateStamp& ds, const TZ_ptr& tz) {
         this->epochtime = EpochTime(
             ds.year, ds.month, ds.day, ds.hour, ds.minute, ds.second,
             tz
@@ -74,7 +76,7 @@ namespace uICAL {
         );
     }
 
-    DateStamp DateTime::datestamp(const TZ::ptr& tz) const {
+    DateStamp DateTime::datestamp(const TZ_ptr& tz) const {
         auto ymdhms = this->epochtime.ymdhms(tz);
 
         return DateStamp(
@@ -161,7 +163,7 @@ namespace uICAL {
         }
 
         return span +
-                ((index - ((unsigned)then >= (unsigned)today ? 1 : 0)) * 7) + 
+                ((index - ((unsigned)then >= (unsigned)today ? 1 : 0)) * 7) +
                 ((unsigned)then - (unsigned)today);
     }
 

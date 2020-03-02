@@ -8,8 +8,9 @@
 #include "uICAL/cppstl.h"
 #include "uICAL/types.h"
 #include "uICAL/util.h"
-#include "uICAL/rruleiter.h"
+#include "uICAL/datestamp.h"
 #include "uICAL/calendar.h"
+#include "uICAL/rruleiter.h"
 
 #include "error.h"
 #include "calendar.h"

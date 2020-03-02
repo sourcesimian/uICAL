@@ -4,21 +4,17 @@
 #include "uICAL/cppstl.h"
 #include "uICAL/types.h"
 #include "uICAL/util.h"
+#include "uICAL/error.h"
+#include "uICAL/logging.h"
+#include "uICAL/rrule.h"
+#include "uICAL/rruleiter.h"
+#include "uICAL/counter.h"
 #include "uICAL/bysetposcounter.h"
 #include "uICAL/byweekdaycounter.h"
 #include "uICAL/byandcounter.h"
-#include "uICAL/counter.h"
-#include "uICAL/error.h"
-#include "uICAL/rruleiter.h"
-#include "uICAL/rrule.h"
-#include "uICAL/logging.h"
 
 namespace uICAL {
-    RRuleIter::ptr RRuleIter::init(const RRule::ptr rr, const DateTime& begin, const DateTime& end) {
-        return RRuleIter::ptr(new RRuleIter(rr, begin, end));
-    }
-
-    RRuleIter::RRuleIter(const RRule::ptr rr, const DateTime& begin, const DateTime& end)
+    RRuleIter::RRuleIter(const RRule_ptr rr, const DateTime& begin, const DateTime& end)
     : rr(rr)
     {
         if (begin.valid() && end.valid() && begin > end) {
@@ -44,7 +40,7 @@ namespace uICAL {
         DateStamp base = this->rr->dtstart.datestamp();
         this->setupCounters(base);
 
-        /* 
+        /*
         DateStamp begin;
         if (!this->range_begin.empty()) {
             begin = this->range_begin.datestamp(this->dtstart.tz);
@@ -173,7 +169,7 @@ namespace uICAL {
         +----------+--------+--------+-------+-------+------+-------+------+
         ref: https://icalendar.org/iCalendar-RFC-5545/3-3-10-recurrence-rule.html
         */
-        
+
         if (this->rr->freq == RRule::Freq::SECONDLY ||
             this->rr->freq == RRule::Freq::MINUTELY ||
             this->rr->freq == RRule::Freq::HOURLY)
@@ -193,7 +189,7 @@ namespace uICAL {
             else if (this->rr->freq == RRule::Freq::HOURLY)
                                             this->counters.push_back(HourInc::init(this->rr->interval));
 
-            std::vector<Counter::ptr> dayCounters;
+            std::vector<Counter_ptr> dayCounters;
             if (this->rr->byDay.size())      dayCounters.push_back(ByWeekDayCounter::init(this->rr->byDay, this->rr));
             if (this->rr->byMonthDay.size()) dayCounters.push_back(ByMonthDayCounter::init(this->rr->byMonthDay));
             if (this->rr->byYearDay.size())  dayCounters.push_back(ByYearDayCounter::init(this->rr->byYearDay));
@@ -212,7 +208,7 @@ namespace uICAL {
             if (this->rr->byHour.size())     this->counters.push_back(ByHourCounter::init(this->rr->byHour));
             else                            this->counters.push_back(ByHourCounter::init(base.hour));
 
-            std::vector<Counter::ptr> dayCounters;
+            std::vector<Counter_ptr> dayCounters;
             if (this->rr->byDay.size())      dayCounters.push_back(ByWeekDayCounter::init(this->rr->byDay, this->rr));
             if (this->rr->byMonthDay.size()) dayCounters.push_back(ByMonthDayCounter::init(this->rr->byMonthDay));
             if (this->rr->byYearDay.size())  throw ICalError("BYYEARDAY is N/A");
@@ -235,7 +231,7 @@ namespace uICAL {
             if (this->rr->byHour.size())     this->counters.push_back(ByHourCounter::init(this->rr->byHour));
             else                            this->counters.push_back(ByHourCounter::init(base.hour));
 
-            std::vector<Counter::ptr> dayCounters;
+            std::vector<Counter_ptr> dayCounters;
             if (this->rr->byDay.size())      dayCounters.push_back(ByWeekDayCounter::init(this->rr->byDay, this->rr));
             if (this->rr->byMonthDay.size()) throw ICalError("BYMONTHDAY is N/A");
             if (this->rr->byYearDay.size())  throw ICalError("BYYEARDAY is N/A");
@@ -259,7 +255,7 @@ namespace uICAL {
             if (this->rr->byHour.size())     this->counters.push_back(ByHourCounter::init(this->rr->byHour));
             else                            this->counters.push_back(ByHourCounter::init(base.hour));
 
-            std::vector<Counter::ptr> dayCounters;
+            std::vector<Counter_ptr> dayCounters;
             if (this->rr->byDay.size())      dayCounters.push_back(ByWeekDayCounter::init(this->rr->byDay, this->rr));
             if (this->rr->byMonthDay.size()) dayCounters.push_back(ByMonthDayCounter::init(this->rr->byMonthDay));
             if (this->rr->byYearDay.size())  throw ICalError("BYYEARDAY is N/A");
@@ -283,7 +279,7 @@ namespace uICAL {
             if (this->rr->byHour.size())     this->counters.push_back(ByHourCounter::init(this->rr->byHour));
             else                            this->counters.push_back(ByHourCounter::init(base.hour));
 
-            std::vector<Counter::ptr> dayCounters;
+            std::vector<Counter_ptr> dayCounters;
             if (this->rr->byDay.size())      dayCounters.push_back(ByWeekDayCounter::init(this->rr->byDay, this->rr));
             if (this->rr->byMonthDay.size()) dayCounters.push_back(ByMonthDayCounter::init(this->rr->byMonthDay));
             if (this->rr->byYearDay.size())  dayCounters.push_back(ByYearDayCounter::init(this->rr->byYearDay));
@@ -342,7 +338,7 @@ namespace uICAL {
             // if (this->expired(base)) {
             //     return false;
             // }
-        } 
+        }
         return true;
     }
 

@@ -5,16 +5,14 @@
 #define uical_rruleiter_h
 
 #include "uICAL/base.h"
-#include "uICAL/counter.h"
-#include "uICAL/rrule.h"
 
 namespace uICAL {
+    class Counter;
+    class RRule;
+
     class RRuleIter : public Base {
         public:
-            using ptr = std::shared_ptr<RRuleIter>;
-
-            static RRuleIter::ptr init(const RRule::ptr rr, const DateTime& begin, const DateTime& end);
-            RRuleIter(const RRule::ptr rr, const DateTime& begin, const DateTime& end);
+            RRuleIter(const RRule_ptr rr, const DateTime& begin, const DateTime& end);
 
             bool next();
             DateTime now() const;
@@ -22,7 +20,7 @@ namespace uICAL {
             void str(ostream& out) const;
 
         protected:
-            using counters_t = std::vector<Counter::ptr>;
+            using counters_t = std::vector<Counter_ptr>;
             using sync_f = std::function<void(counters_t::iterator it)>;
 
             bool start();
@@ -34,8 +32,8 @@ namespace uICAL {
             void setCurrentNow();
             bool resetCascade(counters_t::iterator it, sync_f sync);
             bool expired(const DateTime& current) const;
-        
-            const RRule::ptr rr;
+
+            const RRule_ptr rr;
 
             DateTime until;
             DateTime range_begin;

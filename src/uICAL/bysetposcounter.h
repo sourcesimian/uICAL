@@ -11,7 +11,7 @@ namespace uICAL {
 
     class BySetPosCounter : protected CounterT<int> {
         public:
-            static Counter::ptr init(Counter::ptr counter, const values_t& values);
+            static Counter_ptr init(Counter_ptr counter, const values_t& values);
 
             virtual bool reset(const DateStamp& base);
             virtual DateStamp value() const;
@@ -22,10 +22,10 @@ namespace uICAL {
             virtual void str(ostream& out) const;
 
         protected:
-            BySetPosCounter(Counter::ptr counter, const values_t& values);
+            BySetPosCounter(Counter_ptr counter, const values_t& values);
             virtual ~BySetPosCounter() = default;
 
-            Counter::ptr counter;
+            Counter_ptr counter;
             std::vector<DateStamp> results;
     };
 }

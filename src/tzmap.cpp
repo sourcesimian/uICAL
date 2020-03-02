@@ -3,35 +3,25 @@
 ############################################################################*/
 #include "uICAL/cppstl.h"
 #include "uICAL/types.h"
-#include "uICAL/vcomponent.h"
 #include "uICAL/tzmap.h"
 #include "uICAL/tz.h"
+#include "uICAL/vline.h"
+#include "uICAL/vobject.h"
 
 namespace uICAL {
-    TZMap::ptr TZMap::init() {
-        return TZMap::ptr(new TZMap());
-    }
-
-    TZMap::ptr TZMap::init(VComponent& calendar) {
-        return TZMap::ptr(new TZMap(calendar));
-    }
-
     TZMap::TZMap() {
     }
 
-    TZMap::TZMap(VComponent& calendar) {
-        auto timezones = calendar.listComponents("VTIMEZONE");
-        for (auto timezone : timezones) {
-            string tzId = timezone->getPropertyByName("TZID")->value;
+    void TZMap::add(const VObject_ptr& timezone) {
+        string tzId = timezone->getPropertyByName("TZID")->value;
 
-            auto standards = timezone->listComponents("STANDARD");
-            for (auto standard : standards) {
+        auto standards = timezone->listObjects("STANDARD");
+        for (auto standard : standards) {
 
-                string offset = standard->getPropertyByName("TZOFFSETFROM")->value;
-                string name = standard->getPropertyByName("TZNAME")->value;
+            string offset = standard->getPropertyByName("TZOFFSETFROM")->value;
+            string name = standard->getPropertyByName("TZNAME")->value;
 
-                this->add(tzId, name, offset);
-            }
+            this->add(tzId, name, offset);
         }
     }
 

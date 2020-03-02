@@ -13,7 +13,6 @@
     #include <iostream>
 #endif
 
-
 namespace uICAL {
     extern const char* endl;
     extern const char* fmt_04d;
@@ -25,12 +24,11 @@ namespace uICAL {
             public:
                 using size_t = unsigned int;
                 static const size_t npos = -1;
-                
+
                 string() : String() {}
                 string(const String& b) : String(b) {}
                 string(const char* st) : String(st) {}
                 string(const StringSumHelper& ssh) : String(ssh) {}
-                // string(const std::ostringstream& sst) : String(sst.str().c_str()) {}
 
                 string substr(size_t from) const { return string(String::substring(from)); }
                 string substr(size_t from, size_t len) const { return string(String::substring(from, from + len)); }

@@ -142,7 +142,7 @@ void relay_updateCalendar(Stream& stm) {
 void readStream(Stream& stm) {
     size_t len = 81;
     char buf[len];
-    
+
     for (;;) {
         size_t read = stm.readBytesUntil('\r', buf, len-1);
         if (read > 0) {
@@ -157,7 +157,7 @@ void readStream(Stream& stm) {
 
 void loop() {
     Serial.println("Loop: BEGIN");
-    
+
     updateCalendar(relay.icalURL, relay_updateCalendar);
     unsigned unixTimeStamp = getUnixTimeStamp();
     relay.wait(relay.updateGates(unixTimeStamp));

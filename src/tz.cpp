@@ -5,31 +5,20 @@
 #include "uICAL/types.h"
 #include "uICAL/error.h"
 #include "uICAL/tz.h"
-#include "uICAL/epochtime.h"
 #include "uICAL/datestamp.h"
+#include "uICAL/epochtime.h"
+#include "uICAL/tzmap.h"
 
 namespace uICAL {
-    static TZ::ptr UNDEF = TZ::ptr(new TZ());
-    static TZ::ptr UNAWARE = TZ::ptr(new TZ(false));
+    static TZ_ptr UNDEF = new_ptr<TZ>();
+    static TZ_ptr UNAWARE = new_ptr<TZ>(false);
 
-    TZ::ptr TZ::undef() {
+    TZ_ptr TZ::undef() {
         return UNDEF;
     }
 
-    TZ::ptr TZ::unaware() {
+    TZ_ptr TZ::unaware() {
         return UNAWARE;
-    }
-
-    TZ::ptr TZ::init(int offsetMins) {
-        return ptr(new TZ(offsetMins));
-    }
-
-    TZ::ptr TZ::init(const string& tz) {
-        return ptr(new TZ(tz));
-    }
-
-    TZ::ptr TZ::init(const string& tz, const TZMap::ptr& tzmap) {
-        return ptr(new TZ(tz, tzmap));
     }
 
     TZ::TZ() {
@@ -52,7 +41,7 @@ namespace uICAL {
         this->aware = true;
     }
 
-    TZ::TZ(const string& tz, const TZMap::ptr& tzmap)
+    TZ::TZ(const string& tz, const TZMap_ptr& tzmap)
     : idmap(tzmap)
     {
         string id = this->idmap->findId(tz);

@@ -9,7 +9,7 @@ namespace uICAL {
         public:
             string message;
     };
-    
+
     class ParseError : public Error {
         public:
             ParseError(string m) {

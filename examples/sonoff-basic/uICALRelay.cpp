@@ -10,7 +10,7 @@ void uICALRelay::begin() {
     for (this->gateCount=0; this->gateCount<100; this->gateCount++) {
         if (!this->gates[this->gateCount].name) {
             break;
-        } 
+        }
     }
 
     pinMode(this->pushButtonPin, INPUT);
@@ -37,7 +37,7 @@ void uICALRelay::statusLedToggle() {
 void uICALRelay::updateCalendar(Stream& stm) {
     try {
         uICAL::istream_Stream istm(stm);
-        uICAL::Calendar::ptr cal = this->cal = uICAL::Calendar::init(istm);
+        uICAL::Calendar_ptr cal = this->cal = uICAL::Calendar::load(istm);
 
         if (cal->valid()) {
             this->cal = cal;
@@ -60,12 +60,12 @@ unsigned uICALRelay::updateGates(unsigned unixTimeStamp) {
     Serial.println("No NTP fix");
     return sleep / 10;
   }
-  uICAL::DateTime now(unixTimeStamp);  
+  uICAL::DateTime now(unixTimeStamp);
   uICAL::DateTime calBegin(unixTimeStamp);
   uICAL::DateTime calEnd(unixTimeStamp + this->pollPeriod);
 
-  try { 
-    uICAL::CalendarIter::ptr calIt = uICAL::CalendarIter::init(this->cal, calBegin, calEnd);
+  try {
+    uICAL::CalendarIter_ptr calIt = uICAL::new_ptr<uICAL::CalendarIter>(this->cal, calBegin, calEnd);
 
     uint8_t relayState[this->gateCount];
 
@@ -74,7 +74,7 @@ unsigned uICALRelay::updateGates(unsigned unixTimeStamp) {
     }
 
     while (calIt->next()) {
-      uICAL::CalendarEntry::ptr entry = calIt->current();
+      uICAL::CalendarEntry_ptr entry = calIt->current();
 
       uICAL::DateTime dtStart = entry->start();
       uICAL::string start = dtStart.as_str();

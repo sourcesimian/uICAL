@@ -5,17 +5,13 @@
 #define uical_rrule_h
 
 #include "uICAL/base.h"
-#include "uICAL/types.h"
 #include "uICAL/datetime.h"
-#include "uICAL/datestamp.h"
-#include "uICAL/tz.h"
 
 namespace uICAL {
+    class DateStamp;
+
     class RRule : public Base {
         public:
-            using ptr = std::shared_ptr<RRule>;
-
-            static RRule::ptr init(const string& rrule, const DateTime& dtstart);
             RRule(const string& rrule, const DateTime& dtstart);
 
             void exclude(const DateTime& exclude);

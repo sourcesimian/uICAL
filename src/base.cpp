@@ -6,7 +6,7 @@
 #include "uICAL/base.h"
 
 namespace uICAL {
-    
+
     string Base::as_str() const {
         ostream stm;
         this->str(stm);

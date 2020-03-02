@@ -56,7 +56,7 @@ namespace uICAL {
         constexpr unsigned char a[] = {31, 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31};
         return a[m-1];
     }
-    
+
     // Preconditions: m is in [1, 12]
     // Returns: The number of days in the month m of leap year
     // The result is always in the range [29, 31].

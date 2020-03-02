@@ -1,39 +1,35 @@
 /*############################################################################
 # Copyright (c) 2020 Source Simian  :  https://github.com/sourcesimian/uICAL #
 ############################################################################*/
-#ifndef uical_component_h
-#define uical_component_h
+#ifndef uical_vobject_h
+#define uical_vobject_h
 
 #include "uICAL/base.h"
-#include "uICAL/vline.h"
 
 namespace uICAL {
+    class VLine;
+    class VObjectStream;
 
     class VObject : public Base {
         public:
-            using ptr = std::shared_ptr<VObject>;
+            VObject();
 
-            bool empty() const;
+            virtual bool empty() const;
+            virtual const string& getName() const;
 
-            const string& getName() const;
-
-            VLine::ptr getPropertyByName(const string& name);
-            using vector = std::vector<ptr>;
-            vector listComponents(const string& name);
+            VLine_ptr getPropertyByName(const string& name) const;
+            using vector = std::vector<VObject_ptr>;
+            vector listObjects(const string& name) const;
 
             void str(ostream& out) const;
 
         protected:
-            static ptr init();
-            static ptr init(VLine::ptr beginline);
-
-            VComponent();
-            VComponent(VLine::ptr beginline);
 
             string name;
-            std::vector<VLine::ptr> lines;
-            std::vector<VComponent::ptr> children;
+            std::vector<VLine_ptr> lines;
+            std::vector<VObject_ptr> children;
 
-            friend VComponentStream;
+            friend class VObjectStream;
     };
 }
+#endif

@@ -37,7 +37,7 @@ namespace uICAL {
         enum class _logging_level {
             error = UICAL_LOG_LEVEL_ERROR,
             warn  = UICAL_LOG_LEVEL_WARN,
-            info  = UICAL_LOG_LEVEL_INFO, 
+            info  = UICAL_LOG_LEVEL_INFO,
             debug = UICAL_LOG_LEVEL_DEBUG,
             trace = UICAL_LOG_LEVEL_TRACE,
         };
@@ -73,31 +73,31 @@ namespace uICAL {
             #define log_error(...)      _logging_msg(_logging_level::error, __FILENAME__, __LINE__, __func__, __VA_ARGS__)
         #else
             #define log_error(...)      (void)0
-        #endif 
+        #endif
 
         #if (UICAL_LOG_LEVEL >= UICAL_LOG_LEVEL_WARN)
             #define log_warning(...)    _logging_msg(_logging_level::warn, __FILENAME__, __LINE__, __func__, __VA_ARGS__)
         #else
             #define log_warning(...)    (void)0
-        #endif 
+        #endif
 
         #if (UICAL_LOG_LEVEL >= UICAL_LOG_LEVEL_INFO)
             #define log_info(...)       _logging_msg(_logging_level::info, __FILENAME__, __LINE__, __func__, __VA_ARGS__)
         #else
             #define log_info(...)       (void)0
-        #endif 
+        #endif
 
         #if (UICAL_LOG_LEVEL >= UICAL_LOG_LEVEL_DEBUG)
             #define log_debug(...)      _logging_msg(_logging_level::debug, __FILENAME__, __LINE__, __func__, __VA_ARGS__)
         #else
             #define log_debug(...)      (void)0
-        #endif 
+        #endif
 
         #if (UICAL_LOG_LEVEL >= UICAL_LOG_LEVEL_TRACE)
             #define log_trace(...)      _logging_msg(_logging_level::trace, __FILENAME__, __LINE__, __func__, __VA_ARGS__)
         #else
             #define log_trace(...)      (void)0
-        #endif 
+        #endif
 
     #endif
 }

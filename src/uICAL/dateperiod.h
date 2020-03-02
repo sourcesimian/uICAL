@@ -5,7 +5,6 @@
 #define uical_datespan_h
 
 #include "uICAL/base.h"
-#include "uICAL/datetime.h"
 
 namespace uICAL {
     class DatePeriod : public Base {

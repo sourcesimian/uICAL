@@ -8,7 +8,12 @@
 #include "uICAL/error.h"
 #include "uICAL/util.h"
 #include "uICAL/calendar.h"
+#include "uICAL/calendarentry.h"
+#include "uICAL/calendariter.h"
+#include "uICAL/datetime.h"
+#include "uICAL/datestamp.h"
 #include "uICAL/stream.h"
+#include "uICAL/tz.h"
 
 #define PY_SSIZE_T_CLEAN
 #include <Python.h>
@@ -61,7 +66,7 @@ namespace uical_python {
 
             std::istringstream _ical(ical);
             uICAL::istream_stl inp(_ical);
-            uICAL::Calendar::ptr cal = uICAL::Calendar::init(inp);
+            uICAL::Calendar_ptr cal = uICAL::Calendar::load(inp);
 
             uICAL::DateTime calBegin;
             uICAL::DateTime calEnd;
@@ -72,7 +77,7 @@ namespace uical_python {
                 calEnd = uICAL::DateTime(std::string(PyUnicode_AsUTF8(end)));
             }
 
-            self->calendar = uICAL::CalendarIter::init(cal, calBegin, calEnd);
+            self->calendar = uICAL::new_ptr<uICAL::CalendarIter>(cal, calBegin, calEnd);
 
             return 0;
         }
@@ -102,7 +107,7 @@ namespace uical_python {
     Calendar_current(CalendarObject *self, PyObject *Py_UNUSED(ignored))
     {
         try {
-            uICAL::CalendarEntry::ptr entry = self->calendar->current();
+            uICAL::CalendarEntry_ptr entry = self->calendar->current();
 
             uICAL::DateTime dtStart = entry->start();
             uICAL::DateStamp dsStart = dtStart.datestamp();

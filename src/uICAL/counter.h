@@ -19,7 +19,7 @@ namespace uICAL {
             virtual bool reset(const DateStamp& base);
             virtual bool next() { return true; }
             virtual DateStamp value() const { return this->base; }
-            
+
             virtual bool syncLock(const DateStamp& from, const DateStamp& now) const = 0;
             virtual const string name() const = 0;
 
@@ -31,10 +31,10 @@ namespace uICAL {
             DateStamp base;
     };
 
-    bool operator > (const Counter::ptr& a, const Counter::ptr& b);
-    bool operator < (const Counter::ptr& a, const Counter::ptr& b);
-    bool operator <= (const Counter::ptr& a, const Counter::ptr& b);
-    bool operator == (const Counter::ptr& a, const Counter::ptr& b);
+    bool operator > (const Counter_ptr& a, const Counter_ptr& b);
+    bool operator < (const Counter_ptr& a, const Counter_ptr& b);
+    bool operator <= (const Counter_ptr& a, const Counter_ptr& b);
+    bool operator == (const Counter_ptr& a, const Counter_ptr& b);
 
     template <typename T>
     class CounterT : public Counter {
@@ -59,7 +59,7 @@ namespace uICAL {
                 out << "<" << this->name() << " " << this->values << ">";
             }
 
-        protected:            
+        protected:
             CounterT(const values_t values) : values(values) {}
 
             virtual void wrap() {
@@ -72,12 +72,12 @@ namespace uICAL {
 
     class BySecondCounter : protected CounterT<unsigned> {
         public:
-            static Counter::ptr init(const values_t values);
-            static Counter::ptr init(const value_t value);
-            
+            static Counter_ptr init(const values_t values);
+            static Counter_ptr init(const value_t value);
+
             BySecondCounter(const values_t values) : CounterT(values) {}
 
-            DateStamp value() const;      
+            DateStamp value() const;
 
             virtual bool syncLock(const DateStamp& from, const DateStamp& now) const;
             virtual const string name() const;
@@ -85,13 +85,13 @@ namespace uICAL {
 
     class ByMinuteCounter : protected CounterT<unsigned> {
         public:
-            static Counter::ptr init(const values_t values);
-            static Counter::ptr init(const value_t value);
-            
+            static Counter_ptr init(const values_t values);
+            static Counter_ptr init(const value_t value);
+
             ByMinuteCounter(const values_t values) : CounterT(values) {}
 
             virtual bool reset(const DateStamp& base);
-            virtual DateStamp value() const;      
+            virtual DateStamp value() const;
 
             virtual bool syncLock(const DateStamp& from, const DateStamp& now) const;
             virtual const string name() const;
@@ -99,12 +99,12 @@ namespace uICAL {
 
     class ByHourCounter : protected CounterT<unsigned> {
         public:
-            static Counter::ptr init(const values_t values);
-            static Counter::ptr init(const value_t value);
+            static Counter_ptr init(const values_t values);
+            static Counter_ptr init(const value_t value);
 
             ByHourCounter(const values_t values) : CounterT(values) {}
             virtual bool reset(const DateStamp& base);
-            virtual DateStamp value() const;      
+            virtual DateStamp value() const;
 
             virtual bool syncLock(const DateStamp& from, const DateStamp& now) const;
             virtual const string name() const;
@@ -112,13 +112,13 @@ namespace uICAL {
 
     class ByMonthDayCounter : protected CounterT<int> {
         public:
-            static Counter::ptr init(const values_t values);
-            static Counter::ptr init(const value_t value);
+            static Counter_ptr init(const values_t values);
+            static Counter_ptr init(const value_t value);
 
             ByMonthDayCounter(const values_t values) : CounterT(values) {}
 
             virtual bool reset(const DateStamp& base);
-            virtual DateStamp value() const;      
+            virtual DateStamp value() const;
             virtual bool next();
 
             virtual bool syncLock(const DateStamp& from, const DateStamp& now) const;
@@ -127,8 +127,8 @@ namespace uICAL {
 
     class ByWeekNoCounter : protected CounterT<unsigned> {
         public:
-            static Counter::ptr init(const values_t values);
-            static Counter::ptr init(const value_t value);
+            static Counter_ptr init(const values_t values);
+            static Counter_ptr init(const value_t value);
 
             ByWeekNoCounter(const values_t values) : CounterT(values) {}
 
@@ -140,13 +140,13 @@ namespace uICAL {
 
     class ByMonthCounter : protected CounterT<unsigned> {
         public:
-            static Counter::ptr init(const values_t values);
-            static Counter::ptr init(const value_t value);
+            static Counter_ptr init(const values_t values);
+            static Counter_ptr init(const value_t value);
 
             ByMonthCounter(const values_t values) : CounterT(values) {}
 
             virtual bool reset(const DateStamp& base);
-            virtual DateStamp value() const;      
+            virtual DateStamp value() const;
 
             virtual bool syncLock(const DateStamp& from, const DateStamp& now) const;
             virtual const string name() const;
@@ -154,13 +154,13 @@ namespace uICAL {
 
     class ByYearDayCounter : protected CounterT<int> {
         public:
-            static Counter::ptr init(const values_t values);
-            static Counter::ptr init(const value_t value);
+            static Counter_ptr init(const values_t values);
+            static Counter_ptr init(const value_t value);
 
             ByYearDayCounter(const values_t values) : CounterT(values) {}
 
             virtual bool reset(const DateStamp& base);
-            virtual DateStamp value() const;      
+            virtual DateStamp value() const;
             virtual bool next();
 
             virtual bool syncLock(const DateStamp& from, const DateStamp& now) const;
@@ -183,7 +183,7 @@ namespace uICAL {
 
     class SecondInc : protected IncCounter {
         public:
-            static Counter::ptr init(unsigned interval);
+            static Counter_ptr init(unsigned interval);
 
             SecondInc(unsigned interval) : IncCounter(interval) {}
 
@@ -194,7 +194,7 @@ namespace uICAL {
 
     class MinuteInc : protected IncCounter {
         public:
-            static Counter::ptr init(unsigned interval);
+            static Counter_ptr init(unsigned interval);
 
             MinuteInc(unsigned interval) : IncCounter(interval) {}
 
@@ -206,7 +206,7 @@ namespace uICAL {
 
     class HourInc : protected IncCounter {
         public:
-            static Counter::ptr init(unsigned interval);
+            static Counter_ptr init(unsigned interval);
 
             HourInc(unsigned interval) : IncCounter(interval) {}
 
@@ -218,7 +218,7 @@ namespace uICAL {
 
     class DayInc : protected IncCounter {
         public:
-            static Counter::ptr init(unsigned interval);
+            static Counter_ptr init(unsigned interval);
 
             DayInc(unsigned interval) : IncCounter(interval) {}
 
@@ -229,7 +229,7 @@ namespace uICAL {
 
     class WeekInc : protected IncCounter {
         public:
-            static Counter::ptr init(unsigned interval, DateTime::Day wkst);
+            static Counter_ptr init(unsigned interval, DateTime::Day wkst);
 
             WeekInc(unsigned interval, DateTime::Day wkst) : IncCounter(interval), wkst(wkst) {}
 
@@ -244,7 +244,7 @@ namespace uICAL {
 
     class MonthInc : protected IncCounter {
         public:
-            static Counter::ptr init(unsigned interval);
+            static Counter_ptr init(unsigned interval);
 
             MonthInc(unsigned interval) : IncCounter(interval) {}
 
@@ -256,7 +256,7 @@ namespace uICAL {
 
     class YearInc : protected IncCounter {
         public:
-            static Counter::ptr init(unsigned interval);
+            static Counter_ptr init(unsigned interval);
 
             YearInc(unsigned interval) : IncCounter(interval) {}
 

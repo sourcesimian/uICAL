@@ -67,7 +67,7 @@ static void run_tests(const std::string dat_file, test_f test)
             expected.clear();
         }
         else {
-            std::cerr << "! bad line (" << i <<"): \"" << line << "\"" << std::endl; 
+            std::cerr << "! bad line (" << i <<"): \"" << line << "\"" << std::endl;
         }
         i ++;
     }
@@ -77,28 +77,28 @@ static void run_tests(const std::string dat_file, test_f test)
 void test_basic(std::string dtstart, std::string rrule, std::string begin, std::vector<std::string> excludes, std::vector<std::string> expected) {
     // if (std::string::npos == rrule.find("RRULE:FREQ=MONTHLY;BYDAY=FR;BYMONTHDAY=13"))
     //     return;
-    
-    uICAL::VLine::ptr ldtstart = uICAL::VLine::init(dtstart);
-    uICAL::VLine::ptr lrrule = uICAL::VLine::init(rrule);
-    
+
+    uICAL::VLine_ptr ldtstart = uICAL::new_ptr<uICAL::VLine>(dtstart);
+    uICAL::VLine_ptr lrrule = uICAL::new_ptr<uICAL::VLine>(rrule);
+
     uICAL::DateTime start = uICAL::DateTime(ldtstart->value);
 
     std::string res;
     try {
-        //uICAL::Recurrence::ptr rec = uICAL::Recurrence::init(lrrule->value);
+        //uICAL::Recurrence_ptr rec = uICAL::new_ptr<uICAL::Recurrence>(lrrule->value);
 
         uICAL::DateTime rrBegin;
         if (!begin.empty()) {
             rrBegin = uICAL::DateTime(begin);
         }
 
-        uICAL::RRule::ptr rr = uICAL::RRule::init(lrrule->value, start);
+        uICAL::RRule_ptr rr = uICAL::new_ptr<uICAL::RRule>(lrrule->value, start);
         for (std::string exclude : excludes) {
-            uICAL::VLine::ptr excl = uICAL::VLine::init(exclude);
+            uICAL::VLine_ptr excl = uICAL::new_ptr<uICAL::VLine>(exclude);
             rr->exclude(uICAL::DateTime(excl->value));
         }
 
-        uICAL::RRuleIter::ptr occ = uICAL::RRuleIter::init(rr, rrBegin, uICAL::DateTime());
+        uICAL::RRuleIter_ptr occ = uICAL::new_ptr<uICAL::RRuleIter>(rr, rrBegin, uICAL::DateTime());
 
         std::vector<std::string> results;
         for (auto eit = expected.begin(); eit != expected.end(); ++eit) {
@@ -112,7 +112,7 @@ void test_basic(std::string dtstart, std::string rrule, std::string begin, std::
         }
 
         std::ostringstream exp, res;
-        
+
         bool fail = false;
         auto eit = expected.begin();
         auto rit = results.begin();
@@ -131,7 +131,7 @@ void test_basic(std::string dtstart, std::string rrule, std::string begin, std::
                 std::string diff;
                 for (unsigned i = 0; i < (*eit).length(); ++i) {
                     diff.push_back((*eit)[i] == (*rit)[i] ? ' ' : (*rit)[i]);
-                } 
+                }
                 exp << (*eit) << " ";
                 res << diff << " ";
                 fail = true;
@@ -160,14 +160,13 @@ void test_2() {
     uICAL::string begin("19970902T090000");
     uICAL::string end("29970902T090000");
 
-    auto rr = uICAL::RRuleIter::init(
-        uICAL::RRule::init(rrule, uICAL::DateTime(dtstart, uICAL::TZ::unaware())),
+    auto rr = uICAL::new_ptr<uICAL::RRuleIter>(
+        uICAL::new_ptr<uICAL::RRule>(rrule, uICAL::DateTime(dtstart, uICAL::TZ::unaware())),
         uICAL::DateTime(), uICAL::DateTime());
     while (rr->next())
     {
         std::cout << rr->now().as_str() << std::endl;
     }
-
 }
 
 

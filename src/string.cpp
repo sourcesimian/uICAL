@@ -6,8 +6,6 @@
 #include "uICAL/string.h"
 #include "uICAL/error.h"
 
-//#include <iostream>
-
 namespace uICAL {
     const char* endl = "\n";
     const char* fmt_04d = "%04d";

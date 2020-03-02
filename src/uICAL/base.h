@@ -7,7 +7,7 @@
 namespace uICAL {
     class string;
     class ostream;
-    
+
     class Base {
         public:
             virtual ~Base() = default;
@@ -23,5 +23,4 @@ namespace uICAL {
         return out;
     }
 }
-
 #endif

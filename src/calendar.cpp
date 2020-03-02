@@ -5,84 +5,59 @@
 #include "uICAL/types.h"
 #include "uICAL/error.h"
 #include "uICAL/util.h"
+#include "uICAL/logging.h"
 #include "uICAL/calendar.h"
+#include "uICAL/calendarentry.h"
+#include "uICAL/tzmap.h"
 #include "uICAL/vevent.h"
-#include "uICAL/vcomponent.h"
-#include "uICAL/vcomponentstream.h"
+#include "uICAL/vobject.h"
+#include "uICAL/vobjectstream.h"
 #include "uICAL/vline.h"
 #include "uICAL/vlinestream.h"
-#include "uICAL/tzmap.h"
-#include "uICAL/calendarentry.h"
-#include "uICAL/logging.h"
 
 namespace uICAL {
-    Calendar::ptr Calendar::init(istream& ical) {
-        return Calendar::ptr(new Calendar(ical));
+    Calendar_ptr Calendar::load(istream& ical) {
+        TZMap_ptr tzmap = new_ptr<TZMap>();
+        return Calendar::load(ical, tzmap);
+    }
+    
+    Calendar_ptr Calendar::load(istream& ical, TZMap_ptr& tzmap) {
+        VLineStream lines(ical);
+        VObject_ptr obj = new_ptr<VObject>();
+        VObjectStream stm(lines, obj);
+
+        if (obj->getName() != "VCALENDAR") {
+            log_error("Parse error: Did not expect: %s", obj->getName().c_str());
+            throw ParseError(string("Parse error: Did not expect: ") + obj->getName().c_str());
+        }
+
+        Calendar_ptr cal = new_ptr<Calendar>();
+
+        for (;;) {
+            VObject_ptr child = stm.nextChild();
+            if (child->empty()) {
+                break;
+            }
+            stm.loadChild();
+
+            if (child->getName() == "VTIMEZONE") {
+                tzmap->add(child);
+            }
+            if (child->getName() == "VEVENT") {
+                VEvent_ptr event = new_ptr<VEvent>(child, tzmap);
+                cal->addEvent(event);
+            }
+        }
+        return cal;
     }
 
-    Calendar::Calendar(istream& ical)
-    {
-        VLineStream lines(ical);
-        VComponentStream components(lines);
+    Calendar::Calendar() {}
 
-        VComponent::ptr vcalendar = components.next();
-
-        this->tzmap = TZMap::init(*vcalendar.get());
-
-        auto events = vcalendar->listComponents("VEVENT");
-
-        for (auto comp : events) {
-            VEvent::ptr ev = VEvent::init(comp, this->tzmap);
-            this->events.push_back(ev);
-            log_trace("Found %s", ev->as_str().c_str());
-        }
+    void Calendar::addEvent(const VEvent_ptr& event) {
+        this->events.push_back(event);
     }
 
     void Calendar::str(ostream& out) const {
         out << "CALENDAR" << uICAL::endl;
-    }
-
-    CalendarIter::ptr CalendarIter::init(const Calendar::ptr cal, const DateTime& begin, const DateTime& end) {
-        return CalendarIter::ptr(new CalendarIter(cal, begin, end));
-    }
-
-    CalendarIter::CalendarIter(const Calendar::ptr cal, const DateTime& begin, const DateTime& end)
-    : cal(cal)
-    {
-        if (begin.valid() && end.valid() && end < begin) {
-            log_error("Begin and end describe a negative range: %s -> %s", begin.as_str().c_str(), end.as_str().c_str());
-            throw ValueError("Begin and end describe a negative range");
-        }
-
-        for (auto ev : this->cal->events) {
-            VEventIter::ptr evIt = VEventIter::init(ev, begin, end);
-
-            if (evIt->next()) {  // Initialise and filter
-                this->events.push_back(evIt);
-            }
-        }
-    }
-
-    bool CalendarIter::next() {
-        if (this->events.size() == 0) {
-            return false;
-        }
-
-        auto minIt = std::min_element(this->events.begin(), this->events.end());
-
-        this->currentEntry = (*minIt)->entry();
-
-        if (! (*minIt)->next()) {
-            this->events.erase(minIt);
-        }
-        return true;
-    }
-
-    CalendarEntry::ptr CalendarIter::current() const {
-        if (! this->currentEntry) {
-            log_warning("%s", "No more entries");
-            throw RecurrenceError("No more entries");
-        }
-        return this->currentEntry;
     }
 }
