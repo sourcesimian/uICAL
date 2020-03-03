@@ -18,10 +18,19 @@
 namespace uICAL {
     Calendar_ptr Calendar::load(istream& ical) {
         TZMap_ptr tzmap = new_ptr<TZMap>();
-        return Calendar::load(ical, tzmap);
+        return Calendar::load(ical, tzmap, [](const VEvent&) { return true; });
     }
-    
+
+    Calendar_ptr Calendar::load(istream& ical, eventP_t addEvent) {
+        TZMap_ptr tzmap = new_ptr<TZMap>();
+        return Calendar::load(ical, tzmap, addEvent);
+    }
+
     Calendar_ptr Calendar::load(istream& ical, TZMap_ptr& tzmap) {
+        return Calendar::load(ical, tzmap, [](const VEvent&) { return true; });
+    }
+
+    Calendar_ptr Calendar::load(istream& ical, TZMap_ptr& tzmap, eventP_t addEvent) {
         VLineStream lines(ical);
         VObject_ptr obj = new_ptr<VObject>();
         VObjectStream stm(lines, obj);
@@ -34,18 +43,27 @@ namespace uICAL {
         Calendar_ptr cal = new_ptr<Calendar>();
 
         for (;;) {
-            VObject_ptr child = stm.nextChild();
-            if (child->empty()) {
+            string name = stm.nextChild();
+            if (name.empty()) {
                 break;
             }
-            stm.loadChild();
 
-            if (child->getName() == "VTIMEZONE") {
+            if (name == "VTIMEZONE") {
+                VObject_ptr child = stm.loadChild();
                 tzmap->add(child);
             }
-            if (child->getName() == "VEVENT") {
+            else if (name == "VEVENT") {
+                VObject_ptr child = stm.loadChild();
                 VEvent_ptr event = new_ptr<VEvent>(child, tzmap);
-                cal->addEvent(event);
+                if (addEvent(*event)) {
+                    cal->addEvent(event);
+                } else {
+                    log_trace("Event skipped: %s @ %s", event->summary.c_str(), event->start.as_str().c_str());
+                }
+            }
+            else {
+                stm.skipChild();
+                log_trace("VObject skipped: %s", name.c_str());
             }
         }
         return cal;

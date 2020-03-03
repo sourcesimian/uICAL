@@ -6,6 +6,9 @@
 #include "uICALRelay.h"
 #include "uICALRelay_config.h"
 
+#include "uICAL/logging.h"
+
+
 void uICALRelay::begin() {
     for (this->gateCount=0; this->gateCount<100; this->gateCount++) {
         if (!this->gates[this->gateCount].name) {
@@ -37,84 +40,99 @@ void uICALRelay::statusLedToggle() {
 void uICALRelay::updateCalendar(Stream& stm) {
     try {
         uICAL::istream_Stream istm(stm);
-        uICAL::Calendar_ptr cal = this->cal = uICAL::Calendar::load(istm);
-
-        if (cal->valid()) {
-            this->cal = cal;
-        }
+        this->cal = this->cal = uICAL::Calendar::load(istm, [=](const uICAL::VEvent& event){
+          return this->addEvent(event);
+        });
     }
     catch (uICAL::Error ex) {
-        Serial.println("! Failed loading calendar");
-        Serial.println(ex.message);
+        log_error("%s: %s", ex.message.c_str(), "! Failed loading calendar");
     }
+}
+
+bool uICALRelay::addEvent(const uICAL::VEvent& event) {
+    return true;
+    // for (int i=0; i<this->gateCount; i++) {
+    //     String relayName = this->gates[i].name;
+    //     relayName.toLowerCase();
+    //     if (event.summary.indexOf(relayName) != -1) {
+    //         return true;
+    //     }
+    // }
+    // return false;
 }
 
 unsigned uICALRelay::updateGates(unsigned unixTimeStamp) {
-  unsigned sleep = this->pollPeriod;
+    unsigned sleep = this->pollPeriod;
 
-  if (!this->cal) {
-    return sleep / 10;
-  }
-
-  if (unixTimeStamp == 0) {
-    Serial.println("No NTP fix");
-    return sleep / 10;
-  }
-  uICAL::DateTime now(unixTimeStamp);
-  uICAL::DateTime calBegin(unixTimeStamp);
-  uICAL::DateTime calEnd(unixTimeStamp + this->pollPeriod);
-
-  try {
-    uICAL::CalendarIter_ptr calIt = uICAL::new_ptr<uICAL::CalendarIter>(this->cal, calBegin, calEnd);
-
-    uint8_t relayState[this->gateCount];
-
-    for (int i=0; i<this->gateCount; i++) {
-      relayState[i] = LOW;
+    if (!this->cal) {
+        return sleep / 10;
     }
 
-    while (calIt->next()) {
-      uICAL::CalendarEntry_ptr entry = calIt->current();
+    if (unixTimeStamp == 0) {
+        log_warning("%s", "No NTP fix");
+        return sleep / 10;
+    }
+    uICAL::DateTime now(unixTimeStamp);
+    uICAL::DateTime calBegin(unixTimeStamp);
+    uICAL::DateTime calEnd(unixTimeStamp + this->pollPeriod);
 
-      uICAL::DateTime dtStart = entry->start();
-      uICAL::string start = dtStart.as_str();
-      String summary = entry->summary();
-      summary.toLowerCase();
-      Serial.println((String)"# Event: " + start + " " + entry->summary());
+    log_info("calBegin Time: %s", calBegin.as_str().c_str());
+    log_info("calEnd Time: %s", calEnd.as_str().c_str());
 
-      for (int i=0; i<this->gateCount; i++) {
-        String relayName = this->gates[i].name;
-        relayName.toLowerCase();
-        if (entry->start() <= now && now < entry->end()) {
-          if (summary.indexOf(relayName) != -1) {
-            relayState[i] = HIGH;
-            sleep = std::min(sleep, (unsigned)(entry->end() - now).totalSeconds());
-          }
-          else if (now > entry->start()) {
-            sleep = std::min(sleep, (unsigned)(entry->start() - now).totalSeconds());
-          }
+    log_info("Current Time: %s", now.as_str().c_str());
+
+    try {
+        uICAL::CalendarIter_ptr calIt = uICAL::new_ptr<uICAL::CalendarIter>(this->cal, calBegin, calEnd);
+
+        uint8_t relayState[this->gateCount];
+
+        for (int i=0; i<this->gateCount; i++) {
+            relayState[i] = LOW;
         }
-      }
-    }
 
-    Serial.println(uICAL::string("Now: ") + now.as_str());
-    for (int i=0; i<this->gateCount; i++) {
-      uint8_t state = digitalRead(this->gates[i].pin);
+        while (calIt->next()) {
+            uICAL::CalendarEntry_ptr entry = calIt->current();
+            log_debug("Event @ %s -> %s : %s",
+                      entry->start().as_str().c_str(),
+                      entry->end().as_str().c_str(),
+                      entry->summary().c_str());
 
-      if (relayState[i] != state) {
-        digitalWrite(this->gates[i].pin, relayState[i]);
-      }
-      Serial.println((String)"Relay: " + (relayState[i] == HIGH ? "ON  " : "OFF ") + this->gates[i].name);
+            uICAL::DateTime dtStart = entry->start();
+            String summary = entry->summary();
+            summary.toLowerCase();
+
+            for (int i=0; i<this->gateCount; i++) {
+                String relayName = this->gates[i].name;
+                relayName.toLowerCase();
+                if (entry->start() <= now && now < entry->end()) {
+                    if (summary.indexOf(relayName) != -1) {
+                        relayState[i] = HIGH;
+                        sleep = std::min(sleep, (unsigned)(entry->end() - now).totalSeconds());
+                    }
+                }
+                else if (now < entry->start()) {
+                    sleep = std::min(sleep, (unsigned)(entry->start() - now).totalSeconds());
+                }
+            }
+        }
+
+        for (int i=0; i<this->gateCount; i++) {
+            uint8_t state = digitalRead(this->gates[i].pin);
+
+            if (relayState[i] != state) {
+                digitalWrite(this->gates[i].pin, relayState[i]);
+            }
+            log_info("Relay: %s - %s", (relayState[i] == HIGH ? "ON  " : "OFF "), this->gates[i].name);
+        }
     }
-  }
-  catch (uICAL::Error ex) {
-    Serial.println(ex.message);
-  }
-  return sleep;
+    catch (uICAL::Error ex) {
+        log_error("%s", ex.message.c_str());
+    }
+    return sleep;
 }
 
 void uICALRelay::wait(unsigned sleep) {
-    Serial.println("# Wait: " + String(sleep) + "s");
+    log_info("Wait: %ds", sleep);
 
     sleep *= 1000;
     while (sleep > 0) {
@@ -122,7 +140,7 @@ void uICALRelay::wait(unsigned sleep) {
         sleep -= 200;
         bool update = digitalRead(this->pushButtonPin);
         if (!update) {
-            Serial.println("Update button");
+            log_info("%s", "Update button pressed");
             break;
         }
     }

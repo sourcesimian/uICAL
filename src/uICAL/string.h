@@ -25,6 +25,8 @@ namespace uICAL {
                 using size_t = unsigned int;
                 static const size_t npos = -1;
 
+                static const string& none();
+
                 string() : String() {}
                 string(const String& b) : String(b) {}
                 string(const char* st) : String(st) {}
@@ -62,6 +64,8 @@ namespace uICAL {
 
         class string : public std::string {
             public:
+                static const string& none();
+
                 string() : std::string() {}
                 string(const std::string& b) : std::string(b) {}
                 string(const char* st) : std::string(st) {}

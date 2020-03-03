@@ -11,6 +11,12 @@ namespace uICAL {
     const char* fmt_04d = "%04d";
     const char* fmt_02d = "%02d";
 
+    static string EMPTY = string();
+
+    const string& string::none() {
+        return EMPTY;
+    }
+
     void string::tokenize(char delim, std::function<void (string)> cb) const {
         if (this->empty()) {
             return;

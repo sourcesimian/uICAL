@@ -20,6 +20,7 @@
 #include "uICAL/rruleiter.h"
 #include "uICAL/tz.h"
 #include "uICAL/tzmap.h"
+#include "uICAL/vevent.h"
 #include "uICAL/vline.h"
 #include "uICAL/vlinestream.h"
 

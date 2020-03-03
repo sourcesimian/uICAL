@@ -24,11 +24,11 @@ namespace uICAL {
             #if defined(ARDUINO)
                 const char* _logging_level_str(_logging_level level) {
                     switch(level) {
-                        case _logging_level::trace:      return "T";
-                        case _logging_level::debug:      return "D";
-                        case _logging_level::info:       return "I";
-                        case _logging_level::warn:       return "W";
-                        case _logging_level::error:      return "E";
+                        case _logging_level::trace:   return "T";
+                        case _logging_level::debug:   return "D";
+                        case _logging_level::info:    return "I";
+                        case _logging_level::warning: return "W";
+                        case _logging_level::error:   return "E";
                         default: return "?";
                     }
                 }
@@ -41,11 +41,11 @@ namespace uICAL {
             #else
                 const char* _logging_level_str(_logging_level level) {
                     switch(level) {
-                        case _logging_level::trace:      return "TRACE";
-                        case _logging_level::debug:      return "DEBUG";
-                        case _logging_level::info:       return "INFO";
-                        case _logging_level::warn:       return "WARNING";
-                        case _logging_level::error:      return "ERROR";
+                        case _logging_level::trace:   return "TRACE";
+                        case _logging_level::debug:   return "DEBUG";
+                        case _logging_level::info:    return "INFO";
+                        case _logging_level::warning: return "WARNING";
+                        case _logging_level::error:   return "ERROR";
                         default: return "???";
                     }
                 }

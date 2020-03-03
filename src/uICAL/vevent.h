@@ -16,11 +16,9 @@ namespace uICAL {
 
             void str(ostream& out) const;
 
-        private:
-
+            string summary;
             DateTime start;
             DateTime end;
-            string summary;
             RRule_ptr rrule;
 
             friend class VEventIter;

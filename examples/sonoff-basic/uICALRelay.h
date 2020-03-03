@@ -31,6 +31,8 @@ class uICALRelay {
         static const uint8_t statusLedPin;
         static const uint8_t pushButtonPin;
 
+        bool addEvent(const uICAL::VEvent& event);
+
         int gateCount;
         uICAL::Calendar_ptr cal;
 };

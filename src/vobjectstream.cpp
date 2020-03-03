@@ -29,76 +29,73 @@ namespace uICAL {
         this->obj->name = line->value;
     }
 
-    VObject_ptr VObjectStream::nextChild() {
-        VObject_ptr child;
+    const string& VObjectStream::nextChild() {
+        VLine_ptr line;
         if (!this->child) {
-            child = this->nextObj(this->obj);
+            line = this->nextObj(this->obj, false);
         }
         else {
-            child = this->nextObj(this->child);
+            line = this->nextObj(this->child, false);
         }
-        this->child = child;
-        return child;
+        if (!line) {
+            return string::none();
+        }
+        this->child = new_ptr<VObject>();
+        this->child->name = line->value;
+        return this->child->name;
     }
 
-    VObject_ptr VObjectStream::nextObj(VObject_ptr& obj) {
+    VObject_ptr VObjectStream::loadChild() {
+        this->loadObj(this->obj, this->child, false);
+        return this->child;
+    }
+
+    void VObjectStream::skipChild() {
+        this->loadObj(this->obj, this->child, true);
+    }
+
+    VLine_ptr VObjectStream::nextObj(VObject_ptr& obj, bool skip) {
         while(true) {
-            VLine_ptr line = stm.next();
+            VLine_ptr line = this->stm.next();
             if (line->empty()) {
                 log_error("%s", "Unexpected end of ICAL lines");
                 throw ParseError("Unexpected end of ICAL");
             }
             if (line->name == "BEGIN") {
-                VObject_ptr child = new_ptr<VObject>();
-                child->name = line->value;
-                log_debug("Child obj: %s", child->name.c_str());
-                return child;
+                return line;
             }
             else if (line->name == "END") {
                 if (obj->name == line->value) {
                     log_trace("End of component: %s", line->as_str().c_str());
-                    return new_ptr<VObject>();
+                    return nullptr;
                 }
                 if (this->obj->name == line->value) {
                     log_trace("End of stream: %s", line->as_str().c_str());
-                    return new_ptr<VObject>();
+                    return nullptr;
                 }
                 log_error("END mismatch \"%s\": %s", obj->name.c_str(), line->as_str().c_str());
                 throw ParseError(string("END mismatch for:") + obj->name.c_str() + string(" ") + line->as_str());
             }
             else {
-                obj->lines.push_back(line);
+                if (!skip) {
+                    obj->lines.push_back(line);
+                }
             }
         }
     }
 
-    void VObjectStream::loadChild() {
-        this->loadObj(this->obj, this->child);
-    }
-
-    void VObjectStream::loadObj(VObject_ptr& obj, VObject_ptr& child) {
+    void VObjectStream::loadObj(VObject_ptr& obj, VObject_ptr& child, bool skip) {
         for (;;) {
-            VObject_ptr nextObj = this->nextObj(child);
-            if (!nextObj->empty()) {
-                this->loadObj(child, nextObj);
-            }
-            else {
+            VLine_ptr line = this->nextObj(child, skip);
+            if (!line) {
                 break;
             }
+            VObject_ptr nextObj = new_ptr<VObject>();
+            nextObj->name = line->value;
+            this->loadObj(child, nextObj, skip);
         }
-        obj->children.push_back(child);
+        if (!skip) {
+            obj->children.push_back(child);
+        }
     }
-
-    // void VObjectStream::skipChild(VObject_ptr& child) {
-    //     while (true) {
-    //         VLine_ptr line = stm.next();
-    //         if (line->empty()) {
-    //             log_error("%s", "Unexpected end of ICAL lines");
-    //             throw ParseError("Unexpected end of ICAL");
-    //         }
-    //         if (line->name == "END" && child->name == line->value) {
-    //             return;
-    //         }
-    //     }
-    // }
 }

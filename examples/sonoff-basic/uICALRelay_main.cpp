@@ -156,11 +156,9 @@ void readStream(Stream& stm) {
 }
 
 void loop() {
-    Serial.println("Loop: BEGIN");
+    Serial.println((String)"Uptime: " + (getUnixTimeStamp() -   startTimeStamp) + "s");
 
     updateCalendar(relay.icalURL, relay_updateCalendar);
     unsigned unixTimeStamp = getUnixTimeStamp();
     relay.wait(relay.updateGates(unixTimeStamp));
-
-    Serial.println((String)"Uptime: " + (getUnixTimeStamp() -   startTimeStamp) + "s");
 }
