@@ -1,10 +1,12 @@
+#include "../catch.hpp"
+
 #include "uICAL.h"
 
 #include <iostream>
 #include <fstream>
 #include <list>
 
-void test_tz1() {
+TEST_CASE("TZ::test1", "[uICAL][TZ]") {
     std::cout << "TEST: tz1" << std::endl;
 
     std::ifstream input(std::string("test/data/ical2.txt"));
@@ -42,12 +44,32 @@ void test_tz1() {
         std::cout << dt.datestamp().as_str() << std::endl;
         std::cout << "--" << std::endl;
 
-        for (auto tz : tzList) {
-            std::cout << dt.datestamp(tz).as_str() << " " << tz->as_str() << std::endl;
-        }
-    }
-}
+        auto it = tzList.begin();
+        auto next = [&]() {
+            if (it == tzList.end()) {
+                return uICAL::string("END");
+            }
+            uICAL::string ret = dt.datestamp(*it).as_str() + uICAL::string(" ") + (*it)->as_str();
+            it++;
+            return ret;
+        };
 
-void test_tz() {
-    test_tz1();
+        REQUIRE(next() == "20191106T055555 NZDT");
+        REQUIRE(next() == "20191106T055555 NZDT");
+        REQUIRE(next() == "20191105T185555 CET");
+        REQUIRE(next() == "20191105T185555 CET");
+        REQUIRE(next() == "20191105T125555 EST");
+        REQUIRE(next() == "20191105T125555 EST");
+        REQUIRE(next() == "20191105T115555 CST");
+        REQUIRE(next() == "20191105T115555 CST");
+        REQUIRE(next() == "20191105T105555 MST");
+        REQUIRE(next() == "20191105T105555 MST");
+        REQUIRE(next() == "20191105T095555 PST");
+        REQUIRE(next() == "20191105T095555 PST");
+        REQUIRE(next() == "END");
+
+        // for (auto tz : tzList) {
+        //     std::cout << dt.datestamp(tz).as_str() << " " << tz->as_str() << std::endl;
+        // }
+    }
 }

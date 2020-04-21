@@ -126,7 +126,6 @@ void setup_ntp() {
 
 #endif
 
-
 void setup() {
     relay.begin();
 
@@ -158,7 +157,15 @@ void readStream(Stream& stm) {
 void loop() {
     Serial.println((String)"Uptime: " + (getUnixTimeStamp() -   startTimeStamp) + "s");
 
-    updateCalendar(relay.icalURL, relay_updateCalendar);
-    unsigned unixTimeStamp = getUnixTimeStamp();
-    relay.wait(relay.updateGates(unixTimeStamp));
+    unsigned wait = relay.pollPeriod;
+    try {
+        updateCalendar(relay.icalURL, relay_updateCalendar);
+        unsigned unixTimeStamp = getUnixTimeStamp();
+        wait = relay.updateGates(unixTimeStamp);
+    }
+    catch(uICAL::Error e) {
+        Serial.println((String)"EXCEPTION: " + e.message);
+    }
+    unsigned freeEnd = ESP.getFreeHeap();
+    relay.wait(wait);
 }

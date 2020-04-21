@@ -1,3 +1,5 @@
+#include "../catch.hpp"
+
 #include <iostream>
 #include <string>
 #include <vector>
@@ -142,6 +144,7 @@ void test_basic(std::string dtstart, std::string rrule, std::string begin, std::
             std::cout << "  ccc: " << occ->as_str() << std::endl;
             std::cout << "  exp: " << exp.str() << std::endl;
             std::cout << "  res: " << res.str() << std::endl;
+            REQUIRE(false);
         }
         else {
             std::cout << "PASS: " << start.as_str() << " " << rrule << std::endl;
@@ -153,8 +156,11 @@ void test_basic(std::string dtstart, std::string rrule, std::string begin, std::
     }
 }
 
+TEST_CASE("RRule::basic", "[uICAL][RRule]") {
+    run_tests("test/data/rrule.txt", test_basic);
+}
 
-void test_2() {
+TEST_CASE("RRule::test2", "[uICAL][RRule]") {
     uICAL::string rrule("FREQ=DAILY;COUNT=4");
     uICAL::string dtstart("19970902T090000");
     uICAL::string begin("19970902T090000");
@@ -167,10 +173,4 @@ void test_2() {
     {
         std::cout << rr->now().as_str() << std::endl;
     }
-}
-
-
-void test_rrule() {
-    run_tests("test/data/rrule.txt", test_basic);
-    test_2();
 }

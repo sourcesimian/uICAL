@@ -50,15 +50,14 @@ void uICALRelay::updateCalendar(Stream& stm) {
 }
 
 bool uICALRelay::addEvent(const uICAL::VEvent& event) {
-    return true;
-    // for (int i=0; i<this->gateCount; i++) {
-    //     String relayName = this->gates[i].name;
-    //     relayName.toLowerCase();
-    //     if (event.summary.indexOf(relayName) != -1) {
-    //         return true;
-    //     }
-    // }
-    // return false;
+    for (int i=0; i<this->gateCount; i++) {
+        log_debug("gate.name: %s", this->gates[i].name);
+        log_debug("summary: %s", event.summary.c_str());
+        if (event.summary.indexOf(this->gates[i].name) != -1) {
+            return true;
+        }
+    }
+    return false;
 }
 
 unsigned uICALRelay::updateGates(unsigned unixTimeStamp) {

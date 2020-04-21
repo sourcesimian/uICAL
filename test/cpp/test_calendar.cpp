@@ -1,9 +1,10 @@
+#include "../catch.hpp"
 
 #include "uICAL.h"
 
 #include <fstream>
 
-void test_cal1() {
+TEST_CASE("Calendar::basic", "[uICAL][Calendar]") {
     std::ifstream input(std::string("test/data/ical1.txt"));
     uICAL::istream_stl ical(input);
 
@@ -15,14 +16,17 @@ void test_cal1() {
         uICAL::DateTime("20191016T102000Z"),
         uICAL::DateTime("20191017T103000EST", tzmap));
 
-    while (calIt->next()) {
-        auto entry = calIt->current();
-        std::cout << entry->as_str() << std::endl;
-    }
+    auto next = [=](){
+        if(calIt->next()) {
+            return calIt->current()->as_str();
+        }
+        else {
+            return uICAL::string("END");
+        }
+    };
 
-    std::cout << "DONE" << std::endl;
-}
-
-void test_calendar() {
-    test_cal1();
+    std::cout << next() << std::endl;
+    std::cout << next() << std::endl;
+    std::cout << next() << std::endl;
+    REQUIRE(next() == "END");
 }

@@ -18,8 +18,9 @@ namespace uICAL {
         string line;
         if(line.readfrom(this->ical, '\n')) {
             line.rtrim();
-            return new_ptr<VLine>(line);
+            auto ret = new_ptr<VLine>(line);
+            return ret;
         }
-        return new_ptr<VLine>();
+        return nullptr;
     }
 }

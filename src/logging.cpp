@@ -29,6 +29,7 @@ namespace uICAL {
                         case _logging_level::info:    return "I";
                         case _logging_level::warning: return "W";
                         case _logging_level::error:   return "E";
+                        case _logging_level::metric:  return "M";
                         default: return "?";
                     }
                 }
@@ -46,6 +47,7 @@ namespace uICAL {
                         case _logging_level::info:    return "INFO";
                         case _logging_level::warning: return "WARNING";
                         case _logging_level::error:   return "ERROR";
+                        case _logging_level::metric:  return "METRIC";
                         default: return "???";
                     }
                 }

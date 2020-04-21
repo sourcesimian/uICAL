@@ -1,3 +1,5 @@
+#include "../catch.hpp"
+
 #include <cstdio>
 #include <iostream>
 #include <map>
@@ -13,6 +15,7 @@ uICAL::DateStamp ds(const std::string& value) {
 void cmp_datestamp(const std::string test, uICAL::DateStamp res, uICAL::DateStamp exp) {
     using namespace uICAL;
 
+    REQUIRE(res == exp);
     if (res != exp) {
         std::cout << "FAIL: " << test << std::endl;
         std::cout << " res: " << res.as_str() << std::endl;
@@ -20,7 +23,7 @@ void cmp_datestamp(const std::string test, uICAL::DateStamp res, uICAL::DateStam
     }
 }
 
-void test_datestamp_1() {
+TEST_CASE("DateStamp::test1", "[uICAL][DateStamp]") {
     std::cout << "TEST: datestamp 1" << std::endl;
 
     using namespace uICAL;
@@ -48,7 +51,7 @@ void test_datestamp_1() {
     cmp_datestamp("September roll over 2", dt1, ds("19971001T090000"));
 }
 
-void test_datestamp_weekNo() {
+TEST_CASE("DateStamp::weekNo", "[uICAL][DateStamp]") {
     using namespace uICAL;
 
     std::cout << "TEST: datestamp weekNo" << std::endl;
@@ -120,10 +123,4 @@ void test_datestamp_weekNo() {
     t("20060102T090000", DateTime::Day::MON, 1);
     t("20060108T090000", DateTime::Day::SUN, 1);
     t("20060109T090000", DateTime::Day::MON, 2);
-}
-
-
-void test_datestamp() {
-    test_datestamp_1();
-    test_datestamp_weekNo();
 }

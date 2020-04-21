@@ -24,9 +24,9 @@ class uICALRelay {
 
         static const char* hostFingerprint;
         static const char* icalURL;
+        static const int pollPeriod;
 
     protected:
-        static const int pollPeriod;
         static const Gate gates[];
         static const uint8_t statusLedPin;
         static const uint8_t pushButtonPin;

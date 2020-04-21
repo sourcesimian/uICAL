@@ -20,6 +20,7 @@
 
 namespace uICAL {
     #define UICAL_LOGGING_MAX_LEN 256
+    #define UICAL_LOG_LEVEL_METRIC   -1
     #define UICAL_LOG_LEVEL_ERROR    1
     #define UICAL_LOG_LEVEL_WARNING  2
     #define UICAL_LOG_LEVEL_INFO     3
@@ -34,6 +35,7 @@ namespace uICAL {
         #define log_trace(...)   (void)0
     #else
         enum class _logging_level {
+            metric  = UICAL_LOG_LEVEL_METRIC,
             error   = UICAL_LOG_LEVEL_ERROR,
             warning = UICAL_LOG_LEVEL_WARNING,
             info    = UICAL_LOG_LEVEL_INFO,
@@ -97,6 +99,8 @@ namespace uICAL {
         #else
             #define log_trace(...)      (void)0
         #endif
+
+        #define log_metric(...)         _logging_msg(uICAL::_logging_level::metric, __FILENAME__, __LINE__, __func__, "%s %d", __VA_ARGS__)
 
     #endif
 }
