@@ -20,6 +20,7 @@ namespace uICAL {
             DateTime(const DateStamp& datestamp, const TZ_ptr& tz);
             DateTime(seconds_t epochSeconds);
             DateTime(seconds_t epochSeconds, const TZ_ptr& tz);
+            DateTime(const DateTime&) = default;
 
             void str(ostream& out) const;
 

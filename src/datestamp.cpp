@@ -121,8 +121,8 @@ namespace uICAL {
 
     void DateStamp::str(ostream& out) const {
         this->year < 9999 ? out << string::fmt(fmt_04d, this->year) : out << "????";
-        this->month > 0 || this->month < 13 ? out << string::fmt(fmt_02d, this->month) : out << "??";
-        this->day > 0 || this->day < 32 ? out << string::fmt(fmt_02d, this->day) : out << "??";
+        this->month > 0 && this->month < 13 ? out << string::fmt(fmt_02d, this->month) : out << "??";
+        this->day > 0 && this->day < 32 ? out << string::fmt(fmt_02d, this->day) : out << "??";
         out << "T";
         this->hour < 24 ? out << string::fmt(fmt_02d, this->hour) : out << "??";
         this->minute < 60 ? out << string::fmt(fmt_02d, this->minute) : out << "??";;

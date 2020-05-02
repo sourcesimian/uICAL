@@ -59,10 +59,9 @@ namespace uICAL {
         }
         for (;;) {
             Counter_ptr min = *std::min_element(this->counters.begin(), this->counters.end());
-
             bool notEqual = false;
             for (auto counter : this->counters) {
-                if (min != counter) {
+                if (min->value() != counter->value()) {
                     notEqual = true;
                     break;
                 }
@@ -84,7 +83,7 @@ namespace uICAL {
     }
 
     void ByAndCounter::str(ostream& out) const {
-        Joiner values(',');
+        Joiner values('&');
         for (auto counter : this->counters) {
             counter->str(values.out());
             values.next();

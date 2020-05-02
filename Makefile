@@ -1,26 +1,28 @@
 CXX		  := clang++
-CXX_FLAGS := -Wall -Wextra -std=c++11 -g -DUICAL_LOG_LEVEL=5
+CXX_FLAGS := -Wall -Wextra -std=c++11 -g #-DUICAL_LOG_LEVEL=5
 CXX_GCOV := -fprofile-arcs -ftest-coverage
 
 BIN		:= build/bin
 SRC		:= src
 INCLUDE	:= src
 
+.PHONY: coverage devenv
+
+devenv:
+	./devenv/make-devenv.sh
+
+
 virtualenv:
 	./new_virtualenv3.sh ./virtualenv
 	{ \
 		. ./virtualenv/bin/activate; \
 		pip3 install pytest; \
+		python3 ./setup.py build install; \
 	}
 
+
 test-python: virtualenv
-	{ \
-		if ! declare -f deactivate >/dev/null; then \
-			. ./virtualenv/bin/activate; \
-		fi; \
-		python3 ./setup.py build install && \
-		pytest ./test/python/test_*.py; \
-	}
+	pytest ./test/python/test_*.py
 
 
 test-cpp: $(BIN)/test
@@ -43,7 +45,6 @@ clean:
 	rm -rf ./virtualenv/lib/python3.7/site-packages/uICAL*
 
 
-.PHONY: coverage
 coverage: $(BIN)/cov
 	./$(BIN)/cov
 	gcov -dump *.gcno *.gcda >/dev/null 2>/dev/null

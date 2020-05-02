@@ -8,6 +8,7 @@
     #include <Arduino.h>
 #else
     #include <stdlib.h>
+    #include <string.h>
     #include <string>
     #include <sstream>
     #include <iostream>
@@ -70,6 +71,7 @@ namespace uICAL {
                 string(const std::string& b) : std::string(b) {}
                 string(const char* st) : std::string(st) {}
                 string(const std::ostringstream& sst) : std::string(sst.str()) {}
+                string(const string&) = default;
 
                 string& operator = (const string& st) { std::string::operator =(st); return *this; }
 

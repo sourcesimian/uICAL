@@ -45,6 +45,7 @@ namespace uICAL {
 
             void setWeekNo(unsigned n);
 
+            DateStamp(const DateStamp&) = default;
             DateStamp& operator = (const DateStamp& ds);
 
             bool operator > (const DateStamp& ds) const;
