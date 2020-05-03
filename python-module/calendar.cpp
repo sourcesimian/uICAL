@@ -149,14 +149,14 @@ namespace uical_python {
     static PyTypeObject CalendarType = {
         PyVarObject_HEAD_INIT(NULL, 0)
         .tp_name = "uical.Calendar",
-        .tp_doc = "Iterator object for uICAL::Calendar",
         .tp_basicsize = sizeof(CalendarObject),
         .tp_itemsize = 0,
-        .tp_flags = Py_TPFLAGS_DEFAULT,
-        .tp_new = Calendar_new,
-        .tp_init = (initproc) Calendar_init,
         .tp_dealloc = (destructor) Calendar_dealloc,
+        .tp_flags = Py_TPFLAGS_DEFAULT,
+        .tp_doc = "Iterator object for uICAL::Calendar",
         .tp_methods = Calendar_methods,
+        .tp_init = (initproc) Calendar_init,
+        .tp_new = Calendar_new,
     };
 
 

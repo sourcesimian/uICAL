@@ -1,4 +1,4 @@
-CXX		  := clang++
+CXX		  := g++
 CXX_FLAGS := -Wall -Wextra -std=c++11 -g #-DUICAL_LOG_LEVEL=5
 CXX_GCOV := -fprofile-arcs -ftest-coverage
 
@@ -17,24 +17,27 @@ virtualenv:
 	{ \
 		. ./virtualenv/bin/activate; \
 		pip3 install pytest; \
-		python3 ./setup.py build install; \
 	}
 
 
 test-python: virtualenv
-	pytest ./test/python/test_*.py
+	{ \
+		. ./virtualenv/bin/activate; \
+		python3 ./setup.py build install; \
+		pytest ./test/python/test_*.py; \
+	}
 
 
 test-cpp: $(BIN)/test
 	./$(BIN)/test
 
 
-$(BIN)/test: $(SRC)/*.cpp $(INCLUDE)/uical/*.h
+$(BIN)/test: $(SRC)/*.cpp $(INCLUDE)/uical/*.h test/cpp/*.cpp
 	mkdir -p $(BIN)
 	$(CXX) $(CXX_FLAGS) -I$(INCLUDE)/ $(SRC)/*.cpp test/cpp/*.cpp -o $@
 
 
-$(BIN)/cov: $(SRC)/*.cpp $(INCLUDE)/uical/*.h
+$(BIN)/cov: $(SRC)/*.cpp $(INCLUDE)/uical/*.h test/cpp/*.cpp
 	mkdir -p $(BIN)
 	$(CXX) $(CXX_FLAGS) $(CXX_GCOV) -I$(INCLUDE)/ $(SRC)/*.cpp test/cpp/*.cpp -o $@
 
@@ -54,3 +57,7 @@ coverage: $(BIN)/cov
 	mv *.gcov build/coverage/
 	ls build/coverage/*.gcov | grep -v -e ".cpp" -e ".h" | xargs rm
 	grep "####" build/coverage/*.gcov | wc -l
+
+
+memory: $(BIN)/test
+	valgrind --leak-check=full -s ./$(BIN)/test

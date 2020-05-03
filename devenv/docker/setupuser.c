@@ -8,7 +8,7 @@ int main(int argc, char **argv) {
     }
     char* gid = argv[4]; char* gn = argv[3]; char* uid = argv[2]; char* un = argv[1];
     char* home = argv[5];
-    char* spec = \
+    const char* spec = \
         "grep -q '^%s' /etc/group || /usr/sbin/groupadd -g %s %s;" \
         "grep -q '^%s' /etc/passwd || /usr/sbin/useradd -u %s -g %s -d %s %s;";
     char cmd[255];

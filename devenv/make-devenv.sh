@@ -18,29 +18,33 @@ function write_dockerfile_devenv() {
 cat <<EOF > ${1:?DOCKERFILE Required}
 FROM ${BASE_IMAGE} as base
 
+# tzdata package - unattended install (required by valgrind)
+ENV TZ=America/New_York
+ENV DEBIAN_FRONTEND=noninteractive
+
 RUN apt-get update && \
 	apt-get install -y \
         locales \
+        curl \
 		git \
-        clang \
+		make \
 		python3 \
 		python3-distutils \
-        curl \
+		python3-dev \
+		g++ \
+		valgrind \
 
 # Locale
 RUN locale-gen en_US.UTF-8 && update-locale LC_ALL=en_US.UTF-8 LANG=en_C.UTF-8
 
 # User setup
 COPY ./setupuser.c /
-RUN clang -o /usr/bin/setupuser /setupuser.c && chmod 4511 /usr/bin/setupuser
+RUN g++ -o /usr/bin/setupuser /setupuser.c && chmod 4511 /usr/bin/setupuser
 
 # Python
 RUN curl -kLo /get-pip.py https://bootstrap.pypa.io/get-pip.py
 COPY ./python3-requirements.txt /
 RUN python3 /get-pip.py && pip3 install -r /python3-requirements.txt
-
-RUN apt-get install -y make
-
 
 COPY ./usage.sh /
 ENTRYPOINT ./usage.sh

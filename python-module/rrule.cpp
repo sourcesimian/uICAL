@@ -154,14 +154,14 @@ namespace uical_python {
     static PyTypeObject RRuleType = {
         PyVarObject_HEAD_INIT(NULL, 0)
         .tp_name = "uical.RRule",
-        .tp_doc = "Iterator object for uICAL::RRule",
         .tp_basicsize = sizeof(RRuleObject),
         .tp_itemsize = 0,
-        .tp_flags = Py_TPFLAGS_DEFAULT,
-        .tp_new = RRule_new,
-        .tp_init = (initproc) RRule_init,
         .tp_dealloc = (destructor) RRule_dealloc,
+        .tp_flags = Py_TPFLAGS_DEFAULT,
+        .tp_doc = "Iterator object for uICAL::RRule",
         .tp_methods = RRule_methods,
+        .tp_init = (initproc) RRule_init,
+        .tp_new = RRule_new,
     };
 
 

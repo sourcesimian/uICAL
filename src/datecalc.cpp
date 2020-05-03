@@ -13,7 +13,7 @@ namespace uICAL {
     //                 d is in [1, last_day_of_month(y, m)]
     //                 y is a year after 1970-01-01
     // Source: http://howardhinnant.github.io/date_algorithms.html#days_from_civil
-    unsigned days_from_civil(unsigned y, unsigned m, unsigned d) noexcept
+    unsigned days_from_civil(int y, unsigned m, unsigned d) noexcept
     {
         y -= m <= 2;
         const unsigned era = (y >= 0 ? y : y-399) / 400;
@@ -26,7 +26,7 @@ namespace uICAL {
     // Returns year/month/day triple in civil calendar
     // Preconditions:  z is number of days since 1970-01-01
     // Source: http://howardhinnant.github.io/date_algorithms.html#civil_from_days
-    std::tuple<unsigned, unsigned, unsigned> civil_from_days(unsigned z) noexcept
+    std::tuple<unsigned, unsigned, unsigned> civil_from_days(int z) noexcept
     {
         z += 719468;
         const unsigned era = (z >= 0 ? z : z - 146096) / 146097;
