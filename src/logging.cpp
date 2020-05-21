@@ -33,12 +33,6 @@ namespace uICAL {
                         default: return "?";
                     }
                 }
-
-                #if !defined(UICAL_LOG_HANDLER)
-                    void _logging_handler(const char* log){
-                        Serial.println(log);
-                    }
-                #endif
             #else
                 const char* _logging_level_str(_logging_level level) {
                     switch(level) {
@@ -51,8 +45,14 @@ namespace uICAL {
                         default: return "???";
                     }
                 }
+            #endif
 
-                #if !defined(UICAL_LOG_HANDLER)
+            #if !defined(UICAL_LOG_HANDLER)
+                #if defined(ARDUINO)
+                    void _logging_handler(const char* log){
+                        Serial.println(log);
+                    }
+                #else
                     void _logging_handler(const char* log){
                         std::cout << log << std::endl;
                     }

@@ -18,6 +18,10 @@
     #endif
 #endif
 
+#if defined(UICAL_LOG_HANDLER)
+    void UICAL_LOG_HANDLER(const char*);
+#endif
+
 namespace uICAL {
     #define UICAL_LOGGING_MAX_LEN 256
     #define UICAL_LOG_LEVEL_METRIC   -1
@@ -61,10 +65,10 @@ namespace uICAL {
             if (n > (max-3)) {
                 strcpy(buf+(max-3), " ~");
             }
-            #if !defined(UICAL_LOG_HANDLER)
-                _logging_handler(buf);
-            #else
+            #if defined(UICAL_LOG_HANDLER)
                 UICAL_LOG_HANDLER(buf);
+            #else
+                _logging_handler(buf);
             #endif
         }
 
