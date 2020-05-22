@@ -5,7 +5,7 @@ REPO_TAG=sourcesimian/uical/devenv
 
 HERE=$(cd $(dirname "$0"); pwd)
 BUILD_DIR=${HERE}/../.build
-LAUNCHER=$(cd ${HERE}/..; pwd)/de
+LAUNCHER=$(cd ${HERE}/..; pwd)/ce
 
 # Setup Build area
 rm -rf ${BUILD_DIR}

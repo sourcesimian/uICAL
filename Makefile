@@ -6,10 +6,10 @@ BIN		:= build/bin
 SRC		:= src
 INCLUDE	:= src
 
-.PHONY: coverage devenv
+.PHONY: coverage containerenv
 
-devenv:
-	./devenv/make-devenv.sh
+containerenv:
+	./containerenv/make-containerenv.sh
 
 
 virtualenv:
