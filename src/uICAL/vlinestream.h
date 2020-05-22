@@ -9,9 +9,12 @@ namespace uICAL {
         public:
             VLineStream(istream& ical);
             const VLine_ptr next();
+            void repeatLine();
 
         protected:
             istream& ical;
+            VLine_ptr currentLine;
+            bool repeat;
     };
 }
 #endif

@@ -32,38 +32,59 @@ namespace uICAL {
 
     Calendar_ptr Calendar::load(istream& ical, TZMap_ptr& tzmap, eventP_t addEvent) {
         VLineStream lines(ical);
-        VObject_ptr obj = new_ptr<VObject>();
-        VObjectStream stm(lines, obj);
+
+        VObjectStream::lineP_t useLine = [](const string parent, const string line) {
+            if (parent == "VCALENDAR") {
+                if (line.empty()) return true;
+            }
+            else
+            if (parent == "VTIMEZONE") {
+                if (line.empty()) return true;
+                if (line == "TZID") return true;
+            }
+            else if (parent == "STANDARD") {
+                if (line.empty()) return true;
+                if (line == "TZOFFSETFROM") return true;
+                if (line == "TZNAME") return true;
+            }
+            else if (parent == "VEVENT") {
+                if (line.empty()) return true;
+                if (line == "SUMMARY") return true;
+                if (line == "DTSTAMP") return true;
+                if (line == "DTSTART") return true;
+                if (line == "DTEND") return true;
+                if (line == "RRULE") return true;
+            }
+            return false;
+        };
+
+        VObjectStream stm(lines, useLine);
+
+        VObject_ptr obj = stm.nextObject(false);
 
         if (obj->getName() != "VCALENDAR") {
-            log_error("Parse error: Did not expect: %s", obj->getName().c_str());
-            throw ParseError(string("Parse error: Did not expect: ") + obj->getName().c_str());
+            log_error("Parse error, did not expect: %s", obj->getName().c_str());
+            throw ParseError(string("Parse error, did not expect: ") + obj->getName().c_str());
         }
 
         Calendar_ptr cal = new_ptr<Calendar>();
 
         for (;;) {
-            string name = stm.nextChild();
-            if (name.empty()) {
+            auto child = stm.nextObject(true);
+            if (child == nullptr) {
                 break;
             }
 
-            if (name == "VTIMEZONE") {
-                VObject_ptr child = stm.loadChild();
+            if (child->getName() == "VTIMEZONE") {
                 tzmap->add(child);
             }
-            else if (name == "VEVENT") {
-                VObject_ptr child = stm.loadChild();
+            else if (child->getName() == "VEVENT") {
                 VEvent_ptr event = new_ptr<VEvent>(child, tzmap);
                 if (addEvent(*event)) {
                     cal->addEvent(event);
                 } else {
                     log_trace("Event skipped: %s @ %s", event->summary.c_str(), event->start.as_str().c_str());
                 }
-            }
-            else {
-                stm.skipChild();
-                log_trace("VObject skipped: %s", name.c_str());
             }
         }
         return cal;

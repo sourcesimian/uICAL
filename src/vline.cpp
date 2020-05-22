@@ -10,6 +10,8 @@
 
 namespace uICAL {
     VLine::VLine() {
+        this->name = string::none();
+        this->value = string::none();
     }
 
     VLine::VLine(const string& line) {

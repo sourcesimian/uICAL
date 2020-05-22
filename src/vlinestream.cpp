@@ -12,15 +12,26 @@
 namespace uICAL {
     VLineStream::VLineStream(istream& ical)
     : ical(ical)
+    , currentLine(nullptr)
+    , repeat(false)
     {}
 
+    void VLineStream::repeatLine() {
+        this->repeat = true;
+    }
+
     const VLine_ptr VLineStream::next() {
-        string line;
-        if(line.readfrom(this->ical, '\n')) {
-            line.rtrim();
-            auto ret = new_ptr<VLine>(line);
-            return ret;
+        if (!this->repeat || this->currentLine == nullptr) {
+            string line;
+            if(line.readfrom(this->ical, '\n')) {
+                line.rtrim();
+                this->currentLine = new_ptr<VLine>(line);
+            }
+            else {
+                this->currentLine = nullptr;
+            }
         }
-        return nullptr;
+        this->repeat = false;
+        return this->currentLine;
     }
 }

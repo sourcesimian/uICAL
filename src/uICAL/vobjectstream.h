@@ -10,20 +10,18 @@ namespace uICAL {
 
     class VObjectStream {
         public:
-            VObjectStream(VLineStream& stm, VObject_ptr& obj);
+            using lineP_t = std::function<bool (const string parent, const string line)>;
 
-            const string& nextChild();
-            VObject_ptr loadChild();
-            void skipChild();
+            VObjectStream(VLineStream& stm, lineP_t useLine);
+
+            VObject_ptr nextObject(bool recurse);
 
         protected:
-            VLine_ptr nextObj(VObject_ptr& obj, bool skip);
-            void loadObj(VObject_ptr& obj, VObject_ptr& child, bool skip);
+            string nextObjectName();
+            void loadObject(string objName, VObject_ptr& obj, bool recurse);
 
             VLineStream& stm;
-            VObject_ptr& obj;
-            VObject_ptr child;
-
+            lineP_t useLine;
     };
 }
 #endif

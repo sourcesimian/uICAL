@@ -13,89 +13,85 @@
 #include "uICAL/vobjectstream.h"
 
 namespace uICAL {
-    VObjectStream::VObjectStream(VLineStream& stm, VObject_ptr& obj)
+    VObjectStream::VObjectStream(VLineStream& stm, lineP_t useLine)
     : stm(stm)
-    , obj(obj)
-    {
-        VLine_ptr line = stm.next();
-        if (line->empty()) {
-            log_error("Parse error: %s", "Empty stream");
-            throw ParseError(string("Parse error: empty stream"));
-        }
-        if (line->name != "BEGIN") {
-            log_error("Parse error: Bad first line: %s", line->as_str().c_str());
-            throw ParseError(string("Parse error: Bad first line: ") + line->as_str());
-        }
-        this->obj->name = line->value;
-    }
+    , useLine(useLine)
+    {}
 
-    const string& VObjectStream::nextChild() {
-        VLine_ptr line;
-        if (!this->child) {
-            line = this->nextObj(this->obj, false);
-        }
-        else {
-            line = this->nextObj(this->child, false);
-        }
+    string VObjectStream::nextObjectName() {
+        VLine_ptr line = this->stm.next();
+
         if (!line) {
+            log_error("Parse error: %s", "Empty stream");
+            throw ParseError(string("Parse error, empty stream"));
+        }
+        if (line->name == "END") {
             return string::none();
         }
-        this->child = new_ptr<VObject>();
-        this->child->name = line->value;
-        return this->child->name;
+        if (line->name != "BEGIN") {
+            log_error("Parse error, expected BEGIN: %s", line->as_str().c_str());
+            throw ParseError(string("Parse error, expected BEGIN: ") + line->as_str());
+        }
+
+        return line->value;
     }
 
-    VObject_ptr VObjectStream::loadChild() {
-        this->loadObj(this->obj, this->child, false);
-        return this->child;
-    }
-
-    void VObjectStream::skipChild() {
-        this->loadObj(this->obj, this->child, true);
-    }
-
-    VLine_ptr VObjectStream::nextObj(VObject_ptr& obj, bool skip) {
+    void VObjectStream::loadObject(string objName, VObject_ptr& obj, bool recurse) {
         while(true) {
             VLine_ptr line = this->stm.next();
-            if (line->empty()) {
-                log_error("%s", "Unexpected end of ICAL lines");
-                throw ParseError("Unexpected end of ICAL");
+            if (!line) {
+                log_error("%s", "Parse error, unexpected end of ICAL");
+                throw ParseError("Parse error, unexpected end of ICAL");
             }
             if (line->name == "BEGIN") {
-                return line;
+                stm.repeatLine();
+                if (recurse || obj == nullptr) {
+                    string childName = this->nextObjectName();
+                    VObject_ptr child = nullptr;
+                    if (this->useLine(childName, string::none())) {
+                        child = new_ptr<VObject>();
+                        child->name = childName;
+                    }
+                    loadObject(childName, child, true);
+                    if (obj && child) {
+                        obj->children.push_back(child);
+                    }
+                }
+                else {
+                    return;
+                }
             }
             else if (line->name == "END") {
-                if (obj->name == line->value) {
+                if (objName == line->value) {
                     log_trace("End of component: %s", line->as_str().c_str());
-                    return nullptr;
+                    return;
                 }
-                if (this->obj->name == line->value) {
-                    log_trace("End of stream: %s", line->as_str().c_str());
-                    return nullptr;
-                }
-                log_error("END mismatch \"%s\": %s", obj->name.c_str(), line->as_str().c_str());
-                throw ParseError(string("END mismatch for:") + obj->name.c_str() + string(" ") + line->as_str());
+                log_error("END mismatch \"%s\": %s", objName.c_str(), line->as_str().c_str());
+                throw ParseError(string("END mismatch for:") + objName.c_str() + string(" ") + line->as_str());
             }
             else {
-                if (!skip) {
+                if (obj && this->useLine(obj->getName(), line->name)) {
                     obj->lines.push_back(line);
                 }
             }
         }
     }
 
-    void VObjectStream::loadObj(VObject_ptr& obj, VObject_ptr& child, bool skip) {
-        for (;;) {
-            VLine_ptr line = this->nextObj(child, skip);
-            if (!line) {
-                break;
+    VObject_ptr VObjectStream::nextObject(bool recurse) {
+        while(true) {
+            string objName = this->nextObjectName();
+            if (objName.empty()) {
+                return nullptr;
             }
-            VObject_ptr nextObj = new_ptr<VObject>();
-            nextObj->name = line->value;
-            this->loadObj(child, nextObj, skip);
-        }
-        if (!skip) {
-            obj->children.push_back(child);
+            VObject_ptr obj = nullptr;
+            if (this->useLine(objName, string())) {
+                obj = new_ptr<VObject>();
+                obj->name = objName;
+            }
+            loadObject(objName, obj, recurse);
+            if (obj) {
+                return obj;
+            }
         }
     }
 }
