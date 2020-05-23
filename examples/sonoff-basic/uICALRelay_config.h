@@ -1,18 +1,21 @@
 
-const char* g_wifi_ssid = "<your WiFi SSID>";
-const char* g_wifi_pass = "<your WiFi password>";
+WiFi_config_t WiFi_config {
+    .ssid = "<... your WiFi SSID ...>",
+    .pass = "<... your WiFi password ...>",
+};
 
 #define SONOFF_BUTTON 0
 #define SONOFF_RELAY 12
 #define SONOFF_LED1 13
 
-const int uICALRelay::pollPeriod = 300;
-const char uICALRelay::icalURL[] = "https://calendar.google.com/calendar/ical/<...>/basic.ics";
-
-const uint8_t uICALRelay::statusLedPin = SONOFF_LED1;
-const uint8_t uICALRelay::pushButtonPin = SONOFF_BUTTON;
-
-const uICALRelay::Gate uICALRelay::gates[] = {
-    { "Porch Light", SONOFF_RELAY },
-    { 0, 0 },
+uICALRelay::config_t uICALRelay_config {
+    .icalURL = "<... your ICAL URL ...>",
+    .hostFingerprint = 0,
+    .pollPeriod = 300,
+    .statusLedPin = SONOFF_LED1,
+    .pushButtonPin = SONOFF_BUTTON,
+    .gates = (uICALRelay::gate_t []) {
+        { "Porch Light", SONOFF_RELAY },
+        { 0, 0 },
+    },
 };

@@ -26,6 +26,7 @@ namespace uICAL {
             throw ParseError(string("Parse error, empty stream"));
         }
         if (line->name == "END") {
+            log_trace("Final component: %s", line->as_str().c_str());
             return string::none();
         }
         if (line->name != "BEGIN") {
@@ -33,6 +34,7 @@ namespace uICAL {
             throw ParseError(string("Parse error, expected BEGIN: ") + line->as_str());
         }
 
+        log_trace("Component BEGIN: %s", line->value.c_str());
         return line->value;
     }
 
@@ -51,6 +53,10 @@ namespace uICAL {
                     if (this->useLine(childName, string::none())) {
                         child = new_ptr<VObject>();
                         child->name = childName;
+                        log_trace("Use component: %s", childName.c_str());
+                    }
+                    else {
+                        log_trace("Ignore component: %s", childName.c_str());
                     }
                     loadObject(childName, child, true);
                     if (obj && child) {
@@ -63,15 +69,19 @@ namespace uICAL {
             }
             else if (line->name == "END") {
                 if (objName == line->value) {
-                    log_trace("End of component: %s", line->as_str().c_str());
+                    log_trace("Component END: %s", line->value.c_str());
                     return;
                 }
-                log_error("END mismatch \"%s\": %s", objName.c_str(), line->as_str().c_str());
-                throw ParseError(string("END mismatch for:") + objName.c_str() + string(" ") + line->as_str());
+                log_error("Mismatch \"%s\": %s", objName.c_str(), line->as_str().c_str());
+                throw ParseError(string("Mismatch for:") + objName.c_str() + string(" ") + line->as_str());
             }
             else {
                 if (obj && this->useLine(obj->getName(), line->name)) {
                     obj->lines.push_back(line);
+                    log_trace("Use line: %s", line->as_str().c_str());
+                }
+                else {
+                    log_trace("Ignore line: %s", line->as_str().c_str());
                 }
             }
         }

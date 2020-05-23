@@ -6,10 +6,12 @@
     #include <ESP8266WiFi.h>
     #include <ESP8266HTTPClient.h>
     #include <WiFiClientSecureBearSSL.h>
+    #include <ESP8266WebServer.h>
 #else
     #include <Arduino.h>
     #include <WiFi.h>
     #include <HTTPClient.h>
+    #include <WebServer.h>
 #endif
 
 #include <WiFiUDP.h>
@@ -17,17 +19,22 @@
 
 #include "uICALRelay.h"
 
-extern const char* g_wifi_ssid;
-extern const char* g_wifi_pass;
+struct WiFi_config_t {
+    const char* ssid;
+    const char* pass;
+};
+
+#include "uICALRelay_config.h"
 
 #define NTP_HOST "pool.ntp.org"
 
 WiFiUDP ntpUDP;
 EasyNTPClient g_ntpClient(ntpUDP, NTP_HOST, 0); // UTC
-
 unsigned startTimeStamp;
 
-uICALRelay relay;
+void updateCalendar(const char* url, const char* hostFingerprint, std::function<void (Stream&)> processStream);
+unsigned getUnixTimeStamp();
+uICALRelay relay(uICALRelay_config, updateCalendar, getUnixTimeStamp);
 
 
 void setup_serial() {
@@ -49,20 +56,30 @@ bool wifiIsUp() {
 
 
 void setup_wifi() {
-    WiFi.begin((char *)g_wifi_ssid, (char *)g_wifi_pass);
-    Serial.print(String("Waiting for WiFi (") + g_wifi_ssid + ") ");
+    WiFi.begin((char *)WiFi_config.ssid, (char *)WiFi_config.pass);
+    Serial.print(String("Waiting for WiFi (") + WiFi_config.ssid + ") ");
     while (!wifiIsUp()) {
         Serial.print(".");
         relay.statusLedToggle();
         delay(500);
     }
-    Serial.println(" Connected");
+    Serial.print(" Connected [");
+    Serial.print(WiFi.localIP());
+    Serial.println("]");
     relay.statusLed(false);
 }
 
 
-unsigned getUnixTimeStamp() {
-    return g_ntpClient.getUnixTime();
+void setup_wifi_ap() {
+    IPAddress local_ip, gateway, subnet;
+
+    local_ip.fromString("10.0.0.7");
+    gateway.fromString("10.0.0.1");
+    subnet.fromString("255.255.255.0");
+
+    WiFi.softAPConfig(local_ip, gateway, subnet);
+    WiFi.softAP("uICAL_Relay", NULL, 6, 0, 0);
+
 }
 
 
@@ -79,25 +96,39 @@ void setup_ntp() {
     relay.statusLed(false);
 }
 
-#if defined(ARDUINO_ARCH_ESP8266)
 
-    void updateCalendar(const char* url, std::function<void (Stream&)> setStream) {
+#if defined(ARDUINO_ARCH_ESP8266)
+    ESP8266WebServer config_server(80);
+#else
+    WebServer config_server(80);
+#endif
+
+
+void setup_config_api() {
+    config_server.on("/", HTTP_GET, [&]() {
+            config_server.send(200, "text/html",
+                "Welcome to REST Web Server");
+        });
+}
+
+
+#if defined(ARDUINO_ARCH_ESP8266)
+    void updateCalendar(const char* url, const char* hostFingerprint, std::function<void (Stream&)> processStream) {
         String payload;
-        relay.statusLed(true);
 
         std::unique_ptr<BearSSL::WiFiClientSecure> client(new BearSSL::WiFiClientSecure);
         client->setInsecure();
-        //client->setFingerprint(fp);
+        if (hostFingerprint) {
+            client->setFingerprint(hostFingerprint);
+        }
 
-        //Serial.print("[HTTPS] begin...\n");
         HTTPClient https;
         if (https.begin(*client, url)) {
             int httpCode = https.GET();
 
             if (httpCode > 0) {
-                //Serial.printf("[HTTPS] GET... code: %d\n", httpCode);
                 String length = https.getStream().readStringUntil('\n');
-                setStream(https.getStream());
+                processStream(https.getStream());
             } else {
                 Serial.printf("[HTTPS] GET... failed, error: %s\n", https.errorToString(httpCode).c_str());
             }
@@ -105,26 +136,33 @@ void setup_ntp() {
         } else {
             Serial.printf("[HTTPS] Unable to connect\n");
         }
-        relay.statusLed(false);
     }
 
 #else
 
-    void updateCalendar(const char* url, std::function<void (Stream&)> setStream) {
+    void updateCalendar(const char* url, const char* hostFingerprint, std::function<void (Stream&)> processStream) {
         relay.statusLed(true);
-        HTTPClient http;
-        http.begin(url);
-        http.getStream().flush();
-        int httpCode = http.GET();
+        HTTPClient https;
+        https.begin(url);
+        https.getStream().flush();
+        int httpCode = https.GET();
         Serial.printf("[HTTPS] GET... code: %d\n", httpCode);
         if (httpCode > 0) {
-            String length = http.getStream().readStringUntil('\n');
-            setStream(http.getStream());
+            String length = https.getStream().readStringUntil('\n');
+            processStream(https.getStream());
+        } else {
+            Serial.printf("[HTTPS] GET... failed, error: %s\n", https.errorToString(httpCode).c_str());
         }
+        https.end();
         relay.statusLed(false);
     }
-
 #endif
+
+
+unsigned getUnixTimeStamp() {
+    return g_ntpClient.getUnixTime();
+}
+
 
 void setup() {
     relay.begin();
@@ -132,40 +170,19 @@ void setup() {
     setup_serial();
     setup_wifi();
     setup_ntp();
+
+    setup_config_api();
 }
 
-void relay_updateCalendar(Stream& stm) {
-    relay.updateCalendar(stm);
-}
-
-void readStream(Stream& stm) {
-    size_t len = 81;
-    char buf[len];
-
-    for (;;) {
-        size_t read = stm.readBytesUntil('\r', buf, len-1);
-        if (read > 0) {
-            buf[read] = 0;
-            Serial.print(buf);
-        }
-        else {
-            break;
-        }
-    }
-}
 
 void loop() {
-    Serial.println((String)"Uptime: " + (getUnixTimeStamp() -   startTimeStamp) + "s");
-
-    unsigned wait = relay.pollPeriod;
     try {
-        updateCalendar(relay.icalURL, relay_updateCalendar);
-        unsigned unixTimeStamp = getUnixTimeStamp();
-        wait = relay.updateGates(unixTimeStamp);
+        relay.handleRelays();
     }
     catch(uICAL::Error e) {
         Serial.println((String)"EXCEPTION: " + e.message);
+        delay(1000);
     }
-    unsigned freeEnd = ESP.getFreeHeap();
-    relay.wait(wait);
+
+    config_server.handleClient();
 }

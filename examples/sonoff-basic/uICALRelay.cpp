@@ -4,43 +4,82 @@
 #include <Arduino.h>
 
 #include "uICALRelay.h"
-#include "uICALRelay_config.h"
-
 #include "uICAL/logging.h"
 
+uICALRelay::uICALRelay(config_t& config,
+                       updateCalendar_t updateCalendar,
+                       getUnixTimeStamp_t getUnixTimeStamp)
+: config(config)
+, updateCalendar(updateCalendar)
+, getUnixTimeStamp(getUnixTimeStamp)
+, nextUpdate(0)
+{}
 
 void uICALRelay::begin() {
+    // Determine gateCount
     for (this->gateCount=0; this->gateCount<100; this->gateCount++) {
-        if (!this->gates[this->gateCount].name) {
+        if (!this->config.gates[this->gateCount].name) {
             break;
         }
     }
 
-    pinMode(this->pushButtonPin, INPUT);
-    digitalWrite(this->pushButtonPin, HIGH);
+    // Setup push button pin
+    pinMode(this->config.pushButtonPin, INPUT);
+    digitalWrite(this->config.pushButtonPin, HIGH);
 
-    pinMode(this->statusLedPin, OUTPUT);
-    digitalWrite(this->statusLedPin, HIGH);
+    // Setup status LED pin
+    pinMode(this->config.statusLedPin, OUTPUT);
+    digitalWrite(this->config.statusLedPin, HIGH);
 
+    // Setup gate pins
     for (int i=0; i<this->gateCount; i++) {
-        digitalWrite(this->gates[i].pin, LOW);
-        pinMode(this->gates[i].pin, OUTPUT);
+        digitalWrite(this->config.gates[i].pin, LOW);
+        pinMode(this->config.gates[i].pin, OUTPUT);
     }
 }
 
 void uICALRelay::statusLed(bool state) {
-    digitalWrite(this->statusLedPin, !state);
+    digitalWrite(this->config.statusLedPin, !state);
 }
 
 void uICALRelay::statusLedToggle() {
-    uint8_t state = digitalRead(this->statusLedPin);
-    digitalWrite(this->statusLedPin, !state);
+    uint8_t state = digitalRead(this->config.statusLedPin);
+    digitalWrite(this->config.statusLedPin, !state);
 }
 
-void uICALRelay::updateCalendar(Stream& stm) {
+void uICALRelay::handleRelays() {
+    unsigned unixTimeStamp = getUnixTimeStamp();
+
+    bool update = digitalRead(this->config.pushButtonPin);
+    if (!update) {
+        log_info("%s", "Update button pressed");
+        this->nextUpdate = 0;
+    }
+
+    if (unixTimeStamp < this->nextUpdate) {
+        return;
+    }
+
+    this->statusLed(true);
+    this->updateCalendar(this->config.icalURL, this->config.hostFingerprint, [&](Stream& stm) {
+        int a = ESP.getFreeHeap();
+        Serial.println((String)"FREE A: " + a);
+
+        this->processStream(stm);
+
+        int b = ESP.getFreeHeap();
+        Serial.println((String)"FREE B: " + b + " (" + (b-a) + ")");
+    });
+    this->statusLed(true);
+
+    unsigned wait = this->updateGates(unixTimeStamp);
+    this->nextUpdate = unixTimeStamp + wait;
+}
+
+void uICALRelay::processStream(Stream& stm) {
     try {
         uICAL::istream_Stream istm(stm);
-        this->cal = this->cal = uICAL::Calendar::load(istm, [=](const uICAL::VEvent& event){
+        this->cal = uICAL::Calendar::load(istm, [=](const uICAL::VEvent& event){
           return this->addEvent(event);
         });
     }
@@ -51,9 +90,7 @@ void uICALRelay::updateCalendar(Stream& stm) {
 
 bool uICALRelay::addEvent(const uICAL::VEvent& event) {
     for (int i=0; i<this->gateCount; i++) {
-        log_debug("gate.name: %s", this->gates[i].name);
-        log_debug("summary: %s", event.summary.c_str());
-        if (event.summary.indexOf(this->gates[i].name) != -1) {
+        if (event.summary.indexOf(this->config.gates[i].name) != -1) {
             return true;
         }
     }
@@ -61,7 +98,7 @@ bool uICALRelay::addEvent(const uICAL::VEvent& event) {
 }
 
 unsigned uICALRelay::updateGates(unsigned unixTimeStamp) {
-    unsigned sleep = this->pollPeriod;
+    unsigned sleep = this->config.pollPeriod;
 
     if (!this->cal) {
         return sleep / 10;
@@ -73,11 +110,10 @@ unsigned uICALRelay::updateGates(unsigned unixTimeStamp) {
     }
     uICAL::DateTime now(unixTimeStamp);
     uICAL::DateTime calBegin(unixTimeStamp);
-    uICAL::DateTime calEnd(unixTimeStamp + this->pollPeriod);
+    uICAL::DateTime calEnd(unixTimeStamp + this->config.pollPeriod);
 
     log_info("calBegin Time: %s", calBegin.as_str().c_str());
     log_info("calEnd Time: %s", calEnd.as_str().c_str());
-
     log_info("Current Time: %s", now.as_str().c_str());
 
     try {
@@ -101,7 +137,7 @@ unsigned uICALRelay::updateGates(unsigned unixTimeStamp) {
             summary.toLowerCase();
 
             for (int i=0; i<this->gateCount; i++) {
-                String relayName = this->gates[i].name;
+                String relayName = this->config.gates[i].name;
                 relayName.toLowerCase();
                 if (entry->start() <= now && now < entry->end()) {
                     if (summary.indexOf(relayName) != -1) {
@@ -116,31 +152,17 @@ unsigned uICALRelay::updateGates(unsigned unixTimeStamp) {
         }
 
         for (int i=0; i<this->gateCount; i++) {
-            uint8_t state = digitalRead(this->gates[i].pin);
+            uint8_t state = digitalRead(this->config.gates[i].pin);
 
             if (relayState[i] != state) {
-                digitalWrite(this->gates[i].pin, relayState[i]);
+                digitalWrite(this->config.gates[i].pin, relayState[i]);
             }
-            log_info("Relay: %s - %s", (relayState[i] == HIGH ? "ON  " : "OFF "), this->gates[i].name);
+            log_info("Relay: %s - %s", (relayState[i] == HIGH ? "ON  " : "OFF "), this->config.gates[i].name);
         }
     }
     catch (uICAL::Error ex) {
         log_error("%s", ex.message.c_str());
     }
+    log_debug("Sleep: %ds", sleep);
     return sleep;
-}
-
-void uICALRelay::wait(unsigned sleep) {
-    log_info("Wait: %ds", sleep);
-
-    sleep *= 1000;
-    while (sleep > 0) {
-        delay(200);
-        sleep -= 200;
-        bool update = digitalRead(this->pushButtonPin);
-        if (!update) {
-            log_info("%s", "Update button pressed");
-            break;
-        }
-    }
 }

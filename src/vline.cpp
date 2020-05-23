@@ -36,7 +36,6 @@ namespace uICAL {
             this->name = line.substr(0, colon);
         }
         this->value = line.substr(colon + 1, line.length() - colon - 1);
-        log_trace("VLINE %s", this->as_str().c_str());
     }
 
     bool VLine::empty() const {

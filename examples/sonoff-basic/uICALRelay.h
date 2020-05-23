@@ -8,33 +8,47 @@
 
 class uICALRelay {
     public:
-        typedef struct {
+        using updateCalendar_t = std::function<void (const char* url,
+                                                     const char* hostFingerprint,
+                                                     std::function<void (Stream&)> processStream)>;
+        using getUnixTimeStamp_t = std::function<unsigned ()>;
+
+        struct gate_t {
             const char* name;
             const uint8_t pin;
-        } Gate;
+        };
+
+        struct config_t {
+            const char* icalURL;
+            const char* hostFingerprint;
+            const int pollPeriod;
+
+            const uint8_t statusLedPin;
+            const uint8_t pushButtonPin;
+
+            const gate_t* gates;
+        };
+
+        uICALRelay(config_t& config, updateCalendar_t updateCalendar, getUnixTimeStamp_t getUnixTimeStamp);
 
         void begin();
-
-        void updateCalendar(Stream& stm);
-        unsigned updateGates(unsigned unixTimeStamp);
-        void wait(unsigned sleep);
+        void handleRelays();
 
         void statusLed(bool state);
         void statusLedToggle();
 
-        static const char* hostFingerprint;
-        static const char* icalURL;
-        static const int pollPeriod;
-
     protected:
-        static const Gate gates[];
-        static const uint8_t statusLedPin;
-        static const uint8_t pushButtonPin;
-
+        void processStream(Stream& stm);
+        unsigned updateGates(unsigned unixTimeStamp);
         bool addEvent(const uICAL::VEvent& event);
+
+        config_t& config;
+        updateCalendar_t updateCalendar;
+        getUnixTimeStamp_t getUnixTimeStamp;
 
         int gateCount;
         uICAL::Calendar_ptr cal;
+        unsigned nextUpdate;
 };
 
 #endif

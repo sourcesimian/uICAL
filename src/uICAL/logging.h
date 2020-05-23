@@ -104,8 +104,6 @@ namespace uICAL {
             #define log_trace(...)      (void)0
         #endif
 
-        #define log_metric(...)         _logging_msg(uICAL::_logging_level::metric, __FILENAME__, __LINE__, __func__, "%s %d", __VA_ARGS__)
-
     #endif
 }
 #endif

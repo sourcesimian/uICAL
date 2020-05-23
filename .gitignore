@@ -42,3 +42,5 @@ virtualenv/
 *.out
 *.app
 
+.vscode/
+*.code-workspace

@@ -60,11 +60,13 @@ namespace uICAL {
 
         VObjectStream stm(lines, useLine);
 
-        VObject_ptr obj = stm.nextObject(false);
+        {
+            VObject_ptr obj = stm.nextObject(false);
 
-        if (obj->getName() != "VCALENDAR") {
-            log_error("Parse error, did not expect: %s", obj->getName().c_str());
-            throw ParseError(string("Parse error, did not expect: ") + obj->getName().c_str());
+            if (obj->getName() != "VCALENDAR") {
+                log_error("Parse error, did not expect: %s", obj->getName().c_str());
+                throw ParseError(string("Parse error, did not expect: ") + obj->getName().c_str());
+            }
         }
 
         Calendar_ptr cal = new_ptr<Calendar>();
@@ -83,7 +85,7 @@ namespace uICAL {
                 if (addEvent(*event)) {
                     cal->addEvent(event);
                 } else {
-                    log_trace("Event skipped: %s @ %s", event->summary.c_str(), event->start.as_str().c_str());
+                    log_debug("Event ignored: %s @ %s", event->summary.c_str(), event->start.as_str().c_str());
                 }
             }
         }
