@@ -8,47 +8,38 @@
 
 class uICALRelay {
     public:
-        using updateCalendar_t = std::function<void (const char* url,
-                                                     const char* hostFingerprint,
+        using updateCalendar_t = std::function<void (String& url,
+                                                     String& hostFingerprint,
                                                      std::function<void (Stream&)> processStream)>;
         using getUnixTimeStamp_t = std::function<unsigned ()>;
+        using setGate_t = std::function<void (const char* id, bool state)>;
 
-        struct gate_t {
-            const char* name;
-            const uint8_t pin;
-        };
+        uICALRelay(updateCalendar_t updateCalendar, getUnixTimeStamp_t getUnixTimeStamp, setGate_t setGate);
 
-        struct config_t {
-            const char* icalURL;
-            const char* hostFingerprint;
-            const int pollPeriod;
+        void config(String icalURL, int pollPeriod, String hostFingerprint = emptyString);
+        void configGate(const char* id, String name);
 
-            const uint8_t statusLedPin;
-            const uint8_t pushButtonPin;
-
-            const gate_t* gates;
-        };
-
-        uICALRelay(config_t& config, updateCalendar_t updateCalendar, getUnixTimeStamp_t getUnixTimeStamp);
-
-        void begin();
         void handleRelays();
 
-        void statusLed(bool state);
-        void statusLedToggle();
+        void forceUpdate();
 
     protected:
         void processStream(Stream& stm);
         unsigned updateGates(unsigned unixTimeStamp);
         bool addEvent(const uICAL::VEvent& event);
 
-        config_t& config;
         updateCalendar_t updateCalendar;
         getUnixTimeStamp_t getUnixTimeStamp;
+        setGate_t setGate;
 
-        int gateCount;
+        String icalURL;
+        int pollPeriod;
+        String hostFingerprint;
+        std::map<String, const char*> gates;
+
         uICAL::Calendar_ptr cal;
         unsigned nextUpdate;
+        unsigned long lastMillis;
 };
 
 #endif

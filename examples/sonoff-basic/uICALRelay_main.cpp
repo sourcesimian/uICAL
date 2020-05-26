@@ -16,110 +16,133 @@
 
 #include <WiFiUDP.h>
 #include <EasyNTPClient.h>
+#include <DNSServer.h>
+#include <FS.h>
 
 #include "uICALRelay.h"
+#include "ButtonMonitor.h"
+#include "LedFlash.h"
+#include "ConfigIF.h"
 
-struct WiFi_config_t {
-    const char* ssid;
-    const char* pass;
-};
+#define _TRACE_ Serial.println(String("") + "main" + ": (" + __LINE__ + ")")
+
+/*---------------------------------------------------------------------------*/
 
 #include "uICALRelay_config.h"
 
-#define NTP_HOST "pool.ntp.org"
+enum loop_mode_t {
+    INIT_TEST,
+    TEST,
+    INIT_RUN,
+    RUN,
+    INIT_CONFIG,
+    CONFIG,
+};
 
-WiFiUDP ntpUDP;
-EasyNTPClient g_ntpClient(ntpUDP, NTP_HOST, 0); // UTC
-unsigned startTimeStamp;
 
-void updateCalendar(const char* url, const char* hostFingerprint, std::function<void (Stream&)> processStream);
-unsigned getUnixTimeStamp();
-uICALRelay relay(uICALRelay_config, updateCalendar, getUnixTimeStamp);
+/*---------------------------------------------------------------------------*/
+const char * NTP_HOST = "pool.ntp.org";
 
+/*---------------------------------------------------------------------------*/
+loop_mode_t loop_mode;
 
+WiFiUDP g_ntpUDP;
+EasyNTPClient g_ntpClient(g_ntpUDP, NTP_HOST, 0); // UTC
+
+ConfigIF g_config(uICALRelay_config);
+
+void update_calendar(String& url, String& hostFingerprint, std::function<void (Stream&)> processStream);
+unsigned get_unix_timestamp();
+void set_gate(const char* id, bool state);
+
+uICALRelay g_relay(update_calendar, get_unix_timestamp, set_gate);
+ButtonMonitor g_button(uICALRelay_config.pushButtonPin);
+LedFlash g_led(uICALRelay_config.statusLedPin);
+
+void setup_io_pins() {
+    // Setup gate pins
+    for (int i=0; i<100; i++) {
+        if (!uICALRelay_config.gatePins[i].id) {
+            break;
+        }
+        digitalWrite(uICALRelay_config.gatePins[i].pin, LOW);
+        pinMode(uICALRelay_config.gatePins[i].pin, OUTPUT);
+    }
+}
+
+/*---------------------------------------------------------------------------*/
+void set_gate(const char* id, bool state) {
+    for (int i=0; i<100; i++) {
+        if (!uICALRelay_config.gatePins[i].id) {
+            break;
+        }
+        if (id == uICALRelay_config.gatePins[i].id) {
+            digitalWrite(uICALRelay_config.gatePins[i].pin, !state);
+            break;
+        }
+    }
+}
+
+/*---------------------------------------------------------------------------*/
 void setup_serial() {
     Serial.begin(115200);
     for (int i=0; i<60; i++) {
-        relay.statusLedToggle();
+        g_led.toggle();
         delay(100);
     }
-    relay.statusLed(true);
+    g_led.state(true);
     delay(4000);
-    relay.statusLed(false);
+    g_led.state(false);
     Serial.println("~~~");
 }
 
-
-bool wifiIsUp() {
-    return WiFi.status() == WL_CONNECTED;
-}
-
-
 void setup_wifi() {
-    WiFi.begin((char *)WiFi_config.ssid, (char *)WiFi_config.pass);
-    Serial.print(String("Waiting for WiFi (") + WiFi_config.ssid + ") ");
-    while (!wifiIsUp()) {
+    WiFi.disconnect();
+
+    String ssid = g_config.getConfig("wifissid");
+    WiFi.begin(ssid.c_str(), g_config.getConfig("wifipass").c_str());
+    Serial.print(String("Waiting for WiFi (") + ssid + ") ");
+    while (!WiFi.isConnected()) {
         Serial.print(".");
-        relay.statusLedToggle();
-        delay(500);
+        g_led.toggle();
+        delay(300);
     }
     Serial.print(" Connected [");
     Serial.print(WiFi.localIP());
     Serial.println("]");
-    relay.statusLed(false);
+    g_led.state(false);
 }
 
-
-void setup_wifi_ap() {
-    IPAddress local_ip, gateway, subnet;
-
-    local_ip.fromString("10.0.0.7");
-    gateway.fromString("10.0.0.1");
-    subnet.fromString("255.255.255.0");
-
-    WiFi.softAPConfig(local_ip, gateway, subnet);
-    WiFi.softAP("uICAL_Relay", NULL, 6, 0, 0);
-
+unsigned get_unix_timestamp() {
+    return g_ntpClient.getUnixTime();
 }
-
 
 void setup_ntp() {
-    ntpUDP.begin(123);
+    unsigned startTimeStamp;
+
+    g_ntpUDP.begin(123);
 
     Serial.print("Waiting for NTP ");
-    while((startTimeStamp = getUnixTimeStamp()) == 0) {
+    while ((startTimeStamp = get_unix_timestamp()) == 0) {
         Serial.print(".");
-        relay.statusLedToggle();
+        g_led.toggle();
         delay(1000);
     }
     Serial.println((String)" Done: " + startTimeStamp);
-    relay.statusLed(false);
+    g_led.state(false);
 }
 
 
-#if defined(ARDUINO_ARCH_ESP8266)
-    ESP8266WebServer config_server(80);
-#else
-    WebServer config_server(80);
-#endif
-
-
-void setup_config_api() {
-    config_server.on("/", HTTP_GET, [&]() {
-            config_server.send(200, "text/html",
-                "Welcome to REST Web Server");
-        });
-}
-
 
 #if defined(ARDUINO_ARCH_ESP8266)
-    void updateCalendar(const char* url, const char* hostFingerprint, std::function<void (Stream&)> processStream) {
+    void update_calendar(String& url, String& hostFingerprint, std::function<void (Stream&)> processStream) {
+        g_led.state(true);
+
         String payload;
-
         std::unique_ptr<BearSSL::WiFiClientSecure> client(new BearSSL::WiFiClientSecure);
         client->setInsecure();
-        if (hostFingerprint) {
-            client->setFingerprint(hostFingerprint);
+        if (!hostFingerprint.isEmpty()) {
+            client->setFingerprint(hostFingerprint.c_str());
         }
 
         HTTPClient https;
@@ -136,12 +159,15 @@ void setup_config_api() {
         } else {
             Serial.printf("[HTTPS] Unable to connect\n");
         }
+
+        g_led.state(false);
     }
 
 #else
 
-    void updateCalendar(const char* url, const char* hostFingerprint, std::function<void (Stream&)> processStream) {
-        relay.statusLed(true);
+    void update_calendar(String& url, String& hostFingerprint, std::function<void (Stream&)> processStream) {
+        g_led.state(true);
+
         HTTPClient https;
         https.begin(url);
         https.getStream().flush();
@@ -154,35 +180,90 @@ void setup_config_api() {
             Serial.printf("[HTTPS] GET... failed, error: %s\n", https.errorToString(httpCode).c_str());
         }
         https.end();
-        relay.statusLed(false);
+
+        g_led.state(false);
     }
 #endif
 
-
-unsigned getUnixTimeStamp() {
-    return g_ntpClient.getUnixTime();
+void config_relay() {
+    String url = g_config.getConfig("icalurl");
+    int poll = g_config.getConfig("poll").toInt();
+    String fingerprint = g_config.getConfig("fingerprint");
+    g_relay.config(url, poll, fingerprint);
+    
+    for (int i=0; i<100; i++) {
+        if (!uICALRelay_config.gatePins[i].id) {
+            break;
+        }
+        
+        String name = g_config.getConfig(String("gate-") + uICALRelay_config.gatePins[i].id);
+        g_relay.configGate(uICALRelay_config.gatePins[i].id, name);
+    }
 }
 
-
 void setup() {
-    relay.begin();
-
+    setup_io_pins();
     setup_serial();
-    setup_wifi();
-    setup_ntp();
+    SPIFFS.begin();
 
-    setup_config_api();
+    loop_mode = INIT_RUN;
+
+    Serial.println("loop");
 }
 
 
 void loop() {
-    try {
-        relay.handleRelays();
-    }
-    catch(uICAL::Error e) {
-        Serial.println((String)"EXCEPTION: " + e.message);
-        delay(1000);
-    }
+    int button = g_button.getPressed();
+    g_led.handle();
 
-    config_server.handleClient();
+    switch (loop_mode) {
+        case INIT_TEST:
+            g_led.flash(2000);
+            loop_mode = TEST;
+            break;
+
+        case TEST:
+            break;
+
+        case INIT_RUN:
+            Serial.println("Setup run mode");
+            setup_wifi();
+            setup_ntp();
+            config_relay();
+            g_led.state(false);
+            loop_mode = RUN;
+            break;
+
+        case RUN:
+            if (button < -10000) {
+                loop_mode = INIT_CONFIG;
+                break;
+            }
+            if (button > 500 && button < 3000) {
+                g_relay.forceUpdate();
+            }
+            try {
+                g_relay.handleRelays();
+            }
+            catch(uICAL::Error e) {
+                Serial.println((String)"EXCEPTION: " + e.message);
+                delay(1000);
+            }
+            break;
+
+        case INIT_CONFIG:
+            Serial.println("Setup config mode");
+            g_config.begin();
+            g_led.flash(300, 2700);
+            loop_mode = CONFIG;
+            break;
+
+        case CONFIG:
+            if (button > 500 && button < 3000) {
+                loop_mode = INIT_RUN;
+                break;
+            }
+            g_config.handle();
+            break;
+    }
 }
