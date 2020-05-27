@@ -22,11 +22,22 @@
 #include "uICALRelay.h"
 #include "ButtonMonitor.h"
 #include "LedFlash.h"
-#include "ConfigIF.h"
+#include "ConfigWiFiAP.h"
 
 #define _TRACE_ Serial.println(String("") + "main" + ": (" + __LINE__ + ")")
 
 /*---------------------------------------------------------------------------*/
+struct uICALRelay_gatePin_t {
+    const char* id;
+    const uint8_t pin;
+};
+
+struct uICALRelay_config_t {
+    uint8_t statusLedPin;
+    uint8_t pushButtonPin;
+    uICALRelay_gatePin_t* gatePins;
+};
+
 
 #include "uICALRelay_config.h"
 
@@ -49,7 +60,7 @@ loop_mode_t loop_mode;
 WiFiUDP g_ntpUDP;
 EasyNTPClient g_ntpClient(g_ntpUDP, NTP_HOST, 0); // UTC
 
-ConfigIF g_config(uICALRelay_config);
+ConfigWiFiAP g_config(config_ap, config_ap_items, SPIFFS, WiFi);
 
 void update_calendar(String& url, String& hostFingerprint, std::function<void (Stream&)> processStream);
 unsigned get_unix_timestamp();
@@ -196,7 +207,7 @@ void config_relay() {
             break;
         }
         
-        String name = g_config.getConfig(String("gate-") + uICALRelay_config.gatePins[i].id);
+        String name = g_config.getConfig(uICALRelay_config.gatePins[i].id);
         g_relay.configGate(uICALRelay_config.gatePins[i].id, name);
     }
 }

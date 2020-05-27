@@ -51,13 +51,7 @@ void uICALRelay::handleRelays() {
     }
 
     this->updateCalendar(this->icalURL, this->hostFingerprint, [&](Stream& stm) {
-        int a = ESP.getFreeHeap();
-        Serial.println((String)"FREE A: " + a);
-
         this->processStream(stm);
-
-        int b = ESP.getFreeHeap();
-        Serial.println((String)"FREE B: " + b + " (" + (b-a) + ")");
     });
 
     unixTimeStamp = getUnixTimeStamp();

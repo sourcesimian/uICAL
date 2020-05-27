@@ -9,16 +9,20 @@
     #include <WebServer.h>
 #endif
 
+#include <map>
+
 #include <WiFiUDP.h>
 #include <DNSServer.h>
 #include <FS.h>
 
-#include <ConfigIF.h>
+#include <ConfigWiFiAP.h>
 
 const byte DNS_PORT = 53;
 const byte HTTP_PORT = 80;
 
 /*---------------------------------------------------------------------------*/
+
+/*
 static String urlDecode(String str)
 {
     auto h2int = [](char c) {
@@ -56,69 +60,74 @@ static String urlDecode(String str)
     }
     return encodedString;
 }
-
-static auto wifi = WiFi;
-const char* hostname = "uicalrelay.config";
+*/
 
 /*---------------------------------------------------------------------------*/
-ConfigIF::ConfigIF(uICALRelay_config_t& config)
+ConfigWiFiAP::ConfigWiFiAP(config_t& config, item_t* items, FS& fs, wifi_t& wifi)
 : config(config)
-, fs(SPIFFS)
+, items(items)
+, fs(fs)
+, wifi(wifi)
 , dns_server()
 , web_server(HTTP_PORT)
-{}
+{
+    for (int i=0; i<100; i++) {
+        if (items[i].id == 0) break;
+        item_map[items[i].id] = items[i];
+    }
+}
 
-void ConfigIF::begin() {
+void ConfigWiFiAP::begin() {
     setupWiFiAccessPoint();
     setupDnsServer();
     setupWebServer();
 }
 
-void ConfigIF::setupWiFiAccessPoint() {
-    wifi.disconnect();
+void ConfigWiFiAP::setupWiFiAccessPoint() {
 
     IPAddress local_IP(192, 168, 43, 1);
     
-    Serial.println();
-
-    Serial.print("Setting soft-AP configuration ... ");
-    Serial.println(wifi.softAPConfig(local_IP, local_IP, IPAddress(255, 255, 255, 0)) ? "Ready" : "Failed!");
-
+    wifi.disconnect();
     wifi.mode(WIFI_AP);
 
-    String ssid = "uICALRelay-" + getMacAddress();
+    if (!wifi.softAPConfig(local_IP, local_IP, IPAddress(255, 255, 255, 0))) {
+        Serial.print("Setting soft-AP configuration FAILED ");
+    }
+
+    String ssid = config.ssid_prefix + getMacAddress();
     ssid.replace(":", "");
 
-    Serial.print("Setting soft-AP ... ");
-    Serial.println(wifi.softAP(ssid, emptyString, 6, 0, 1) ? "Ready" : "Failed!");
+    if (!wifi.softAP(ssid, emptyString, 6, 0, 1)) {
+        Serial.print("Setting soft-AP FAILED ");
+    }
 
-    Serial.print("Soft-AP IP address = ");
+    Serial.print("ConfigWiFiAP IP address: ");
     Serial.println(getIPAddress());
 }
 
 
-void ConfigIF::setupDnsServer() {
+void ConfigWiFiAP::setupDnsServer() {
     dns_server.setErrorReplyCode(DNSReplyCode::NoError);
     dns_server.start(DNS_PORT, "*", wifi.softAPIP());
 }
 
-void ConfigIF::setupWebServer() {
+void ConfigWiFiAP::setupWebServer() {
     web_server.on("/", HTTP_GET, [&]() {this->respondWithForm();});
     web_server.on("/", HTTP_POST, [&]() {this->receiveFormPost();});
     web_server.onNotFound([&]() {this->captivePortalRedirect();});
     web_server.begin();
 }
 
-void ConfigIF::handle() {
+void ConfigWiFiAP::handle() {
     dns_server.processNextRequest();
     web_server.handleClient();
 }
 
-String ConfigIF::configFilename(String key) {
-    return String("/config-") + key;
+String ConfigWiFiAP::configFilename(String key) {
+    return String(config.config_dir) + "/" + config.config_prefix + key;
 }
 
-String ConfigIF::getConfig(String key) {
+String ConfigWiFiAP::getConfig(String key) {
     File file = fs.open(configFilename(key), "r");
     if (file) {
         char buf[max_config_value_length];
@@ -129,7 +138,7 @@ String ConfigIF::getConfig(String key) {
     return String();
 }
 
-void ConfigIF::setConfig(String key, String value) {
+void ConfigWiFiAP::setConfig(String key, String value) {
     String path = configFilename(key);
     if (fs.exists(path)) {
         fs.remove(path);
@@ -142,18 +151,16 @@ void ConfigIF::setConfig(String key, String value) {
     }
 }
 
-String ConfigIF::getIPAddress() {
+String ConfigWiFiAP::getIPAddress() {
     return wifi.softAPIP().toString();
 }
 
-String ConfigIF::getMacAddress() {
+String ConfigWiFiAP::getMacAddress() {
     return wifi.macAddress();
 }
 
-void ConfigIF::respondWithForm() {
-    Serial.println(String("respondWithForm: ") + web_server.hostHeader());
-
-    if (web_server.hostHeader() != hostname) {
+void ConfigWiFiAP::respondWithForm() {
+    if (web_server.hostHeader() != config.hostname) {
         captivePortalRedirect();
         return;
     }
@@ -162,9 +169,21 @@ void ConfigIF::respondWithForm() {
     
     content +=
         "<html>"
-        "<head><title>uICAL Relay</title></head>"
+        "<head>"
+        "<meta name='viewport' content='width=device-width'>"
+        "<title>" + String(config.name) + "</title>"
+        "<style>"
+        "dl {"
+        "display: block;"
+        "margin-top: 2em;"
+        "margin-bottom: 2em;"
+        "margin-left: 1em;"
+        "margin-right: 0;"
+        "}"
+        "</style>"
+        "</head>"
         "<body>"
-        "<H1>uICAL Relay</H1>";
+        "<H1>" + String(config.name) + "</H1>";
 
     content +=
         "<p>MAC Addr: " + getMacAddress() + "</p>";
@@ -174,18 +193,17 @@ void ConfigIF::respondWithForm() {
         "<form method='post'>"
         "<dl>";
 
-    content += buildFormLine("wifissid", "WiFi SSID", "wifissid", 20);
-    content += buildFormLine("wifipass", "WiFi Password", emptyString, 20);
-    content += buildFormLine("icalurl", "ICAL URL", "icalurl", 120);
-    content += buildFormLine("fingerprint", "Host Fingerprint", "fingerprint", 60);
-    content += buildFormLine("poll", "Poll Period (s)", "poll", 5);
     for (int i=0; i<100; i++) {
-        if (!config.gatePins[i].id) {
-            break;
-        }
-        String id = String("gate-") + config.gatePins[i].id;
-        content += buildFormLine(id, String("Gate \"") + config.gatePins[i].id + "\" Summary" , id, 40);
-    }        
+        if (items[i].id == 0) break;
+        auto item = items[i];
+        content += String("<dt><label for=") + item.id + ">" + item.name + ":</label></dt> <dd><input"
+                          " type=" + (item.secret ? "password" : "text") + 
+                          " id=" + item.id + 
+                          " name=" + item.id + 
+                          " size=" + item.size + 
+                          " value='" + (item.secret ? "" : getConfig(item.id)) +  // TODO: URL Encode
+                          "'></dd>";
+    }
 
     content +=
         "</dl>"
@@ -202,78 +220,32 @@ void ConfigIF::respondWithForm() {
     web_server.send(200, "text/html", content);
 }
 
-String ConfigIF::buildFormLine(String id, String name, String key, int size) {
-    String value;
-    const char* type;
-    if (!key.isEmpty()) {
-        type = "text";
-        value = getConfig(key);
-    }
-    else {
-        type = "password";
-        value = "";
-    }
-    return String("<dt><label for=") + id + ">" + name + ":</label></dt> <dd><input"
-                  " type=" + type + 
-                  " id=" + id + 
-                  " name=" + id + 
-                  " size=" + size + 
-                  " value='" + value + 
-                  "'></dd>";
-}
-
-
-void ConfigIF::receiveFormPost() {
-
-    String post_body = web_server.arg("plain");
-
-    int from = 0;
-    while (true) {
-        int split = post_body.indexOf('=', from);
-        if (split == -1) {
-            break;
+void ConfigWiFiAP::receiveFormPost() {
+    for (int i=0; i< web_server.args(); i++){
+        String key = web_server.argName(i);
+        auto it = item_map.find(key);
+        if (it == item_map.end()) {
+            continue;
+        }
+        
+        String value = web_server.arg(i);
+        value = web_server_t::urlDecode(value);
+        auto item = it->second;
+        if (item.validate(value)) {
+            setConfig(item.id, value);
         }
 
-        int token = post_body.indexOf('&', from);
-        if (token == -1) {
-            token = post_body.length();
-        }
-
-        String key = post_body.substring(from, split);
-        String value = post_body.substring(split + 1, token);
-        value = urlDecode(value);
-        from = token + 1;
-
-        if (key == "wifipass") {
-            if (!value.isEmpty()) {
-                setConfig(key, value);
-            }
-        }
-        else if (key == "poll") {
-            int poll = value.toInt();
-            if (poll >= 5) {
-                setConfig(key, value);
-            }
-        }
-        else {
-            setConfig(key, value);
-        }
     }
     respondWithForm();
 }
 
 
+void ConfigWiFiAP::captivePortalRedirect() {
+    String uri = web_server_t::urlDecode(web_server.uri());
 
+    Serial.println(String("redirect: ") + uri);
 
-bool ConfigIF::isCaptivePortal() {
-    return false;
-}
-
-void ConfigIF::captivePortalRedirect() {
-    Serial.println(String("captivePortalRedirect: ") + web_server.hostHeader());
-
-    Serial.println("Request redirected to captive portal");
-    web_server.sendHeader("Location", String("http://") + hostname + "/", true);
+    web_server.sendHeader("Location", String("http://") + config.hostname + "/", true);
     web_server.send(302, "text/plain", "");
     web_server.client().stop();
 }
