@@ -1,6 +1,7 @@
 /*############################################################################
 # Copyright (c) 2020 Source Simian  :  https://github.com/sourcesimian/uICAL #
 ############################################################################*/
+
 #if defined(ARDUINO_ARCH_ESP8266)
     #include <ESP8266WiFi.h>
     #include <ESP8266WebServer.h>
@@ -17,50 +18,14 @@
 
 #include <ConfigWiFiAP.h>
 
+#if defined(DEBUG)
+    #define LOG(...) Serial.println(__VA_ARGS__)
+#else
+    #define LOG(...) while(false){}
+#endif
+
 const byte DNS_PORT = 53;
 const byte HTTP_PORT = 80;
-
-/*---------------------------------------------------------------------------*/
-
-/*
-static String urlDecode(String str)
-{
-    auto h2int = [](char c) {
-        if (c >= '0' && c <='9'){
-            return((unsigned char)c - '0');
-        }
-        if (c >= 'a' && c <='f'){
-            return((unsigned char)c - 'a' + 10);
-        }
-        if (c >= 'A' && c <='F'){
-            return((unsigned char)c - 'A' + 10);
-        }
-        return(0);
-    };
-
-    String encodedString = "";
-    char ch, code0, code1;
-    for (unsigned i = 0; i < str.length(); i++){
-        ch = str.charAt(i);
-        if (ch == '+'){
-            encodedString += ' ';
-        }
-        else if (ch == '%') {
-            i ++;
-            code0 = str.charAt(i);
-            i ++;
-            code1 = str.charAt(i);
-            ch = (h2int(code0) << 4) | h2int(code1);
-            encodedString += ch;
-    }
-    else {
-        encodedString += ch;
-    }
-        yield();
-    }
-    return encodedString;
-}
-*/
 
 /*---------------------------------------------------------------------------*/
 ConfigWiFiAP::ConfigWiFiAP(config_t& config, item_t* items, FS& fs, wifi_t& wifi)
@@ -77,13 +42,19 @@ ConfigWiFiAP::ConfigWiFiAP(config_t& config, item_t* items, FS& fs, wifi_t& wifi
     }
 }
 
-void ConfigWiFiAP::begin() {
-    setupWiFiAccessPoint();
-    setupDnsServer();
-    setupWebServer();
+bool ConfigWiFiAP::start() {
+    if (!setupWiFiAccessPoint()) return false;
+    if (!setupDnsServer()) return false;
+    if (!setupWebServer()) return false;
+    return true;
 }
 
-void ConfigWiFiAP::setupWiFiAccessPoint() {
+void ConfigWiFiAP::stop() {
+    wifi.disconnect();
+    wifi.mode(WIFI_OFF);
+}
+
+bool ConfigWiFiAP::setupWiFiAccessPoint() {
 
     IPAddress local_IP(192, 168, 43, 1);
     
@@ -91,31 +62,34 @@ void ConfigWiFiAP::setupWiFiAccessPoint() {
     wifi.mode(WIFI_AP);
 
     if (!wifi.softAPConfig(local_IP, local_IP, IPAddress(255, 255, 255, 0))) {
-        Serial.print("Setting soft-AP configuration FAILED ");
+        LOG("ConfigWiFiAP config FAILED ");
+        return false;
     }
 
-    String ssid = config.ssid_prefix + getMacAddress();
+    String ssid = config.ssid_prefix + wifi.macAddress();
     ssid.replace(":", "");
 
-    if (!wifi.softAP(ssid, emptyString, 6, 0, 1)) {
-        Serial.print("Setting soft-AP FAILED ");
+    if (!wifi.softAP(ssid, config.ssid_password, config.ap_channel, 0, config.ap_max_connection)) {
+        LOG("ConfigWiFiAP start FAILED ");
+        return false;
     }
 
-    Serial.print("ConfigWiFiAP IP address: ");
-    Serial.println(getIPAddress());
+    LOG(String("ConfigWiFiAP IP address: ") + wifi.softAPIP().toString());
+    return true;
 }
 
-
-void ConfigWiFiAP::setupDnsServer() {
+bool ConfigWiFiAP::setupDnsServer() {
     dns_server.setErrorReplyCode(DNSReplyCode::NoError);
     dns_server.start(DNS_PORT, "*", wifi.softAPIP());
+    return true;
 }
 
-void ConfigWiFiAP::setupWebServer() {
+bool ConfigWiFiAP::setupWebServer() {
     web_server.on("/", HTTP_GET, [&]() {this->respondWithForm();});
     web_server.on("/", HTTP_POST, [&]() {this->receiveFormPost();});
     web_server.onNotFound([&]() {this->captivePortalRedirect();});
     web_server.begin();
+    return true;
 }
 
 void ConfigWiFiAP::handle() {
@@ -130,8 +104,8 @@ String ConfigWiFiAP::configFilename(String key) {
 String ConfigWiFiAP::getConfig(String key) {
     File file = fs.open(configFilename(key), "r");
     if (file) {
-        char buf[max_config_value_length];
-        int bytesRead = file.readBytes(buf, max_config_value_length - 1);
+        char buf[config.value_max_length];
+        int bytesRead = file.readBytes(buf, config.value_max_length - 1);
         buf[bytesRead] = 0;
         return String(buf);
     }
@@ -145,18 +119,10 @@ void ConfigWiFiAP::setConfig(String key, String value) {
     }
     File file = fs.open(path, "w");
     if (file) {
-        file.print(value.substring(0, max_config_value_length - 1));
+        file.print(value.substring(0, config.value_max_length - 1));
         file.flush();
         file.close();
     }
-}
-
-String ConfigWiFiAP::getIPAddress() {
-    return wifi.softAPIP().toString();
-}
-
-String ConfigWiFiAP::getMacAddress() {
-    return wifi.macAddress();
 }
 
 void ConfigWiFiAP::respondWithForm() {
@@ -170,46 +136,50 @@ void ConfigWiFiAP::respondWithForm() {
     content +=
         "<html>"
         "<head>"
-        "<meta name='viewport' content='width=device-width'>"
-        "<title>" + String(config.name) + "</title>"
-        "<style>"
-        "dl {"
-        "display: block;"
-        "margin-top: 2em;"
-        "margin-bottom: 2em;"
-        "margin-left: 1em;"
-        "margin-right: 0;"
-        "}"
-        "</style>"
+            "<meta name='viewport' content='width=device-width'>"
+            "<title>" + String(config.name) + "</title>"
+            "<style>"
+                "body{background-color: #d0e0f0;} "
+                "form{background-color: #ffffff; margin: 1em; padding: 1em; overflow: hidden;} "
+                "input{background-color: #f4f8fc;width: 100%;} "
+            "</style>"
         "</head>"
         "<body>"
-        "<H1>" + String(config.name) + "</H1>";
+        "<h1>" + String(config.name) + "</h1>";
 
     content +=
-        "<p>MAC Addr: " + getMacAddress() + "</p>";
+        "<p>MAC Addr: " + wifi.macAddress() + "</p>";
 
     content += 
-        "<p>"
         "<form method='post'>"
         "<dl>";
 
     for (int i=0; i<100; i++) {
         if (items[i].id == 0) break;
         auto item = items[i];
-        content += String("<dt><label for=") + item.id + ">" + item.name + ":</label></dt> <dd><input"
-                          " type=" + (item.secret ? "password" : "text") + 
-                          " id=" + item.id + 
-                          " name=" + item.id + 
-                          " size=" + item.size + 
-                          " value='" + (item.secret ? "" : getConfig(item.id)) +  // TODO: URL Encode
-                          "'></dd>";
+        String value = emptyString;
+        if (!item.secret) {
+            value = getConfig(item.id);
+            value.replace("'", "%27");
+        }
+        content += String("<dt>"
+                              "<label for=") + item.id + ">" + item.name + ":</label>"
+                          "</dt>"
+                          "<dd>"
+                              "<input"
+                              " type=" + (item.secret ? "password" : "text") + 
+                              " id=" + item.id + 
+                              " name=" + item.id + 
+                              " maxlength=" + item.max_length + 
+                              " style='max-width: " + item.max_width + "'"
+                              " value='" + value + "'>"
+                          "</dd>";
     }
 
     content +=
         "</dl>"
-        "<input type='submit' value='Submit'>"
+        "<input type='submit' value='Update'>"
         "</form>"
-        "</p>"
         "</body>"
         "</html>";
     
@@ -239,11 +209,10 @@ void ConfigWiFiAP::receiveFormPost() {
     respondWithForm();
 }
 
-
 void ConfigWiFiAP::captivePortalRedirect() {
     String uri = web_server_t::urlDecode(web_server.uri());
 
-    Serial.println(String("redirect: ") + uri);
+    // Serial.println(String("redirect: ") + uri);
 
     web_server.sendHeader("Location", String("http://") + config.hostname + "/", true);
     web_server.send(302, "text/plain", "");

@@ -1,6 +1,7 @@
 /*############################################################################
 # Copyright (c) 2020 Source Simian  :  https://github.com/sourcesimian/uICAL #
 ############################################################################*/
+
 #if defined(ARDUINO_ARCH_ESP8266)
     #include <ESP8266WiFi.h>
 #else
@@ -8,7 +9,6 @@
 #endif
 
 #include "LedFlash.h"
-
 
 LedFlash::LedFlash(uint8_t pin)
 : pin(pin)
@@ -19,7 +19,6 @@ LedFlash::LedFlash(uint8_t pin)
     digitalWrite(pin, HIGH);
     pinMode(pin, OUTPUT);
 }
-
 
 void LedFlash::flash(int on, int off) {
     if (off == 0) {
@@ -34,7 +33,6 @@ void LedFlash::flash(int on, int off) {
     toggle();
     stateChangeMillis = millis();
 }
-
 
 void LedFlash::state(bool on) {
     flashOn = 0;

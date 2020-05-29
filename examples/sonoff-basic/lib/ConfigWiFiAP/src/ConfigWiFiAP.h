@@ -7,15 +7,20 @@ class ConfigWiFiAP {
         struct config_t {
             const char* name;
             const char* ssid_prefix;
+            const char* ssid_password;
+            int ap_channel;
+            int ap_max_connection;
             const char* hostname;
             const char* config_dir;
             const char* config_prefix;
+            int value_max_length;
         };
 
         struct item_t {
             const char* id;
             const char* name;
-            uint8_t size;
+            const char* max_width;
+            int max_length;
             bool secret;
             std::function<bool (String& value)> validate;
         };
@@ -30,7 +35,8 @@ class ConfigWiFiAP {
 
         ConfigWiFiAP(config_t& config, item_t* items, FS& fs, wifi_t& wifi);
 
-        void begin();
+        bool start();
+        void stop();
         void handle();
         String getConfig(String key);
 
@@ -38,20 +44,14 @@ class ConfigWiFiAP {
         void setConfig(String key, String value);
         String configFilename(String key);
 
-        void setupWiFiAccessPoint();
-        void setupDnsServer();
-        void setupWebServer();
+        bool setupWiFiAccessPoint();
+        bool setupDnsServer();
+        bool setupWebServer();
 
         void respondWithForm();
         String buildFormLine(String id, String name, String key, int size);
         void receiveFormPost();
-        bool isCaptivePortal();
         void captivePortalRedirect();
-
-        String getIPAddress();
-        String getMacAddress();
-
-        const size_t max_config_value_length = 255;
 
         config_t& config;
         const item_t* items;
