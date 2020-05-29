@@ -1,0 +1,35 @@
+{
+  "name": "ConfigWiFiAP",
+  "keywords": "Configure, WiFi, Acces Point, Captive Portal",
+  "description": "Configure IoT device with WiFi AP Captive Portal",
+  "repository":
+  {
+    "type": "git",
+    "url": "https://github.com/sourcesimian/uICAL.git"
+  },
+  "authors":
+  [
+    {
+      "name": "Source Simian",
+      "email": "sourcesimian@users.noreply.github.com",
+      "maintainer": true
+    }
+  ],
+  "version": "0.0.1",
+  "license": "MIT",
+  "export":
+  [
+    "src/*"
+  ],
+  "frameworks": "*",
+  "platforms": "*",
+  "examples": [
+    "examples/*/*.cpp",
+    "examples/*/*.ino"
+  ],
+  "build":
+  {
+    "srcDir": "src",
+    "includeDir": "src"
+  }
+}
