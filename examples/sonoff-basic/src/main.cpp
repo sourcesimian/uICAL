@@ -35,6 +35,7 @@
 struct device_gate_pin_t {
     const char* id;
     const uint8_t pin;
+    const bool active_high;
 };
 
 struct device_config_t {
@@ -155,9 +156,21 @@ void set_gate(const char* id, bool state) {
         if (!device_config.gatePins[i].id) break;
 
         if (id == device_config.gatePins[i].id) {
-            digitalWrite(device_config.gatePins[i].pin, !state);
+            digitalWrite(device_config.gatePins[i].pin,
+                         device_config.gatePins[i].active_high == state ? HIGH : LOW);
             break;
         }
+    }
+}
+
+/*---------------------------------------------------------------------------*/
+void setup_io_pins() {
+    for (int i=0; i<100; i++) {
+        if (!device_config.gatePins[i].id) break;
+
+        digitalWrite(device_config.gatePins[i].pin,
+                     !device_config.gatePins[i].active_high ? HIGH : LOW);
+        pinMode(device_config.gatePins[i].pin, OUTPUT);
     }
 }
 
@@ -172,16 +185,6 @@ void config_relay() {
         
         String name = g_config.getConfig(device_config.gatePins[i].id);
         g_relay.configGate(device_config.gatePins[i].id, name);
-    }
-}
-
-/*---------------------------------------------------------------------------*/
-void setup_io_pins() {
-    for (int i=0; i<100; i++) {
-        if (!device_config.gatePins[i].id) break;
-
-        digitalWrite(device_config.gatePins[i].pin, LOW);
-        pinMode(device_config.gatePins[i].pin, OUTPUT);
     }
 }
 

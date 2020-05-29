@@ -13,8 +13,8 @@ device_config_t device_config {
     .statusLedPin = SONOFF_LED1,
     .pushButtonPin = SONOFF_BUTTON,
     .gatePins = (device_gate_pin_t []) {
-        { "relay", SONOFF_RELAY },
-        { 0, 0 },
+        { "relay", SONOFF_RELAY, true },
+        { 0, 0, 0 },
     },
 };
 
