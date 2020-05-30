@@ -49,16 +49,16 @@ struct device_config_t {
 /*---------------------------------------------------------------------------*/
 enum loop_mode_t {
     WIFI_INIT,
-    WIFI_WAIT,
+    WIFI_SETUP,
     NTP_INIT,
-    NTP_WAIT,
+    NTP_SETUP,
     RUN_INIT,
     RUN,
     CONFIG_INIT,
     CONFIG,
 };
 
-loop_mode_t loop_mode;
+loop_mode_t g_loopMode;
 
 WiFiUDP g_ntpUDP;
 EasyNTPClient g_ntpClient(g_ntpUDP, ntp_host, 0); // UTC
@@ -72,6 +72,8 @@ void set_gate(const char* id, bool state);
 uICALRelay g_relay(update_calendar, get_unix_timestamp, set_gate);
 ButtonMonitor g_button(device_config.pushButtonPin);
 LedFlash g_led(device_config.statusLedPin);
+int g_configMillis;
+
 
 /*---------------------------------------------------------------------------*/
 unsigned get_unix_timestamp() {
@@ -82,7 +84,6 @@ unsigned get_unix_timestamp() {
 #if defined(ARDUINO_ARCH_ESP8266)
     void update_calendar(String& url, String& hostFingerprint, std::function<void (Stream&)> processStream) {
         bool success = false;
-        g_led.state(true);
 
         std::unique_ptr<BearSSL::WiFiClientSecure> client(new BearSSL::WiFiClientSecure);
         if (!hostFingerprint.isEmpty()) {
@@ -102,10 +103,6 @@ unsigned get_unix_timestamp() {
                 success = true;
             } else {
                 LOG(String("[HTTPS] GET... failed, error: ") + https.errorToString(httpCode));
-                String sslError;
-                sslError.reserve(255);
-                client->getLastSSLError(sslError.begin(), 254);
-                LOG(String("Last SSL Error: ") + sslError);
             }
             https.end();
         } else {
@@ -116,7 +113,7 @@ unsigned get_unix_timestamp() {
             g_led.state(false);
         }
         else {
-            g_led.flash(100, 4700);
+            g_led.flash(50, 9950);
         }
     }
 
@@ -124,7 +121,6 @@ unsigned get_unix_timestamp() {
 
     void update_calendar(String& url, String& hostFingerprint, std::function<void (Stream&)> processStream) {
         bool success = false;
-        g_led.state(true);
 
         HTTPClient https;
         https.begin(url);
@@ -137,7 +133,6 @@ unsigned get_unix_timestamp() {
             success = true;
         } else {
             LOG(String("[HTTPS] GET... failed, error: ") + https.errorToString(httpCode);
-            loop_mode = WIFI_INIT;
         }
         https.end();
 
@@ -145,7 +140,7 @@ unsigned get_unix_timestamp() {
             g_led.state(false);
         }
         else {
-            g_led.flash(100, 4700);
+            g_led.flash(50, 9950);
         }
     }
 #endif
@@ -196,7 +191,7 @@ void setup() {
 
     SPIFFS.begin();
 
-    loop_mode = WIFI_INIT;
+    g_loopMode = WIFI_INIT;
 }
 
 /*---------------------------------------------------------------------------*/
@@ -204,74 +199,75 @@ void loop() {
     int button = g_button.getPressed();
     g_led.handle();
 
-    switch (loop_mode) {
+    if (button < -10000 && g_loopMode != CONFIG && g_loopMode != CONFIG_INIT) {
+        g_led.state(true);
+        g_loopMode = CONFIG_INIT;
+    }
+    else if (button > 3000 && button < 7000) {
+        LOG("Toggling gate0");
+        digitalWrite(device_config.gatePins[0].pin, !digitalRead(device_config.gatePins[0].pin));
+    }
+
+    switch (g_loopMode) {
         case WIFI_INIT:
             WiFi.disconnect();
             {
                 String ssid = g_config.getConfig("wifissid");
+                if (ssid.isEmpty()) {
+                    g_loopMode = CONFIG_INIT;
+                    break;
+                }
+                LOG(String("WIFI_SETUP mode (") + ssid + ")");
                 WiFi.mode(WIFI_STA);
                 WiFi.begin(ssid.c_str(), g_config.getConfig("wifipass").c_str());
-                LOG(String("Waiting for WiFi (") + ssid + ") ");
             }
             g_led.flash(300, 1700);
-            loop_mode = WIFI_WAIT;
+            g_loopMode = WIFI_SETUP;
             break;
 
-        case WIFI_WAIT:
-            if (button < -10000) {
-                loop_mode = CONFIG_INIT;
-                break;
-            }
+        case WIFI_SETUP:
             if (!WiFi.isConnected()) {
                 break;
             }
-            LOG(String("Connected [") + WiFi.localIP().toString() + "]");
+            LOG(String("WIFI Connected [") + WiFi.localIP().toString() + "]");
             g_led.state(false);
-            loop_mode = NTP_INIT;
+            g_loopMode = NTP_INIT;
             break;
 
         case NTP_INIT:
+            LOG(String("NTP_SETUP mode (") + ntp_host + ")");
             g_ntpUDP.begin(123);
-            g_led.flash(300, 3700);
-            LOG(String("Waiting for NTP from:") + ntp_host);
-            loop_mode = NTP_WAIT;
+            g_led.flash(300, 2700);
+            g_loopMode = NTP_SETUP;
             break;
 
-        case NTP_WAIT:
-            if (button < -10000) {
-                loop_mode = CONFIG_INIT;
-                break;
-            }
+        case NTP_SETUP:
             if (!WiFi.isConnected()) {
-                loop_mode = WIFI_INIT;
+                g_loopMode = WIFI_INIT;
                 break;
             }
             if (g_ntpClient.getUnixTime() == 0) {
                 break;
             }
             g_led.state(false);
-            loop_mode = RUN_INIT;
+            g_loopMode = RUN_INIT;
             break;
 
         case RUN_INIT:
+            LOG("RUN mode");
             config_relay();
             g_led.state(false);
-            LOG("Running uICAL relays");
-            loop_mode = RUN;
+            g_loopMode = RUN;
             break;
 
         case RUN:
-            if (button < -10000) {
-                g_led.state(true);
-                loop_mode = CONFIG_INIT;
-                break;
-            }
-            else if (button > 3000 && button < 70000) {
+            if (button > 100 && button < 3000) {
                 LOG("Forcing update");
+                g_led.state(true);
                 g_relay.forceUpdate();
             }
             if (!WiFi.isConnected()) {
-                loop_mode = WIFI_INIT;
+                g_loopMode = WIFI_INIT;
                 break;
             }
             try {
@@ -284,20 +280,21 @@ void loop() {
             break;
 
         case CONFIG_INIT:
-            LOG("Entering config AP mode");
+            LOG("Entering CONFIG mode");
             if(!g_config.start()) {
-                LOG("Failed to enter config AP mode");
-                loop_mode = WIFI_INIT;
+                LOG("Failed to enter CONFIG mode");
+                g_loopMode = WIFI_INIT;
                 break;
             }
             g_led.flash(200, 100);
-            loop_mode = CONFIG;
+            g_configMillis = millis();
+            g_loopMode = CONFIG;
             break;
 
         case CONFIG:
-            if (button > 100 && button < 3000) {
+            if ((button > 100 && button < 3000) || (millis() - g_configMillis) > 300000) {
                 g_config.stop();
-                loop_mode = WIFI_INIT;
+                g_loopMode = WIFI_INIT;
                 break;
             }
             g_config.handle();

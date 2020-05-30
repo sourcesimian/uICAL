@@ -2,7 +2,7 @@
 # Copyright (c) 2020 Source Simian  :  https://github.com/sourcesimian/uICAL #
 #
 # uICALRelay device config for:
-#   Sonoff Basic RF R2 Power v1.0
+#   Sonoff basic (Sonoff RF R2 POWER V1.0) WiFi Smart Switch
 ############################################################################*/
 
 #define SONOFF_BUTTON 0
@@ -33,8 +33,8 @@ ConfigWiFiAP::config_t config_ap {
 };
 
 ConfigWiFiAP::item_t config_ap_items[] {
-    { "wifissid", "WiFi SSID", "15em", 30, false, [](String& v){
-            return !v.isEmpty();
+    { "wifissid", "WiFi Name", "15em", 30, false, [](String& v){
+            return true;
         }
     },
     { "wifipass", "WiFi Password", "15em", 30, true, [](String& v){
@@ -45,11 +45,11 @@ ConfigWiFiAP::item_t config_ap_items[] {
             return !v.isEmpty();
         }
     },
-    { "fingerprint", "Host Fingerprint", "30em", config_ap.value_max_length, false, [](String& v){
+    { "fingerprint", "Host Fingerprint (SHA1)", "30em", config_ap.value_max_length, false, [](String& v){
             return true;
         }
     },
-    { "poll", "Poll Period (s)", "3em", 5, false, [](String& v){
+    { "poll", "Update Period (s)", "4em", 6, false, [](String& v){
             if (v.isEmpty()) { return false; }
             return v.toInt() >= 5;
         }

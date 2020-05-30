@@ -48,10 +48,18 @@ class ConfigWiFiAP {
         bool setupDnsServer();
         bool setupWebServer();
 
-        void respondWithForm();
-        String buildFormLine(String id, String name, String key, int size);
-        void receiveFormPost();
-        void captivePortalRedirect();
+        //PGM_P formTmpl();
+        void sendTemplate(const String& tmpl);
+
+        void sendForm();
+        void sendName();
+        void sendMacAddress();
+        void sendItems();
+
+        void handleGet();
+        void handlePost();
+        void respondWith200();
+        void respondWith302();
 
         config_t& config;
         const item_t* items;
@@ -61,4 +69,7 @@ class ConfigWiFiAP {
         web_server_t web_server;
 
         std::map<String, item_t> item_map;
+
+        using send_template_t = std::function<void (void)>;
+        std::map<String, send_template_t> template_map;
 };
