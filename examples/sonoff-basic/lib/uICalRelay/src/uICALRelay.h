@@ -16,7 +16,7 @@ class uICALRelay {
 
         uICALRelay(updateCalendar_t updateCalendar, getUnixTimeStamp_t getUnixTimeStamp, setGate_t setGate);
 
-        void config(String icalURL, int pollPeriod, String hostFingerprint = emptyString);
+        void config(String icalURL, int pollCalendarPeriod, String hostFingerprint = emptyString);
         void configGate(const char* id, String name);
 
         void handleRelays();
@@ -24,22 +24,24 @@ class uICALRelay {
         void forceUpdate();
 
     protected:
-        void processStream(Stream& stm);
+        bool processStream(Stream& stm);
         unsigned updateGates(unsigned unixTimeStamp);
-        bool addEvent(const uICAL::VEvent& event);
+        bool useEvent(const uICAL::VEvent& event);
 
         updateCalendar_t updateCalendar;
         getUnixTimeStamp_t getUnixTimeStamp;
         setGate_t setGate;
 
         String icalURL;
-        int pollPeriod;
+        int pollCalendarPeriod;
         String hostFingerprint;
         std::map<String, const char*> gates;
 
         uICAL::Calendar_ptr cal;
-        unsigned nextUpdate;
+        unsigned nextGateUpdate;
+        unsigned nextCalendarUpdate;
         unsigned long lastMillis;
+        static const unsigned gateUpdateWindow = 3600;
 };
 
 #endif

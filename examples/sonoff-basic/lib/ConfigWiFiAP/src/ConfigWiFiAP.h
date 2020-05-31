@@ -37,7 +37,9 @@ class ConfigWiFiAP {
 
         bool start();
         void stop();
+
         void handle();
+
         String getConfig(String key);
 
     protected:
@@ -48,7 +50,6 @@ class ConfigWiFiAP {
         bool setupDnsServer();
         bool setupWebServer();
 
-        //PGM_P formTmpl();
         void sendTemplate(const String& tmpl);
 
         void sendForm();
@@ -63,13 +64,14 @@ class ConfigWiFiAP {
 
         config_t& config;
         const item_t* items;
+
         FS& fs;
         wifi_t& wifi;
-        DNSServer dns_server;
-        web_server_t web_server;
+        DNSServer dnsServer;
+        web_server_t webServer;
 
-        std::map<String, item_t> item_map;
+        std::map<String, item_t> itemMap;
 
         using send_template_t = std::function<void (void)>;
-        std::map<String, send_template_t> template_map;
+        std::map<String, send_template_t> templateMap;
 };

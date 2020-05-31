@@ -12,20 +12,21 @@ uICALRelay::uICALRelay(updateCalendar_t updateCalendar, getUnixTimeStamp_t getUn
 , getUnixTimeStamp(getUnixTimeStamp)
 , setGate(setGate)
 , icalURL(emptyString)
-, nextUpdate(0)
+, nextGateUpdate((unsigned)-1)
+, nextCalendarUpdate(0)
 , lastMillis(0)
 {}
 
-void uICALRelay::config(String icalURL, int pollPeriod, String hostFingerprint) {
-    this->nextUpdate = 0;
+void uICALRelay::config(String icalURL, int pollCalendarPeriod, String hostFingerprint) {
+    this->nextCalendarUpdate = 0;
 
-    log_info("Config URL: \"%s\"", icalURL.c_str());
+    log_info("Configure calendar URL: \"%s\"", icalURL.c_str());
     this->icalURL = icalURL;
 
-    log_info("Config Poll Period: %d", pollPeriod);
-    this->pollPeriod = pollPeriod;
+    log_info("Configure calendar Poll Period: %d", pollCalendarPeriod);
+    this->pollCalendarPeriod = pollCalendarPeriod;
 
-    log_info("Config Host Fingerprint: \"%s\"", hostFingerprint.c_str());
+    log_info("Configure calendar Host Fingerprint: \"%s\"", hostFingerprint.c_str());
     this->hostFingerprint = hostFingerprint;
 
     this->gates.clear();
@@ -33,46 +34,62 @@ void uICALRelay::config(String icalURL, int pollPeriod, String hostFingerprint) 
 
 void uICALRelay::configGate(const char* id, String name) {
     this->gates[name] = id;
-    log_info("Config gate '%s': \"%s\"", id, name.c_str());
+    log_info("Configure gate '%s': \"%s\"", id, name.c_str());
 }
 
 void uICALRelay::forceUpdate() {
-    this->nextUpdate = 0;
+    this->nextCalendarUpdate = 0;
 }
 
 void uICALRelay::handleRelays() {
+    unsigned unixTimeStamp;
+
     if ((this->lastMillis + 1000) > millis()) {
         return;
     }
 
-    unsigned unixTimeStamp = getUnixTimeStamp();
-    if (unixTimeStamp < this->nextUpdate) {
+    unixTimeStamp = getUnixTimeStamp();
+    if (unixTimeStamp == 0) {
+        log_warning("%s", "No NTP fix");
         return;
     }
 
-    this->updateCalendar(this->icalURL, this->hostFingerprint, [&](Stream& stm) {
-        this->processStream(stm);
-    });
+    if (unixTimeStamp >= this->nextGateUpdate) {
+        this->nextGateUpdate = this->updateGates(unixTimeStamp);
+    }
 
-    unixTimeStamp = getUnixTimeStamp();
-    unsigned wait = this->updateGates(unixTimeStamp);
-    this->nextUpdate = unixTimeStamp + wait;
+    if (unixTimeStamp >= this->nextCalendarUpdate) {
+        this->updateCalendar(this->icalURL, this->hostFingerprint, [&](Stream& stm) {
+            if(this->processStream(stm) == true) {
+                this->nextGateUpdate = 0;
+            }
+        });
+        this->nextCalendarUpdate = unixTimeStamp + this->pollCalendarPeriod;
+    }
+
+    if (unixTimeStamp >= this->nextGateUpdate) {
+        unixTimeStamp = getUnixTimeStamp();
+        this->nextGateUpdate = this->updateGates(unixTimeStamp);
+    }
+
     this->lastMillis = millis();
 }
 
-void uICALRelay::processStream(Stream& stm) {
+bool uICALRelay::processStream(Stream& stm) {
     try {
         uICAL::istream_Stream istm(stm);
         this->cal = uICAL::Calendar::load(istm, [=](const uICAL::VEvent& event){
-          return this->addEvent(event);
+            return this->useEvent(event);
         });
+        return true;
     }
     catch (uICAL::Error ex) {
         log_error("%s: %s", ex.message.c_str(), "! Failed loading calendar");
+        return false;
     }
 }
 
-bool uICALRelay::addEvent(const uICAL::VEvent& event) {
+bool uICALRelay::useEvent(const uICAL::VEvent& event) {
     for (auto it = this->gates.begin(); it != this->gates.end(); ++it) {
         if (event.summary.startsWith(it->first)) {
             return true;
@@ -82,61 +99,60 @@ bool uICALRelay::addEvent(const uICAL::VEvent& event) {
 }
 
 unsigned uICALRelay::updateGates(unsigned unixTimeStamp) {
-    unsigned sleep = this->pollPeriod;
+    unsigned wait = this->gateUpdateWindow;
 
-    if (!this->cal) {
-        return sleep / 10;
-    }
-
-    if (unixTimeStamp == 0) {
-        log_warning("%s", "No NTP fix");
-        return sleep / 10;
-    }
     uICAL::DateTime now(unixTimeStamp);
     uICAL::DateTime calBegin(unixTimeStamp);
-    uICAL::DateTime calEnd(unixTimeStamp + this->pollPeriod);
+    uICAL::DateTime calEnd(unixTimeStamp + this->gateUpdateWindow);
 
+    log_info("Current Time: %s", now.as_str().c_str());
     log_info("calBegin Time: %s", calBegin.as_str().c_str());
     log_info("calEnd Time: %s", calEnd.as_str().c_str());
-    log_info("Current Time: %s", now.as_str().c_str());
+
+    auto updateWait = [&](uICAL::DateTime dt) {
+        wait = std::min(wait, (unsigned)(dt - now).totalSeconds());
+    };
+    
+    std::map<const char*, bool> gateStates;
+    for (auto it = this->gates.begin(); it != this->gates.end(); ++it) {
+        gateStates[it->second] = false;
+    }
 
     try {
-        uICAL::CalendarIter_ptr calIt = uICAL::new_ptr<uICAL::CalendarIter>(this->cal, calBegin, calEnd);
+        if (this->cal) {
+            uICAL::CalendarIter_ptr calIt = uICAL::new_ptr<uICAL::CalendarIter>(this->cal, calBegin, calEnd);
 
-        std::map<const char*, bool> gateStates;
-        for (auto it = this->gates.begin(); it != this->gates.end(); ++it) {
-            gateStates[it->second] = false;
-        }
-        
-        while (calIt->next()) {
-            uICAL::CalendarEntry_ptr entry = calIt->current();
-            log_debug("Event @ %s -> %s : %s",
-                      entry->start().as_str().c_str(),
-                      entry->end().as_str().c_str(),
-                      entry->summary().c_str());
+            while (calIt->next()) {
+                uICAL::CalendarEntry_ptr entry = calIt->current();
+                log_debug("Event @ %s -> %s : %s",
+                        entry->start().as_str().c_str(),
+                        entry->end().as_str().c_str(),
+                        entry->summary().c_str());
 
-            for (auto it = this->gates.begin(); it != this->gates.end(); ++it) {
-                if (entry->start() <= now && now < entry->end()) {
+                for (auto it = this->gates.begin(); it != this->gates.end(); ++it) {
+                    if (entry->start() <= now && now < entry->end()) {
 
-                    if (entry->summary() == it->first) {
-                        gateStates[it->second] = true;
-                        sleep = std::min(sleep, (unsigned)(entry->end() - now).totalSeconds());
+                        if (entry->summary() == it->first) {
+                            gateStates[it->second] = true;
+                            updateWait(entry->end());
+                        }
+                    }
+                    else if (now < entry->start()) {
+                        updateWait(entry->start());
                     }
                 }
-                else if (now < entry->start()) {
-                    sleep = std::min(sleep, (unsigned)(entry->start() - now).totalSeconds());
-                }
             }
-        }
-
-        for (auto it = gateStates.begin(); it != gateStates.end(); ++it) {
-            log_info("Gate: '%s' %s", it->first, (it->second ? "ON  " : "OFF "));
-            setGate(it->first, it->second);
         }
     }
     catch (uICAL::Error ex) {
         log_error("%s", ex.message.c_str());
     }
-    log_debug("Sleep: %ds", sleep);
-    return sleep;
+
+    for (auto it = gateStates.begin(); it != gateStates.end(); ++it) {
+        log_info("Gate: '%s' %s", it->first, (it->second ? "ON  " : "OFF "));
+        this->setGate(it->first, it->second);
+    }
+
+    log_debug("Wait: %ds", wait);
+    return unixTimeStamp + wait;
 }
