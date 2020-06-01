@@ -20,7 +20,7 @@
 #include <FS.h>
 
 #include <uICALRelay.h>
-#include <ConfigWiFiAP.h>
+#include <SimpleConfigWiFiAP.h>
 
 #include "ButtonMonitor.h"
 #include "LedFlash.h"
@@ -54,6 +54,8 @@ enum loop_mode_t {
     NTP_SETUP,
     RUN_INIT,
     RUN,
+    MANUAL_ON_INIT,
+    MANUAL_ON,
     CONFIG_INIT,
     CONFIG,
 };
@@ -66,7 +68,7 @@ const int NTP_PORT = 123;
 WiFiUDP g_ntpUDP;
 EasyNTPClient g_ntpClient(g_ntpUDP, NTP_HOST, NTP_OFFSET);
 
-ConfigWiFiAP g_config(config_ap, config_ap_items, SPIFFS, WiFi);
+SimpleConfigWiFiAP g_config(config_ap, config_ap_items, SPIFFS, WiFi);
 
 void update_calendar(String& url, String& hostFingerprint, std::function<void (Stream&)> processStream);
 unsigned get_unix_timestamp();
@@ -75,8 +77,8 @@ void set_gate(const char* id, bool state);
 uICALRelay g_relay(update_calendar, get_unix_timestamp, set_gate);
 ButtonMonitor g_button(device_config.push_button_pin);
 LedFlash g_led(device_config.status_led_pin);
-int g_configMillis;
-
+unsigned g_configMillis;
+unsigned g_manualOnUntil;
 
 /*---------------------------------------------------------------------------*/
 unsigned get_unix_timestamp() {
@@ -194,6 +196,7 @@ void setup() {
 
     SPIFFS.begin();
 
+    g_manualOnUntil = 0;
     g_loopMode = WIFI_INIT;
 }
 
@@ -207,8 +210,12 @@ void loop() {
         g_loopMode = CONFIG_INIT;
     }
     else if (button > 50 && button < 2000 && g_loopMode != CONFIG) {
-        LOG("Toggling gate0");
-        digitalWrite(device_config.gate_pins[0].pin, !digitalRead(device_config.gate_pins[0].pin));
+        if (g_manualOnUntil) {
+            g_loopMode = RUN_INIT;
+        }
+        else {
+            g_loopMode = MANUAL_ON_INIT;
+        }
     }
 
     switch (g_loopMode) {
@@ -284,6 +291,20 @@ void loop() {
             catch(uICAL::Error e) {
                 LOG((String)"EXCEPTION: " + e.message);
                 delay(1000);
+            }
+            break;
+
+        case MANUAL_ON_INIT:
+            LOG("Manual ON mode");
+            g_manualOnUntil = get_unix_timestamp() + g_config.getConfig("onduration").toInt();
+            g_led.state(true);
+            set_gate("relay", true);
+            g_loopMode = MANUAL_ON;
+            break;
+
+        case MANUAL_ON:
+            if (g_manualOnUntil < get_unix_timestamp()) {
+                g_loopMode = RUN_INIT;
             }
             break;
 

@@ -1,5 +1,5 @@
 {
-  "name": "ConfigWiFiAP",
+  "name": "SimpleConfigWiFiAP",
   "keywords": "Configure, WiFi, Acces Point, Captive Portal",
   "description": "Configure IoT device with WiFi AP Captive Portal",
   "repository":

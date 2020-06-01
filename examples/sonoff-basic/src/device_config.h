@@ -20,19 +20,21 @@ device_config_t device_config {
 
 const char* NTP_HOST = "pool.ntp.org";
 
-ConfigWiFiAP::config_t config_ap {
-    .name = "uICAL Timeswitch",
-    .ssid_prefix = "uICAL-Timeswitch-",
+SimpleConfigWiFiAP::config_t config_ap {
+    .name = "Online Timeswitch",
+    .version = "v0.1",
+    .description = "Custom firmware for the Sonoff Basic by <a href=https://github.com/sourcesimian/uICAL/blob/master/examples/sonoff-basic/README.md>Source Simian</a>",
+    .ssid_prefix = "OnlineTimeswitch-",
     .ssid_password = 0,
     .ap_channel = 6,
     .ap_max_connection = 1,
-    .hostname = "uical-timeswitch.config",
+    .hostname = "online-timeswitch.config",
     .config_dir = "/uical",
     .config_prefix = "cfg-",
     .value_max_length = 255,
 };
 
-ConfigWiFiAP::item_t config_ap_items[] {
+SimpleConfigWiFiAP::item_t config_ap_items[] {
     { "wifissid", "WiFi Name", "15em", 30, false, [](String& v){
             return true;
         }
@@ -56,6 +58,11 @@ ConfigWiFiAP::item_t config_ap_items[] {
     },
     { "relay", "Relay Event Summary", "15em", config_ap.value_max_length, false, [](String& v){
             return !v.isEmpty();
+        }
+    },
+    { "onduration", "Manual On Maximum Duration (s)", "4em", 6, false, [](String& v){
+            if (v.isEmpty()) { return false; }
+            return v.toInt() >= 0;
         }
     },
     { 0 },

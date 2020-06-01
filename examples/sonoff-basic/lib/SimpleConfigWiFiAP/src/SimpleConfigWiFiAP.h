@@ -2,10 +2,12 @@
 # Copyright (c) 2020 Source Simian  :  https://github.com/sourcesimian/uICAL #
 ############################################################################*/
 
-class ConfigWiFiAP {
+class SimpleConfigWiFiAP {
     public:
         struct config_t {
             const char* name;
+            const char* version;
+            const char* description;
             const char* ssid_prefix;
             const char* ssid_password;
             int ap_channel;
@@ -33,7 +35,7 @@ class ConfigWiFiAP {
             using web_server_t = WebServer;
         #endif
 
-        ConfigWiFiAP(config_t& config, item_t* items, FS& fs, wifi_t& wifi);
+        SimpleConfigWiFiAP(config_t& config, item_t* items, FS& fs, wifi_t& wifi);
 
         bool start();
         void stop();
@@ -53,8 +55,6 @@ class ConfigWiFiAP {
         void sendTemplate(const String& tmpl);
 
         void sendForm();
-        void sendName();
-        void sendMacAddress();
         void sendItems();
 
         void handleGet();

@@ -16,7 +16,7 @@
 
 #include <map>
 
-#include <ConfigWiFiAP.h>
+#include <SimpleConfigWiFiAP.h>
 
 #if defined(DEBUG)
     #define LOG(...) Serial.println(__VA_ARGS__)    
@@ -29,40 +29,45 @@ const int HTTP_PORT = 80;
 
 static const char form_tmpl[] PROGMEM = {
     "<html>"
-    "<head>"
-        "<meta name='viewport' content='width=device-width'>"
-        "<title>{{name}}</title>"
-        "<style>"
-            "*{background-color:#292a2b;color:#afafaf;padding:5px;margin:0;box-sizing:border-box;outline:none;font-family:sans-serif;font-size:18px;}"
-            "h1{font-size:35px;}"
-            "p{padding:20px;}"
-            "form{margin:0 10px;overflow:hidden;} "
-            "label,a{color:#1bbbe3;}"
-            "input{font-size:25px;}"
-            "input{background:hsl(0,0%,10%);border:1px solid hsl(0,0%,5%);width:100%;} "
-            "input[type=submit]{padding:20px 0;background:hsl(0,0%,20%);}"
-            "input[type=submit]:hover{background:hsl(0,0%,25%);}"
-            "input[type=submit]:active{background:hsl(0,0%,15%);}"
-            "a{text-decoration:none;font-size:inherit;}"
-            ".footer{font-size:13px;text-align:right;}"
-        "</style>"
-    "</head>"
-    "<body>"
-        "<h1>{{name}}</h1>"
-        "<p>MAC Addr: {{macAddr}}</p>"
-        "<form method='post'>"
-            "<dl>"
-                "{{items}}"
-            "</dl>"
-            "<input type='submit' value='Update'>"
-        "</form>"
-        "<p class=footer>Made with<a href=https://github.com/sourcesimian/ConfigWiFiAP>ConfigWiFiAP</a></p>"
-    "</body>"
+        "<head>"
+            "<meta name='viewport' content='width=device-width'>"
+            "<title>{{name}}</title>"
+            "<style>"
+                "*{background-color:#292a2b;color:#afafaf;padding:5px;margin:0;box-sizing:border-box;outline:none;font-family:sans-serif;font-size:18px;}"
+                "div{padding:3px 20px;}"
+                "label,a{color:#1bbbe3;}"
+                "input{background:hsl(0,0%,10%);border:1px solid hsl(0,0%,5%);width:100%;} "
+                "input[type=submit]{padding:20px 0;background:hsl(0,0%,20%);}"
+                "input[type=submit]:hover{background:hsl(0,0%,25%);}"
+                "input[type=submit]:active{background:hsl(0,0%,15%);}"
+                "a{text-decoration:none;font-size:inherit;}"
+                "input{font-size:25px;}"
+                ".header{font-size:35px;display:inline-block;}"
+                ".version{font-size:18px;float:right;}"
+                ".mac{font-size:13px;display:inline-block;}"
+                ".credit{font-size:13px;float:right;}"
+            "</style>"
+        "</head>"
+        "<body>"
+            "<div class=header>{{name}}</div>"
+            "<div class=version>{{version}}</div>"
+            "<div>{{description}}</div>"
+            "<div>"
+                "<form method='post'>"
+                    "<dl>"
+                        "{{items}}"
+                    "</dl>"
+                    "<input type='submit' value='Update'>"
+                "</form>"
+            "</div>"
+            "<div class=mac>MAC Addr: {{macAddr}}</div>"
+            "<div class=credit>Made with<a href=https://github.com/sourcesimian/uICAL/tree/master/examples/sonoff-basic/lib/SimpleConfigWiFiAP>SimpleConfigWiFiAP</a></div>"
+        "</body>"
     "</html>"
 };
 
 
-ConfigWiFiAP::ConfigWiFiAP(config_t& config, item_t* items, FS& fs, wifi_t& wifi)
+SimpleConfigWiFiAP::SimpleConfigWiFiAP(config_t& config, item_t* items, FS& fs, wifi_t& wifi)
 : config(config)
 , items(items)
 , fs(fs)
@@ -70,9 +75,21 @@ ConfigWiFiAP::ConfigWiFiAP(config_t& config, item_t* items, FS& fs, wifi_t& wifi
 , dnsServer()
 , webServer(HTTP_PORT)
 {
-    templateMap["name"] = [&](){this->sendName();};
-    templateMap["macAddr"] = [&](){this->sendMacAddress();};
-    templateMap["items"] = [&](){this->sendItems();};
+    templateMap["name"] = [&](){
+        webServer.sendContent(config.name);
+    };
+    templateMap["macAddr"] = [&](){
+        webServer.sendContent(wifi.macAddress());
+    };
+    templateMap["items"] = [&](){
+        this->sendItems();
+    };
+    templateMap["version"] = [&](){
+        webServer.sendContent(config.version);
+    };
+    templateMap["description"] = [&](){
+        webServer.sendContent(config.description);
+    };
 
     for (int i=0; i<100; i++) {
         if (items[i].id == 0) break;
@@ -80,19 +97,19 @@ ConfigWiFiAP::ConfigWiFiAP(config_t& config, item_t* items, FS& fs, wifi_t& wifi
     }
 }
 
-bool ConfigWiFiAP::start() {
+bool SimpleConfigWiFiAP::start() {
     if (!setupWiFiAccessPoint()) return false;
     if (!setupDnsServer()) return false;
     if (!setupWebServer()) return false;
     return true;
 }
 
-void ConfigWiFiAP::stop() {
+void SimpleConfigWiFiAP::stop() {
     wifi.disconnect();
     wifi.mode(WIFI_OFF);
 }
 
-bool ConfigWiFiAP::setupWiFiAccessPoint() {
+bool SimpleConfigWiFiAP::setupWiFiAccessPoint() {
 
     IPAddress local_IP(192, 168, 43, 1);
     
@@ -100,40 +117,40 @@ bool ConfigWiFiAP::setupWiFiAccessPoint() {
     wifi.mode(WIFI_AP);
 
     if (!wifi.softAPConfig(local_IP, local_IP, IPAddress(255, 255, 255, 0))) {
-        LOG("ConfigWiFiAP config FAILED ");
+        LOG("SimpleConfigWiFiAP config FAILED ");
         return false;
     }
 
     String ssid = config.ssid_prefix + wifi.macAddress();
     ssid.replace(":", "");
 
-    LOG(String("ConfigWiFiAP SSID: ") + ssid);
+    LOG(String("SimpleConfigWiFiAP SSID: ") + ssid);
 
     if (!wifi.softAP(ssid, config.ssid_password, config.ap_channel, 0, config.ap_max_connection)) {
-        LOG("ConfigWiFiAP start FAILED ");
+        LOG("SimpleConfigWiFiAP start FAILED ");
         return false;
     }
 
-    LOG(String("ConfigWiFiAP IP address: ") + wifi.softAPIP().toString());
+    LOG(String("SimpleConfigWiFiAP IP address: ") + wifi.softAPIP().toString());
     return true;
 }
 
-bool ConfigWiFiAP::setupDnsServer() {
+bool SimpleConfigWiFiAP::setupDnsServer() {
     dnsServer.setErrorReplyCode(DNSReplyCode::NoError);
     dnsServer.start(DNS_PORT, "*", wifi.softAPIP());
     return true;
 }
 
-void ConfigWiFiAP::handle() {
+void SimpleConfigWiFiAP::handle() {
     dnsServer.processNextRequest();
     webServer.handleClient();
 }
 
-String ConfigWiFiAP::configFilename(String key) {
+String SimpleConfigWiFiAP::configFilename(String key) {
     return String(config.config_dir) + "/" + config.config_prefix + key;
 }
 
-String ConfigWiFiAP::getConfig(String key) {
+String SimpleConfigWiFiAP::getConfig(String key) {
     File file = fs.open(configFilename(key), "r");
     if (file) {
         char buf[config.value_max_length];
@@ -144,7 +161,7 @@ String ConfigWiFiAP::getConfig(String key) {
     return String();
 }
 
-void ConfigWiFiAP::setConfig(String key, String value) {
+void SimpleConfigWiFiAP::setConfig(String key, String value) {
     String path = configFilename(key);
     if (fs.exists(path)) {
         fs.remove(path);
@@ -157,15 +174,7 @@ void ConfigWiFiAP::setConfig(String key, String value) {
     }
 }
 
-void ConfigWiFiAP::sendName() {
-    webServer.sendContent(config.name);
-}
-
-void ConfigWiFiAP::sendMacAddress() {
-    webServer.sendContent(wifi.macAddress());
-}
-
-void ConfigWiFiAP::sendItems() {
+void SimpleConfigWiFiAP::sendItems() {
     for (int i=0; i<100; i++) {
         if (items[i].id == 0) break;
         auto item = items[i];
@@ -191,7 +200,7 @@ void ConfigWiFiAP::sendItems() {
     }
 }
 
-void ConfigWiFiAP::sendTemplate(const String& tmpl) {
+void SimpleConfigWiFiAP::sendTemplate(const String& tmpl) {
     int cursor = 0;
     int id0, id1;
 
@@ -223,7 +232,7 @@ void ConfigWiFiAP::sendTemplate(const String& tmpl) {
     }
 }
 
-void ConfigWiFiAP::sendForm() {
+void SimpleConfigWiFiAP::sendForm() {
     webServer.sendHeader("Cache-Control", "no-cache, no-store, must-revalidate");
     webServer.sendHeader("Pragma", "no-cache");
     webServer.sendHeader("Expires", "-1");
@@ -235,7 +244,7 @@ void ConfigWiFiAP::sendForm() {
     webServer.client().stop();
 }
 
-bool ConfigWiFiAP::setupWebServer() {
+bool SimpleConfigWiFiAP::setupWebServer() {
     webServer.on("/", HTTP_GET, [&]() {this->handleGet();});
     webServer.on("/", HTTP_POST, [&]() {this->handlePost();});
     webServer.on("/generate_204", HTTP_GET, [&]() {this->respondWith200();});
@@ -244,7 +253,7 @@ bool ConfigWiFiAP::setupWebServer() {
     return true;
 }
 
-void ConfigWiFiAP::handleGet() {
+void SimpleConfigWiFiAP::handleGet() {
     if (webServer.hostHeader() != config.hostname) {
         respondWith302();
         return;
@@ -252,7 +261,7 @@ void ConfigWiFiAP::handleGet() {
     sendForm();
 }
 
-void ConfigWiFiAP::handlePost() {
+void SimpleConfigWiFiAP::handlePost() {
     for (int i=0; i< webServer.args(); i++){
         String key = webServer.argName(i);
         auto it = itemMap.find(key);
@@ -270,12 +279,12 @@ void ConfigWiFiAP::handlePost() {
     sendForm();
 }
 
-void ConfigWiFiAP::respondWith200() {
+void SimpleConfigWiFiAP::respondWith200() {
     webServer.send(200, "text/plain", "");
     webServer.client().stop();
 }
 
-void ConfigWiFiAP::respondWith302() {
+void SimpleConfigWiFiAP::respondWith302() {
     webServer.sendHeader("Location", String("http://") + config.hostname + "/", true);
     webServer.send(302, "text/plain", "");
     webServer.client().stop();
