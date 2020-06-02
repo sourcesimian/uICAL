@@ -23,13 +23,13 @@ const char* NTP_HOST = "pool.ntp.org";
 SimpleConfigWiFiAP::config_t config_ap {
     .name = "Online Timeswitch",
     .version = "v0.1",
-    .description = "Custom firmware for the Sonoff Basic by <a href=https://github.com/sourcesimian/uICAL/blob/master/examples/sonoff-basic/README.md>Source Simian</a>",
+    .description = "Custom firmware for the Sonoff Basic by<a href=https://github.com/sourcesimian/uICAL/blob/master/examples/sonoff-basic/README.md>Source Simian</a>",
     .ssid_prefix = "OnlineTimeswitch-",
     .ssid_password = 0,
     .ap_channel = 6,
     .ap_max_connection = 1,
     .hostname = "online-timeswitch.config",
-    .config_dir = "/uical",
+    .config_dir = "/olts",
     .config_prefix = "cfg-",
     .value_max_length = 255,
 };
@@ -56,13 +56,13 @@ SimpleConfigWiFiAP::item_t config_ap_items[] {
             return v.toInt() >= 5;
         }
     },
-    { "relay", "Relay Event Summary", "15em", config_ap.value_max_length, false, [](String& v){
-            return !v.isEmpty();
-        }
-    },
-    { "onduration", "Manual On Maximum Duration (s)", "4em", 6, false, [](String& v){
+    { "onduration", "Manual On Duration (s)", "4em", 6, false, [](String& v){
             if (v.isEmpty()) { return false; }
             return v.toInt() >= 0;
+        }
+    },
+    { "relay", "Calendar Event Title", "15em", config_ap.value_max_length, false, [](String& v){
+            return !v.isEmpty();
         }
     },
     { 0 },

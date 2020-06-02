@@ -2,17 +2,10 @@
 # Copyright (c) 2020 Source Simian  :  https://github.com/sourcesimian/uICAL #
 ############################################################################*/
 
-#if defined(ARDUINO_ARCH_ESP8266)
-    #include <ESP8266WiFi.h>
-    #include <ESP8266HTTPClient.h>
-    #include <WiFiClientSecureBearSSL.h>
-    #include <ESP8266WebServer.h>
-#else
-    #include <Arduino.h>
-    #include <WiFi.h>
-    #include <HTTPClient.h>
-    #include <WebServer.h>
-#endif
+#include <ESP8266WiFi.h>
+#include <ESP8266HTTPClient.h>
+#include <WiFiClientSecureBearSSL.h>
+#include <ESP8266WebServer.h>
 
 #include <WiFiUDP.h>
 #include <EasyNTPClient.h>
@@ -86,69 +79,40 @@ unsigned get_unix_timestamp() {
 }
 
 /*---------------------------------------------------------------------------*/
-#if defined(ARDUINO_ARCH_ESP8266)
-    void update_calendar(String& url, String& hostFingerprint, std::function<void (Stream&)> processStream) {
-        bool success = false;
+void update_calendar(String& url, String& hostFingerprint, std::function<void (Stream&)> processStream) {
+    bool success = false;
 
-        std::unique_ptr<BearSSL::WiFiClientSecure> client(new BearSSL::WiFiClientSecure);
-        if (!hostFingerprint.isEmpty()) {
-            client->setFingerprint(hostFingerprint.c_str());
-        }
-        else {
-            client->setInsecure();
-        }
-
-        HTTPClient https;
-        if (https.begin(*client, url)) {
-            int httpCode = https.GET();
-
-            if (httpCode > 0) {
-                String length = https.getStream().readStringUntil('\n');
-                processStream(https.getStream());
-                success = true;
-            } else {
-                LOG(String("[HTTPS] GET... failed, error: ") + https.errorToString(httpCode));
-            }
-            https.end();
-        } else {
-            LOG("[HTTPS] Unable to connect");
-        }
-
-        if (success) {
-            g_led.state(false);
-        }
-        else {
-            g_led.flash(50, 9950);
-        }
+    std::unique_ptr<BearSSL::WiFiClientSecure> client(new BearSSL::WiFiClientSecure);
+    if (!hostFingerprint.isEmpty()) {
+        client->setFingerprint(hostFingerprint.c_str());
+    }
+    else {
+        client->setInsecure();
     }
 
-#else
-
-    void update_calendar(String& url, String& hostFingerprint, std::function<void (Stream&)> processStream) {
-        bool success = false;
-
-        HTTPClient https;
-        https.begin(url);
-        https.getStream().flush();
+    HTTPClient https;
+    if (https.begin(*client, url)) {
         int httpCode = https.GET();
-        LOG(String("[HTTPS] GET... code: ") + httpCode);
+
         if (httpCode > 0) {
             String length = https.getStream().readStringUntil('\n');
             processStream(https.getStream());
             success = true;
         } else {
-            LOG(String("[HTTPS] GET... failed, error: ") + https.errorToString(httpCode);
+            LOG(String("[HTTPS] GET... failed, error: ") + https.errorToString(httpCode));
         }
         https.end();
-
-        if (success) {
-            g_led.state(false);
-        }
-        else {
-            g_led.flash(50, 9950);
-        }
+    } else {
+        LOG("[HTTPS] Unable to connect");
     }
-#endif
+
+    if (success) {
+        g_led.state(false);
+    }
+    else {
+        g_led.flash(50, 9950);
+    }
+}
 
 /*---------------------------------------------------------------------------*/
 void set_gate(const char* id, bool state) {
@@ -211,6 +175,7 @@ void loop() {
     }
     else if (button > 50 && button < 2000 && g_loopMode != CONFIG) {
         if (g_manualOnUntil) {
+            g_manualOnUntil = 0;
             g_loopMode = RUN_INIT;
         }
         else {
@@ -304,6 +269,7 @@ void loop() {
 
         case MANUAL_ON:
             if (g_manualOnUntil < get_unix_timestamp()) {
+                g_manualOnUntil = 0;
                 g_loopMode = RUN_INIT;
             }
             break;

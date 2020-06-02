@@ -34,7 +34,7 @@ static const char form_tmpl[] PROGMEM = {
             "<title>{{name}}</title>"
             "<style>"
                 "*{background-color:#292a2b;color:#afafaf;padding:5px;margin:0;box-sizing:border-box;outline:none;font-family:sans-serif;font-size:18px;}"
-                "div{padding:3px 20px;}"
+                "div{padding:3px 10px;}"
                 "label,a{color:#1bbbe3;}"
                 "input{background:hsl(0,0%,10%);border:1px solid hsl(0,0%,5%);width:100%;} "
                 "input[type=submit]{padding:20px 0;background:hsl(0,0%,20%);}"
@@ -61,7 +61,7 @@ static const char form_tmpl[] PROGMEM = {
                 "</form>"
             "</div>"
             "<div class=mac>MAC Addr: {{macAddr}}</div>"
-            "<div class=credit>Made with<a href=https://github.com/sourcesimian/uICAL/tree/master/examples/sonoff-basic/lib/SimpleConfigWiFiAP>SimpleConfigWiFiAP</a></div>"
+            "<div class=credit>IoT device config with<a href=https://github.com/sourcesimian/uICAL/tree/master/examples/sonoff-basic/lib/SimpleConfigWiFiAP>SimpleConfigWiFiAP</a></div>"
         "</body>"
     "</html>"
 };
