@@ -33,18 +33,21 @@ To flash the firmware to the Sonoff Basic you will need:
 * 4-way TTL jumper cable
 * soldering iron
 
-There are many guides an dvideos online on how to do this, this one is an [example](https://tasmota.github.io/docs/devices/Sonoff-Basic/). Search the internet to find out more.
+There are many guides and videos online on how to do this, this one is an [example](https://tasmota.github.io/docs/devices/Sonoff-Basic/). Search the internet to find out more.
 
 ## Electrical Safety
 **Never mix mains power and TTL/USB!**
-Only ever connect your Sonoff Basic to the mains **OR** the FT232R USB to TTL. Never both! Disconnect the the mains before connecting the 4-way TTL jumper cable. Before connecting to mains power disconnect the 4-way TTL jumper cable, and close the case!
+
+Only ever connect your Sonoff Basic to the mains **OR** the FT232R USB to TTL. Never both!
+
+Disconnect the the mains before connecting the 4-way TTL jumper cable. Before connecting to mains power, disconnect the 4-way TTL jumper cable, and close the case!
 
 ## Flashing the Firmware
-Plug the FTDI FT232R USB to TTL into your serial port and find the path to your serial device in `/dev/`. Set the value of `upload_port = /dev/cu....` in `platformio.ini` to your serial device. Disconnect the USB once you have found it.
+Plug the FTDI FT232R USB to TTL into your USB port and find the path to the serial device in `/dev/`. Set the value of `upload_port = /dev/cu....` in `platformio.ini` to the serial device. Disconnect the USB once you have found it.
 
 Connect the 4-way TTL jumper cable to the Sonoff board - make sure that:
 * the FTDI FT232R USB to TTL is in **3.3V mode**,
-* the 4 TTL jumper cables: 3.3V, TX, RX, GND are connected correctly on both ends.
+* the 4 TTL jumper cables: `3.3V`, `TX`, `RX`, `GND` are correctly connected on both ends.
 
 While pressing the button on the Sonoff, connect the USB cable - this puts the board in flashing mode.
 
