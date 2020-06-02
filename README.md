@@ -1,8 +1,24 @@
-# uICAL
-Lightweight C++ and Python library for reading ICAL calendar format
+uICAL  <!-- omit in toc -->
+====
 
-## Implementation
-Implemented in C++ to the C++11 standard. based on [iCalendar RFC-5545](https://icalendar.org/RFC-Specifications/iCalendar-RFC-5545/).
+***Lightweight C++ library for parsing ICAL calendar format***
+
+This project implements the [iCalendar RFC-5545](https://icalendar.org/RFC-Specifications/iCalendar-RFC-5545/) standard in pure C++ to the C++ 11 standard. It is targeted at small embedded, Arduino and IoT devices with limited resources and no operating system. uICAL can however be used on any platform which is C++ 11 compliant.
+
+At the time of writing I could not find a suitable ICAL parser implementation for my use case, thus I set out to write uICAL. Fortunately, I underestimated the difficuilty in correctly implementing the ICAL specification, or I would never have started. The code now satisfies all the test cases I've been able to find, and runs quite sucessfully in an [ESP8266](https://github.com/sourcesimian/uICAL/blob/master/examples/sonoff-basic/README.md) microcontroller.
+
+Coincedentally during the writing of uICAL the [iCalendar.org](https://icalendar.org) made this [IoT](https://icalendar.org/iot.html) calendar reading service available which is a neat way of off-loading the task from an under resourced IoT device.
+
+- [Availability](#availability)
+- [API](#api)
+- [C++ Library](#c-library)
+- [Arduino C++](#arduino-c)
+  - [License](#license)
+
+# Availability
+
+The library is available as pure C++, Python and Micropython.
+Arduino PlatformIO library.
 
 # API
 
@@ -11,15 +27,6 @@ Implemented in C++ to the C++11 standard. based on [iCalendar RFC-5545](https://
 make test-cpp
 ```
 
-# Python
-```
-make test-python
-```
-
-In your virtualenv:
-```
-python3 setup.py build install
-```
 
 # Arduino C++
 Checkout uICAL into `./lib/`.
@@ -31,49 +38,6 @@ Then in source use:
 auto ical = uICAL::Calendar(...);
 ```
 
-# MicroPython - ESP32
-ref: [MicroPython C modules](https://docs.micropython.org/en/latest/develop/cmodules.html)
-```
-git checkout https://github.com/micropython/micropython
-```
-
-Setup as described in [`micropython/ports/esp32/README.md`](https://github.com/micropython/micropython/blob/master/ports/esp32/README.md)
-
-Verify setup with:
-```
-cd micropython/ports/esp32
-make all
-```
-
-Checkout uICAL to a `modules` directory e.g.:
-```
-├── usermod/
-│   ├──uICAL/
-│  ...  
-└── micropython/
-    ├──ports/
-   ... ├──esp32/
-      ...
-```
-
-Then build with:
-```
-cd micropython/ports/esp32
-make USER_C_MODULES=../../../modules all
-make USER_C_MODULES=../../../usermod CFLAGS_EXTRA=-DMODULE_UICAL_ENABLED=1 all
-```
-
-> NOTE: To flash the firmware you must have your ESP32 module in the bootloader mode and connected to a serial port on your PC
-
-The first time you install MicroPython:
-```
-make erase
-```
-
-Flash ther MicroPython firmware:
-```
-make deploy
-```
 
 
 
@@ -82,11 +46,3 @@ License
 ----
 
 [MIT](LICENSE)
-
-
-**Free Software, Hell Yeah!**
-
-[//]:
-    [dill]: <https://github.com/joemccann/dillinger>
-    
- 

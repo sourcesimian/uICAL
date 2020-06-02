@@ -1,7 +1,7 @@
 Online Timeswitch - Sonoff Basic <!-- omit in toc -->
 ================================
 
-The Sonoff Basic WiFi controlled switch from [Itead](https://www.itead.cc/) is an exellent little device. It is inexpensive and easily reprogrammed for custom use. It is one of the many popular devices used in the  [Tasmota](https://tasmota.github.io/docs/) IoT and home automation ecosystem.
+The Sonoff Basic WiFi controlled switch from [Itead](https://www.itead.cc/) is an exellent little device. It is inexpensive and easily reprogrammed for custom use. It is one of the many popular devices used in the  [Tasmota](https://tasmota.github.io/docs/) IoT and home automation ecosystem. It is based on the [ESP8266](https://en.wikipedia.org/wiki/ESP8266) microcontroller.
 
 This project was developed to showcase the [uICAL](https://github.com/sourcesimian/uICAL) library and re-purposes the Sonoff Basic as a standalone online timeswitch, scheduled from an online calendar (in ICAL format). It is an ideal product for people who do not wish to commit to integrated IoT home automation, but would like one or two lights to go on and off according to a schedule in an online calendar.
 
