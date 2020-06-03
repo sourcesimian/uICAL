@@ -1,4 +1,11 @@
-# MicroPython - ESP32
+uICAL in MicroPython  <!-- omit in toc -->
+====================
+
+> NOTE: uICAL support in Micropython is still in progress
+
+- [ESP32](#esp32)
+
+# ESP32
 ref: [MicroPython C modules](https://docs.micropython.org/en/latest/develop/cmodules.html)
 ```
 git checkout https://github.com/micropython/micropython

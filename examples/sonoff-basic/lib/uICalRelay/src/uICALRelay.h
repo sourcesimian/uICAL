@@ -42,6 +42,7 @@ class uICALRelay {
         unsigned nextCalendarUpdate;
         unsigned long lastMillis;
         static const unsigned gateUpdateWindow = 3600;
+        static const unsigned updateFailRetryDelay = 60;
 };
 
 #endif

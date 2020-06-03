@@ -59,17 +59,21 @@ void uICALRelay::handleRelays() {
     }
 
     if (unixTimeStamp >= this->nextCalendarUpdate) {
+        bool updated = false;
         this->updateCalendar(this->icalURL, this->hostFingerprint, [&](Stream& stm) {
             if(this->processStream(stm) == true) {
-                this->nextGateUpdate = 0;
+                updated = true;
             }
         });
-        this->nextCalendarUpdate = unixTimeStamp + this->pollCalendarPeriod;
-    }
+        if (updated) {
+            this->nextCalendarUpdate = unixTimeStamp + this->pollCalendarPeriod;
 
-    if (unixTimeStamp >= this->nextGateUpdate) {
-        unixTimeStamp = getUnixTimeStamp();
-        this->nextGateUpdate = this->updateGates(unixTimeStamp);
+            unixTimeStamp = getUnixTimeStamp();
+            this->nextGateUpdate = this->updateGates(unixTimeStamp);
+        }
+        else {
+            this->nextCalendarUpdate = unixTimeStamp + this->updateFailRetryDelay;
+        }
     }
 
     this->lastMillis = millis();

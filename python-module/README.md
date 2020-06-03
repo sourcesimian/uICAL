@@ -1,4 +1,9 @@
-# Python
+uICAL Python Module  <!-- omit in toc -->
+===================
+
+- [Building](#building)
+
+# Building
 ```
 make test-python
 ```

@@ -1,4 +1,4 @@
-Online Timeswitch - Sonoff Basic <!-- omit in toc -->
+Online Timeswitch - Sonoff Basic  <!-- omit in toc -->
 ================================
 
 The Sonoff Basic WiFi controlled switch from [Itead](https://www.itead.cc/) is an exellent little device. It is inexpensive and easily reprogrammed for custom use. It is one of the many popular devices used in the  [Tasmota](https://tasmota.github.io/docs/) IoT and home automation ecosystem. It is based on the [ESP8266](https://en.wikipedia.org/wiki/ESP8266) microcontroller.
@@ -18,6 +18,7 @@ This project was developed to showcase the [uICAL](https://github.com/sourcesimi
     - [Poll Period](#poll-period)
   - [Force a Calendar Update](#force-a-calendar-update)
   - [Manual On](#manual-on)
+  - [LED States](#led-states)
 
 # Programming
 ## The Device
@@ -36,7 +37,7 @@ To flash the firmware to the Sonoff Basic you will need:
 There are many guides and videos online on how to do this, this one is an [example](https://tasmota.github.io/docs/devices/Sonoff-Basic/). Search the internet to find out more.
 
 ## Electrical Safety
-**Never mix mains power and TTL/USB!**
+> **Never mix mains power and TTL/USB!**
 
 Only ever connect your Sonoff Basic to the mains **OR** the FT232R USB to TTL. Never both!
 
@@ -70,7 +71,7 @@ Enter:
 * Manual On Duration (s) - The maximum amount of time which the manual ON override will be active. 3600 seconds is a good default.
 * Calendar Event Title - the name you will use for the event in your calendar.
 
-Click "**Update**". And then press the button to exit config mode. The LED should flash slowly while the device is connecting to your WiFi and updating the calendar, and if sucessful will switch off. If the LED continues to flicker there is some sort of connectivity or configuration problem.
+Click "**Update**". And then press the button to exit config mode. The LED should flash slowly while the device is connecting to your WiFi and updating the calendar. If sucessful the LED will switch off. If the LED continues to flash, see (LED States)[#led-states] below to diagnose the issue.
 
 ### Calendar URL
 The calendar URL you use will depend on which calendar system you are using. The Online Timeswitch can only understand the [iCAL format](https://icalendar.org/RFC-Specifications/iCalendar-RFC-5545/).
@@ -80,7 +81,7 @@ If you are using [Google Calendars](https://calendar.google.com/): in the **My c
 ### Host Fingerprint
 To ensure that your Online Timeswitch is fetching your calendar from the authentic host you can add a host fingerprint. However, if you set it wrong the Online Timeswitch will fail to fetch your  calendar.
 
-It is important to note that the fingerprint may not be the usual one due to some optimisations in the HTTPS library used, for more detail see [BearSSL Fingerprint Lookup](https://github.com/sourcesimian/uICAL/blob/master/examples/BearSslFingerprint/README.md).
+It is important to note that the fingerprint may not be the usual one due to some optimisations in the HTTPS library used, for more detail see [BearSSL Fingerprint Lookup](../BearSslFingerprint/README.md).
 
 The fingerprint in this case for https://calendar.google.com/ is `f3:c2:ff:9d:10:7e:b8:fc:96:13:da:de:e8:43:1d:2f:65:ae:2c:fa`.
 
@@ -93,3 +94,11 @@ If you have made a change to your calendar and you want the Online Timeswitch to
 ## Manual On
 As with electro-mechanical time switches it is sometimes convienient to have a manual on mode. Short press the button to engage the manual on mode. The LED will stay lit to indicate that manual on mode is engaged. Short press the button again to exit manual on mode. The Online Timeswitch will then continue to follow your calendar. If you leave the manual on mode engaged the Online Timeswitch will automaticaly exit after the manual on duration you have configured.
 
+## LED States
+The LED is used to give you an indication of the the state of the device:
+* Config mode: Flashing rapidly, about 3 times a second.
+* Wifi Connecting: Flashing once every two seconds.
+* NTP updating: Flashing once every four seconds.
+* URL fetch failed: Flashing once every ten seconds. Will retry in 60 seconds.
+* Force update: The LED is illuminated while the update is taking place.
+* Manual on mode: The LED is continuously iluminated
