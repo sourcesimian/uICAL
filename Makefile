@@ -56,7 +56,7 @@ coverage: $(BIN)/cov
 	rm -f build/coverage/*
 	mv *.gcov build/coverage/
 	ls build/coverage/*.gcov | grep -v -e ".cpp" -e ".h" | xargs rm
-	grep "####" build/coverage/*.gcov | wc -l
+	grep "####" build/coverage/src*.cpp.gcov | grep -v "\-:" | awk '{print $$1}' | sed -e 's|build/coverage/src#||' -e 's|\.gcov:||' | uniq -c 
 
 
 memory: $(BIN)/test

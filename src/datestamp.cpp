@@ -200,29 +200,26 @@ namespace uICAL {
 
     void DateStamp::incSecond(unsigned n) {
         this->second += n;
-        while(this->second > 59) {
+        if(this->second > 59) {
             this->incMinute(this->second/60);
             this->second %= 60;
         }
-        this->second %= 60;
     }
 
     void DateStamp::incMinute(unsigned n) {
         this->minute += n;
-        while(this->minute > 59) {
+        if(this->minute > 59) {
             this->incHour(this->minute/60);
             this->minute %= 60;
         }
-        this->minute %= 60;
     }
 
      void DateStamp::incHour(unsigned n) {
         this->hour += n;
-        while(this->hour > 23) {
+        if(this->hour > 23) {
             this->incDay(this->hour/24);
             this->hour %= 24;
         }
-        this->hour %= 24;
     }
 
     void DateStamp::decDay(unsigned n) {

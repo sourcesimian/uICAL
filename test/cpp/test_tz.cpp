@@ -7,8 +7,6 @@
 #include <list>
 
 TEST_CASE("TZ::test1", "[uICAL][TZ]") {
-    std::cout << "TEST: tz1" << std::endl;
-
     std::ifstream input(std::string("test/data/ical2.txt"));
     uICAL::istream_stl ical(input);
 
@@ -40,10 +38,6 @@ TEST_CASE("TZ::test1", "[uICAL][TZ]") {
         auto tz = uICAL::new_ptr<uICAL::TZ>("Z");
         auto dt = uICAL::DateTime(ds, tz);
 
-        std::cout << ds.as_str() << std::endl;
-        std::cout << dt.datestamp().as_str() << std::endl;
-        std::cout << "--" << std::endl;
-
         auto it = tzList.begin();
         auto next = [&]() {
             if (it == tzList.end()) {
@@ -67,9 +61,5 @@ TEST_CASE("TZ::test1", "[uICAL][TZ]") {
         REQUIRE(next() == "20191105T095555 PST");
         REQUIRE(next() == "20191105T095555 PST");
         REQUIRE(next() == "END");
-
-        // for (auto tz : tzList) {
-        //     std::cout << dt.datestamp(tz).as_str() << " " << tz->as_str() << std::endl;
-        // }
     }
 }

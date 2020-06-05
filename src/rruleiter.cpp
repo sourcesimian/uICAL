@@ -183,7 +183,8 @@ namespace uICAL {
             if (this->rr->byMinute.size())   this->counters.push_back(ByMinuteCounter::init(this->rr->byMinute));
             else if (this->rr->freq == RRule::Freq::MINUTELY)
                                             this->counters.push_back(MinuteInc::init(this->rr->interval));
-            else                            this->counters.push_back(ByMinuteCounter::init(base.minute));
+            else if (this->rr->freq != RRule::Freq::SECONDLY)
+                                            this->counters.push_back(ByMinuteCounter::init(base.minute));
 
             if (this->rr->byHour.size())     this->counters.push_back(ByHourCounter::init(this->rr->byHour));
             else if (this->rr->freq == RRule::Freq::HOURLY)

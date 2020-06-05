@@ -24,8 +24,6 @@ void cmp_datestamp(const std::string test, uICAL::DateStamp res, uICAL::DateStam
 }
 
 TEST_CASE("DateStamp::test1", "[uICAL][DateStamp]") {
-    std::cout << "TEST: datestamp 1" << std::endl;
-
     using namespace uICAL;
 
     DateStamp dt1, exp;
@@ -42,7 +40,6 @@ TEST_CASE("DateStamp::test1", "[uICAL][DateStamp]") {
     dt1.incDay(1);
     cmp_datestamp("Non leap year - Feburary rollover", dt1, ds("19850301T090000"));
 
-
     // September roll over
     dt1 = ds("19970929T090000");
     dt1.incDay(1);
@@ -54,18 +51,13 @@ TEST_CASE("DateStamp::test1", "[uICAL][DateStamp]") {
 TEST_CASE("DateStamp::weekNo", "[uICAL][DateStamp]") {
     using namespace uICAL;
 
-    std::cout << "TEST: datestamp weekNo" << std::endl;
-
     auto t = [](const std::string datetime, DateTime::Day dayOfWeek, unsigned weekNo) {
         DateStamp dt = ds(datetime);
         DateTime::Day d = dt.dayOfWeek();
         unsigned w = dt.weekNo();
-        if (dayOfWeek != DateTime::Day::NONE && d != dayOfWeek)
-            std::cout << dt.as_str() << " = " << (unsigned)d << " " << "{{" << (unsigned)dayOfWeek << "}}" << std::endl;
-        else if (w != weekNo)
-            std::cout << dt.as_str() << " = " << w << " " << "[" << weekNo << "]" << std::endl;
-        else
-            std::cout << dt.as_str() << " = " << w << std::endl;
+
+        REQUIRE(d == dayOfWeek);
+        REQUIRE(w == weekNo);
 
     };
 
@@ -123,4 +115,35 @@ TEST_CASE("DateStamp::weekNo", "[uICAL][DateStamp]") {
     t("20060102T090000", DateTime::Day::MON, 1);
     t("20060108T090000", DateTime::Day::SUN, 1);
     t("20060109T090000", DateTime::Day::MON, 2);
+}
+
+static const char* datetime1 = "20191016T102000Z";
+static const char* datetime2 = "20200605T064937Z";
+
+TEST_CASE("DateStamp::str", "[uICAL][DateStamp]") {
+    uICAL::DateTime dt1(datetime1);
+    uICAL::DateTime dt2(datetime2);
+
+    REQUIRE(dt1.as_str() == datetime1);
+
+    auto diff = dt2 - dt1;
+    REQUIRE(diff.as_str() == "P232DT20H29M37S");
+
+    auto ds = dt2.datestamp();
+
+    REQUIRE(ds.as_str() == "20200605T064937");
+}
+
+TEST_CASE("DateStamp::throw", "[uICAL][DateStamp]") {
+    REQUIRE_THROWS_WITH(uICAL::DateStamp("20200605T064937-"), "ValueError: Bad datestamp: \"20200605T064937-\"");
+
+    REQUIRE_THROWS_WITH(uICAL::DateStamp("YYYY0605T064937"), "ValueError: Invalid year: 0");
+    REQUIRE_THROWS_WITH(uICAL::DateStamp("2020MM05T064937"), "ValueError: Invalid month: 0");
+    REQUIRE_THROWS_WITH(uICAL::DateStamp("202006DDT064937"), "ValueError: Invalid day: 0");
+
+    REQUIRE_THROWS_WITH(uICAL::DateStamp("20200605x064937"), "ValueError: Bad datestamp: \"20200605x064937\"");
+
+    REQUIRE_THROWS_WITH(uICAL::DateStamp("20200605T244937"), "ValueError: Invalid hour: 24");
+    REQUIRE_THROWS_WITH(uICAL::DateStamp("20200605T066037"), "ValueError: Invalid minute: 60");
+    REQUIRE_THROWS_WITH(uICAL::DateStamp("20200605T064975"), "ValueError: Invalid second: 75");
 }

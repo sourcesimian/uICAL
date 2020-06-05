@@ -58,16 +58,6 @@ namespace uICAL {
     }
 
     // Preconditions: m is in [1, 12]
-    // Returns: The number of days in the month m of leap year
-    // The result is always in the range [29, 31].
-    // Source: http://howardhinnant.github.io/date_algorithms.html#last_day_of_month_leap_year
-    unsigned last_day_of_month_leap_year(unsigned m) noexcept
-    {
-        constexpr unsigned char a[] = {31, 29, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31};
-        return a[m-1];
-    }
-
-    // Preconditions: m is in [1, 12]
     // Returns: The number of days in the month m of year y
     // The result is always in the range [28, 31].
     // Source: http://howardhinnant.github.io/date_algorithms.html#last_day_of_month

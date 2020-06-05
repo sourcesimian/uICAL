@@ -187,6 +187,7 @@ namespace uICAL {
 
             SecondInc(unsigned interval) : IncCounter(interval) {}
 
+            virtual bool reset(const DateStamp& base);
             virtual bool next();
 
             virtual const string name() const;

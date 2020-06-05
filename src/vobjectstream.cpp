@@ -13,6 +13,15 @@
 #include "uICAL/vobjectstream.h"
 
 namespace uICAL {
+    VObjectStream::VObjectStream(VLineStream& stm)
+    : stm(stm)
+    , useLine([](const string parent, const string line) {
+            std::ignore = parent;
+            std::ignore = line;
+            return true;
+        })
+    {}
+
     VObjectStream::VObjectStream(VLineStream& stm, lineP_t useLine)
     : stm(stm)
     , useLine(useLine)
@@ -73,7 +82,7 @@ namespace uICAL {
                     return;
                 }
                 log_error("Mismatch \"%s\": %s", objName.c_str(), line->as_str().c_str());
-                throw ParseError(string("Mismatch for:") + objName.c_str() + string(" ") + line->as_str());
+                throw ParseError(string("Mismatch for: \"") + objName.c_str() + string("\": ") + line->as_str());
             }
             else {
                 if (obj && this->useLine(obj->getName(), line->name)) {

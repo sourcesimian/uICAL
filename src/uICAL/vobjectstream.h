@@ -12,6 +12,7 @@ namespace uICAL {
         public:
             using lineP_t = std::function<bool (const string parent, const string line)>;
 
+            VObjectStream(VLineStream& stm);
             VObjectStream(VLineStream& stm, lineP_t useLine);
 
             VObject_ptr nextObject(bool recurse);

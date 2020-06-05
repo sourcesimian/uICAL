@@ -22,7 +22,7 @@ namespace uICAL {
         else
             this->parseRRule(rrule);
 
-        log_trace("RRULE %s", this->as_str().c_str());
+        log_trace("%s", this->as_str().c_str());
     }
 
     void RRule::parseRRule(const string& rrule) {

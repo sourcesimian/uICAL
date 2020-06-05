@@ -139,6 +139,18 @@ namespace uical_python {
     }
 
 
+    static PyObject *
+    RRule__str__(PyObject *s) {
+        RRuleObject* self = (RRuleObject*)s;
+        try {
+            PyObject* ret = PyUnicode_FromString(self->rrule->as_str().c_str());
+            return ret;
+        } catch (uICAL::Error ex) {
+            PyErr_SetString(UicalError, ex.message.c_str());
+            return 0;
+        }            
+    }
+
     static PyMethodDef RRule_methods[] = {
         {"next", (PyCFunction) RRule_next, METH_NOARGS,
          "Test if there is a next value"
@@ -150,13 +162,13 @@ namespace uical_python {
     };
 
 
-
     static PyTypeObject RRuleType = {
         PyVarObject_HEAD_INIT(NULL, 0)
         .tp_name = "uical.RRule",
         .tp_basicsize = sizeof(RRuleObject),
         .tp_itemsize = 0,
         .tp_dealloc = (destructor) RRule_dealloc,
+        .tp_str = RRule__str__,
         .tp_flags = Py_TPFLAGS_DEFAULT,
         .tp_doc = "Iterator object for uICAL::RRule",
         .tp_methods = RRule_methods,

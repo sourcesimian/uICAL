@@ -10,20 +10,6 @@
 
 #include "uICAL.h"
 
-std::string string_diff(const std::string a, const std::string b) {
-    std::ostringstream out;
-    int len = std::min(a.length(), b.length());
-    for (int i = 0; i < len; ++i) {
-        if (a.c_str()[i] == b.c_str()[i]) {
-            out << " ";
-        }
-        else {
-            out << "^";
-        }
-    }
-    return out.str();
-}
-
 using test_f = std::function<void(std::string, std::string, std::string, std::vector<std::string>, std::vector<std::string>)>;
 
 static void run_tests(const std::string dat_file, test_f test)
@@ -69,7 +55,8 @@ static void run_tests(const std::string dat_file, test_f test)
             expected.clear();
         }
         else {
-            std::cerr << "! bad line (" << i <<"): \"" << line << "\"" << std::endl;
+            FAIL("! bad line (" << i <<"): \"" << line << "\"");
+            CHECK(false);
         }
         i ++;
     }
@@ -77,9 +64,6 @@ static void run_tests(const std::string dat_file, test_f test)
 }
 
 void test_basic(std::string dtstart, std::string rrule, std::string begin, std::vector<std::string> excludes, std::vector<std::string> expected) {
-    // if (std::string::npos == rrule.find("RRULE:FREQ=MONTHLY;BYDAY=FR;BYMONTHDAY=13"))
-    //     return;
-
     uICAL::VLine_ptr ldtstart = uICAL::new_ptr<uICAL::VLine>(dtstart);
     uICAL::VLine_ptr lrrule = uICAL::new_ptr<uICAL::VLine>(rrule);
 
@@ -87,8 +71,6 @@ void test_basic(std::string dtstart, std::string rrule, std::string begin, std::
 
     std::string res;
     try {
-        //uICAL::Recurrence_ptr rec = uICAL::new_ptr<uICAL::Recurrence>(lrrule->value);
-
         uICAL::DateTime rrBegin;
         if (!begin.empty()) {
             rrBegin = uICAL::DateTime(begin);
@@ -140,23 +122,27 @@ void test_basic(std::string dtstart, std::string rrule, std::string begin, std::
             }
         }
         if (fail) {
-            std::cout << "FAIL: " << start.as_str() << " " << rrule << std::endl;
-            std::cout << "  ccc: " << occ->as_str() << std::endl;
-            std::cout << "  exp: " << exp.str() << std::endl;
-            std::cout << "  res: " << res.str() << std::endl;
+            WARN("FAIL: " << start.as_str() << " " << rrule << "\n" <<
+                 "  ccc: " << occ->as_str() << "\n" <<
+                 "  exp: " << exp.str() << "\n" <<
+                 "  res: " << res.str()
+            );
+
             REQUIRE(false);
         }
         else {
-            std::cout << "PASS: " << start.as_str() << " " << rrule << std::endl;
+            INFO("PASS: " << start.as_str() << " " << rrule);
+            REQUIRE(true);
         }
     }
     catch (uICAL::Error e) {
-        std::cout << "EXEP: " << start.as_str() << " " << rrule << std::endl;
-        std::cout << "  msg: " << e.message << std::endl;
+        WARN("EXEP: " << start.as_str() << " " << rrule << "\n" <<
+             "  msg: " << e.message
+        );
     }
 }
 
-TEST_CASE("RRule::basic", "[uICAL][RRule]") {
+TEST_CASE("RRule::rrule_txt", "[uICAL][RRule]") {
     run_tests("test/data/rrule.txt", test_basic);
 }
 
@@ -166,11 +152,109 @@ TEST_CASE("RRule::test2", "[uICAL][RRule]") {
     uICAL::string begin("19970902T090000");
     uICAL::string end("29970902T090000");
 
-    auto rr = uICAL::new_ptr<uICAL::RRuleIter>(
+    auto rr = uICAL::RRuleIter(
         uICAL::new_ptr<uICAL::RRule>(rrule, uICAL::DateTime(dtstart, uICAL::TZ::unaware())),
         uICAL::DateTime(), uICAL::DateTime());
-    while (rr->next())
-    {
-        std::cout << rr->now().as_str() << std::endl;
-    }
+
+    REQUIRE_THROWS_WITH(rr.now(), "RecurrenceError: Not yet initialised, call next() first");
+
+    REQUIRE(rr.next() == true);
+    REQUIRE(rr.now().as_str() == "19970902T090000");
+
+    REQUIRE(rr.next() == true);
+    REQUIRE(rr.now().as_str() == "19970903T090000");
+
+    REQUIRE(rr.next() == true);
+    REQUIRE(rr.now().as_str() == "19970904T090000");
+
+    REQUIRE(rr.next() == true);
+    REQUIRE(rr.now().as_str() == "19970905T090000");
+
+    REQUIRE(rr.next() == false);
+
+    REQUIRE_THROWS_WITH(rr.now(), "RecurrenceError: No more occurrences");
+}
+
+TEST_CASE("RRULE::str", "[uICAL][RRule]") {
+    uICAL::string rule("FREQ=DAILY;COUNT=4");
+    uICAL::string dtstart("19970902T090000");
+
+    uICAL::RRule_ptr rrule = uICAL::new_ptr<uICAL::RRule>(rule, dtstart);
+
+    REQUIRE(rrule->as_str() == "RRULE:FREQ=DAILY;INTERVAL=1;COUNT=4;WKST=MO");
+}
+
+TEST_CASE("RRULE::empty", "[uICAL][RRule]") {
+    uICAL::string rule("");
+    uICAL::string dtstart("19970902T090000");
+
+    auto rrule = uICAL::RRule(rule, dtstart);
+
+    REQUIRE(rrule.as_str() == "RRULE:FREQ=DAILY;INTERVAL=1;COUNT=1;WKST=MO");
+}
+
+TEST_CASE("RRULE::bad_freq", "[uICAL][RRule]") {
+    uICAL::string rule("FREQ=FORTNIGHTLY");
+    uICAL::string dtstart("19970902T090000");
+
+    REQUIRE_THROWS_WITH(uICAL::RRule(rule, dtstart), "ParseError: Unknown RRULE:FREQ type: FORTNIGHTLY");
+}
+
+// TEST_CASE("RRULE::bad_indexs", "[uICAL][RRule]") {
+//     uICAL::string dtstart("19970902T090000");
+
+//     auto rrule = uICAL::RRule("", dtstart);
+
+//     REQUIRE_THROWS_WITH(rrule.parseDay("MY"), "ParseError: Unknown day name: MY");
+//     REQUIRE_THROWS_WITH(rrule.dayAsString(uICAL::DateTime::Day::NONE), "ParseError: Unknown day index: ...");
+//     REQUIRE_THROWS_WITH(rrule.frequencyAsString(uICAL::RRule::Freq::NONE), "ParseError: Unknown dafrequencyy index: ...");
+// }
+
+TEST_CASE("RRULE::negative_range", "[uICAL][RRule]") {
+    uICAL::string dtstart("19970902T090000");
+    uICAL::string begin("19970902T090000");
+    uICAL::string end("19970901T090000");
+
+    REQUIRE_THROWS_WITH(
+        uICAL::RRuleIter(uICAL::new_ptr<uICAL::RRule>("", uICAL::DateTime(dtstart)),
+                         uICAL::DateTime(begin),
+                         uICAL::DateTime(end)),
+        "ValueError: Begin and end describe a negative range"
+    );
+}
+
+TEST_CASE("RRULE::negative_end", "[uICAL][RRule]") {
+    uICAL::string dtstart("19970902T090000");
+    uICAL::string begin("19970802T090000");
+    uICAL::string end("19970901T090000");
+
+    auto rruleIt = uICAL::RRuleIter(uICAL::new_ptr<uICAL::RRule>("", uICAL::DateTime(dtstart)),
+                                    uICAL::DateTime(begin),
+                                    uICAL::DateTime(end));
+
+    REQUIRE(rruleIt.next() == false);
+}
+
+// TEST_CASE("RRULE::until_before_begin", "[uICAL][RRule]") {
+//     uICAL::string dtstart("19970902T090000");
+//     uICAL::string begin("19971102T090000");
+//     uICAL::string end("19971130T090000");
+
+//     auto rruleIt = uICAL::RRuleIter(uICAL::new_ptr<uICAL::RRule>("FREQ=DAILY;WKST=MO;UNTIL=19970930T090000",
+//                                                                  uICAL::DateTime(dtstart)),
+//                                     uICAL::DateTime(begin),
+//                                     uICAL::DateTime(end));
+//     REQUIRE(rruleIt.next() == false);
+// }
+
+TEST_CASE("RRULE::done_before_begin", "[uICAL][RRule]") {
+    uICAL::string dtstart("19970902T090000");
+    uICAL::string begin("19971102T090000");
+    uICAL::string end("19971130T090000");
+
+    auto rruleIt = uICAL::RRuleIter(uICAL::new_ptr<uICAL::RRule>("FREQ=DAILY;WKST=MO;COUNT=10",
+                                                                 uICAL::DateTime(dtstart)),
+                                    uICAL::DateTime(begin),
+                                    uICAL::DateTime(end));
+    REQUIRE(rruleIt.next() == false);
 }

@@ -14,7 +14,6 @@ namespace uICAL {
         public:
             VObject();
 
-            virtual bool empty() const;
             virtual const string& getName() const;
 
             VLine_ptr getPropertyByName(const string& name) const;

@@ -9,11 +9,6 @@
 #include "uICAL/vline.h"
 
 namespace uICAL {
-    VLine::VLine() {
-        this->name = string::none();
-        this->value = string::none();
-    }
-
     VLine::VLine(const string& line) {
         if(line.empty()) {
             log_error("%s", "VLINE is empty");
@@ -36,10 +31,6 @@ namespace uICAL {
             this->name = line.substr(0, colon);
         }
         this->value = line.substr(colon + 1, line.length() - colon - 1);
-    }
-
-    bool VLine::empty() const {
-        return this->name.empty();
     }
 
     string VLine::getParam(const string& key) {

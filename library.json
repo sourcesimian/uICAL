@@ -1,7 +1,7 @@
 {
   "name": "uICAL",
-  "keywords": "ICAL, RRULE, scheduling, calendar Python, MicroPython, cmodule",
-  "description": "Library for reading ICAL calendar format",
+  "keywords": "iCalendar, ICAL, recurrence, RRULE, scheduling, calendar",
+  "description": "Library for parsing iCalendar file format",
   "repository":
   {
     "type": "git",
@@ -17,10 +17,12 @@
   ],
   "version": "0.0.1",
   "license": "MIT",
-  "export":
-  [
-    "src/*"
-  ],
+  "export": {
+    "include":
+    [
+      "src/*"
+    ]
+  },
   "frameworks": "*",
   "platforms": "*",
   "examples": [

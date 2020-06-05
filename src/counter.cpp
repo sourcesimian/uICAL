@@ -260,6 +260,10 @@ namespace uICAL {
         return Counter_ptr((Counter*)new SecondInc(interval));
     }
 
+    bool SecondInc::reset(const DateStamp& base) {
+        return IncCounter::reset(base);
+    }
+
     bool SecondInc::next() {
         unsigned minute = this->base.minute;
         this->base.incSecond(this->interval);

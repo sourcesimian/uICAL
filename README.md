@@ -1,7 +1,7 @@
 uICAL  <!-- omit in toc -->
 ====
 
-***Lightweight C++ library for parsing ICAL calendar format***
+***Library for parsing iCalendar file format***
 
 This project implements the [iCalendar RFC-5545](https://icalendar.org/RFC-Specifications/iCalendar-RFC-5545/) standard in pure C++ to the C++ 11 standard and minimal STL. It is targeted at small embedded, Arduino and IoT devices with limited resources and no operating system. uICAL can however be used in any project which is C++ 11 compliant.
 

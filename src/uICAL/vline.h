@@ -9,10 +9,8 @@
 namespace uICAL {
     class VLine : public Base {
         public:
-            VLine();
             VLine(const string& line);
 
-            bool empty() const;
             string name;
             std::map<string, string> params;
             string value;

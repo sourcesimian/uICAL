@@ -13,14 +13,9 @@ namespace uICAL {
     VObject::VObject()
     {}
 
-    bool VObject::empty() const {
-        return this->name.empty();
-    }
-
     const string& VObject::getName() const {
         return this->name;
     }
-
 
     VLine_ptr VObject::getPropertyByName(const string& name) const {
         for (auto line : this->lines) {
@@ -28,7 +23,7 @@ namespace uICAL {
                 return line;
             }
         }
-        return new_ptr<VLine>();
+        return nullptr;
     }
 
     VObject::vector VObject::listObjects(const string& name) const {
