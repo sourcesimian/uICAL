@@ -43,8 +43,18 @@ static void run_tests(const std::string dat_file, test_f test)
                  rrule.size() &&
                  expected.size() &&
                  (line.find(" ") == 0 || line.length() == 0)) {
-            test(dtstart, rrule, expected[0], excludes, expected);
-
+            try {
+                test(dtstart, rrule, expected[0], excludes, expected);
+            }
+            catch (uICAL::Error e) {
+                WARN("uICAL::Error " << e.message.c_str());
+            } catch (const std::exception& e) {
+                WARN("std::exception " << e.what());
+            } catch (const std::string& e) {
+                WARN("std::string " << e.c_str());
+            } catch (...) {
+                WARN("Exception ... caught");
+            }
             dtstart.clear();
             rrule.clear();
             expected.clear();

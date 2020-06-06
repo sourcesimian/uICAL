@@ -174,13 +174,15 @@ namespace uICAL {
             this->rr->freq == RRule::Freq::MINUTELY ||
             this->rr->freq == RRule::Freq::HOURLY)
         {
+            if (this->rr->byWeekNo.size())   throw ICalError("BYWEEKNO is N/A");
+
             // TODO: BYSETPOS
-            if (this->rr->bySecond.size())   this->counters.push_back(BySecondCounter::init(this->rr->bySecond));
+            if (this->rr->bySecond.size())  this->counters.push_back(BySecondCounter::init(this->rr->bySecond));
             else if (this->rr->freq == RRule::Freq::SECONDLY)
                                             this->counters.push_back(SecondInc::init(this->rr->interval));
             else                            this->counters.push_back(BySecondCounter::init(base.second));
 
-            if (this->rr->byMinute.size())   this->counters.push_back(ByMinuteCounter::init(this->rr->byMinute));
+            if (this->rr->byMinute.size())  this->counters.push_back(ByMinuteCounter::init(this->rr->byMinute));
             else if (this->rr->freq == RRule::Freq::MINUTELY)
                                             this->counters.push_back(MinuteInc::init(this->rr->interval));
             else if (this->rr->freq != RRule::Freq::SECONDLY)
@@ -190,33 +192,33 @@ namespace uICAL {
             else if (this->rr->freq == RRule::Freq::HOURLY)
                                             this->counters.push_back(HourInc::init(this->rr->interval));
 
-            std::vector<Counter_ptr> dayCounters;
-            if (this->rr->byDay.size())      dayCounters.push_back(ByWeekDayCounter::init(this->rr->byDay, this->rr));
-            if (this->rr->byMonthDay.size()) dayCounters.push_back(ByMonthDayCounter::init(this->rr->byMonthDay));
-            if (this->rr->byYearDay.size())  dayCounters.push_back(ByYearDayCounter::init(this->rr->byYearDay));
-            if (dayCounters.size())         this->counters.push_back(ByAndCounter::init(dayCounters));
+            std::vector<Counter_ptr> andCounters;
+            if (this->rr->byDay.size())      andCounters.push_back(ByWeekDayCounter::init(this->rr->byDay, this->rr));
+            if (this->rr->byMonthDay.size()) andCounters.push_back(ByMonthDayCounter::init(this->rr->byMonthDay));
+            if (this->rr->byYearDay.size())  andCounters.push_back(ByYearDayCounter::init(this->rr->byYearDay));
+            if (andCounters.size())          this->counters.push_back(ByAndCounter::init(andCounters));
 
-            if (this->rr->byWeekNo.size())   throw ICalError("BYWEEKNO is N/A");
             if (this->rr->byMonth.size())    this->counters.push_back(ByMonthCounter::init(this->rr->byMonth));
         }
 
         else if (this->rr->freq == RRule::Freq::DAILY) {
+            if (this->rr->byWeekNo.size())   throw ICalError("BYWEEKNO is N/A");
+            if (this->rr->byYearDay.size())  throw ICalError("BYYEARDAY is N/A");
+
             // TODO: BYSETPOS
-            if (this->rr->bySecond.size())   this->counters.push_back(BySecondCounter::init(this->rr->bySecond));
+            if (this->rr->bySecond.size())  this->counters.push_back(BySecondCounter::init(this->rr->bySecond));
             else                            this->counters.push_back(BySecondCounter::init(base.second));
-            if (this->rr->byMinute.size())   this->counters.push_back(ByMinuteCounter::init(this->rr->byMinute));
+            if (this->rr->byMinute.size())  this->counters.push_back(ByMinuteCounter::init(this->rr->byMinute));
             else                            this->counters.push_back(ByMinuteCounter::init(base.minute));
-            if (this->rr->byHour.size())     this->counters.push_back(ByHourCounter::init(this->rr->byHour));
+            if (this->rr->byHour.size())    this->counters.push_back(ByHourCounter::init(this->rr->byHour));
             else                            this->counters.push_back(ByHourCounter::init(base.hour));
 
-            std::vector<Counter_ptr> dayCounters;
-            if (this->rr->byDay.size())      dayCounters.push_back(ByWeekDayCounter::init(this->rr->byDay, this->rr));
-            if (this->rr->byMonthDay.size()) dayCounters.push_back(ByMonthDayCounter::init(this->rr->byMonthDay));
-            if (this->rr->byYearDay.size())  throw ICalError("BYYEARDAY is N/A");
-            if (dayCounters.size() == 0)    dayCounters.push_back(DayInc::init(this->rr->interval));
-            if (dayCounters.size())         this->counters.push_back(ByAndCounter::init(dayCounters));
+            std::vector<Counter_ptr> andCounters;
+            if (this->rr->byDay.size())      andCounters.push_back(ByWeekDayCounter::init(this->rr->byDay, this->rr));
+            if (this->rr->byMonthDay.size()) andCounters.push_back(ByMonthDayCounter::init(this->rr->byMonthDay));
+            if (andCounters.size() == 0)    andCounters.push_back(DayInc::init(this->rr->interval));
+            if (andCounters.size())         this->counters.push_back(ByAndCounter::init(andCounters));
 
-            if (this->rr->byWeekNo.size())   throw ICalError("BYWEEKNO is N/A for SECONDLY");
             if (this->rr->byMonth.size()) {
                                         this->counters.push_back(ByMonthCounter::init(this->rr->byMonth));
                                         this->counters.push_back(YearInc::init(1));
@@ -224,6 +226,10 @@ namespace uICAL {
         }
 
         else if (this->rr->freq == RRule::Freq::WEEKLY) {
+            if (this->rr->byWeekNo.size())      throw ICalError("BYWEEKNO is N/A");
+            if (this->rr->byYearDay.size())     throw ICalError("BYYEARDAY is N/A");
+            if (this->rr->byMonthDay.size())    throw ICalError("BYMONTHDAY is N/A");
+
             // TODO: BYSETPOS
             if (this->rr->bySecond.size())   this->counters.push_back(BySecondCounter::init(this->rr->bySecond));
             else                            this->counters.push_back(BySecondCounter::init(base.second));
@@ -232,38 +238,35 @@ namespace uICAL {
             if (this->rr->byHour.size())     this->counters.push_back(ByHourCounter::init(this->rr->byHour));
             else                            this->counters.push_back(ByHourCounter::init(base.hour));
 
-            std::vector<Counter_ptr> dayCounters;
-            if (this->rr->byDay.size())      dayCounters.push_back(ByWeekDayCounter::init(this->rr->byDay, this->rr));
-            if (this->rr->byMonthDay.size()) throw ICalError("BYMONTHDAY is N/A");
-            if (this->rr->byYearDay.size())  throw ICalError("BYYEARDAY is N/A");
-            if (dayCounters.size())         this->counters.push_back(ByAndCounter::init(dayCounters));
+            if (this->rr->byDay.size())     this->counters.push_back(ByWeekDayCounter::init(this->rr->byDay, this->rr));
             else                            this->counters.push_back(ByWeekDayCounter::init(RRule::Day_pair(0, base.dayOfWeek()), this->rr));
 
-            this->counters.push_back(WeekInc::init(this->rr->interval, this->rr->wkst));
-
-            if (this->rr->byWeekNo.size())   throw ICalError("BYWEEKNO is N/A for SECONDLY");
-            if (this->rr->byMonth.size()) {
-                                            this->counters.push_back(ByMonthCounter::init(this->rr->byMonth));
-                                            this->counters.push_back(YearInc::init(1));
+            if (this->rr->byMonth.size())   {
+                this->counters.push_back(ByMonthCounter::init(this->rr->byMonth));
+                this->counters.push_back(YearInc::init(1));
+            }
+            else {
+                this->counters.push_back(WeekInc::init(this->rr->interval, this->rr->wkst));
             }
         }
 
         else if (this->rr->freq == RRule::Freq::MONTHLY) {
-            if (this->rr->bySecond.size())   this->counters.push_back(BySecondCounter::init(this->rr->bySecond));
+            if (this->rr->byWeekNo.size())   throw ICalError("BYWEEKNO is N/A");
+            if (this->rr->byYearDay.size())  throw ICalError("BYYEARDAY is N/A");
+
+            if (this->rr->bySecond.size())  this->counters.push_back(BySecondCounter::init(this->rr->bySecond));
             else                            this->counters.push_back(BySecondCounter::init(base.second));
-            if (this->rr->byMinute.size())   this->counters.push_back(ByMinuteCounter::init(this->rr->byMinute));
+            if (this->rr->byMinute.size())  this->counters.push_back(ByMinuteCounter::init(this->rr->byMinute));
             else                            this->counters.push_back(ByMinuteCounter::init(base.minute));
-            if (this->rr->byHour.size())     this->counters.push_back(ByHourCounter::init(this->rr->byHour));
+            if (this->rr->byHour.size())    this->counters.push_back(ByHourCounter::init(this->rr->byHour));
             else                            this->counters.push_back(ByHourCounter::init(base.hour));
 
-            std::vector<Counter_ptr> dayCounters;
-            if (this->rr->byDay.size())      dayCounters.push_back(ByWeekDayCounter::init(this->rr->byDay, this->rr));
-            if (this->rr->byMonthDay.size()) dayCounters.push_back(ByMonthDayCounter::init(this->rr->byMonthDay));
-            if (this->rr->byYearDay.size())  throw ICalError("BYYEARDAY is N/A");
-            if (dayCounters.size())         this->counters.push_back(BySetPosCounter::init(ByAndCounter::init(dayCounters), this->rr->bySetPos));
+            std::vector<Counter_ptr> andCounters;
+            if (this->rr->byDay.size())      andCounters.push_back(ByWeekDayCounter::init(this->rr->byDay, this->rr));
+            if (this->rr->byMonthDay.size()) andCounters.push_back(ByMonthDayCounter::init(this->rr->byMonthDay));
+            if (andCounters.size())         this->counters.push_back(BySetPosCounter::init(ByAndCounter::init(andCounters), this->rr->bySetPos));
             else                            this->counters.push_back(ByMonthDayCounter::init(base.day));
 
-            if (this->rr->byWeekNo.size())   throw ICalError("BYWEEKNO is N/A for SECONDLY");
             if (this->rr->byMonth.size()) {
                                             this->counters.push_back(ByMonthCounter::init(this->rr->byMonth));
                                             this->counters.push_back(YearInc::init(1));
@@ -280,11 +283,11 @@ namespace uICAL {
             if (this->rr->byHour.size())     this->counters.push_back(ByHourCounter::init(this->rr->byHour));
             else                            this->counters.push_back(ByHourCounter::init(base.hour));
 
-            std::vector<Counter_ptr> dayCounters;
-            if (this->rr->byDay.size())      dayCounters.push_back(ByWeekDayCounter::init(this->rr->byDay, this->rr));
-            if (this->rr->byMonthDay.size()) dayCounters.push_back(ByMonthDayCounter::init(this->rr->byMonthDay));
-            if (this->rr->byYearDay.size())  dayCounters.push_back(ByYearDayCounter::init(this->rr->byYearDay));
-            if (dayCounters.size())         this->counters.push_back(ByAndCounter::init(dayCounters));
+            std::vector<Counter_ptr> andCounters;
+            if (this->rr->byDay.size())      andCounters.push_back(ByWeekDayCounter::init(this->rr->byDay, this->rr));
+            if (this->rr->byMonthDay.size()) andCounters.push_back(ByMonthDayCounter::init(this->rr->byMonthDay));
+            if (this->rr->byYearDay.size())  andCounters.push_back(ByYearDayCounter::init(this->rr->byYearDay));
+            if (andCounters.size())         this->counters.push_back(ByAndCounter::init(andCounters));
             else                            this->counters.push_back(ByMonthDayCounter::init(base.day));
 
             if (this->rr->byWeekNo.size())   this->counters.push_back(ByWeekNoCounter::init(this->rr->byWeekNo));
@@ -317,6 +320,8 @@ namespace uICAL {
     bool RRuleIter::resetCascade(counters_t::iterator it, sync_f sync) {
         DateStamp base = (*it)->value();
         for (;;) {
+            if (it == this->counters.begin())
+                break;
             -- it;
             if (!(*it)->reset(base)) {
                 ++ it;
