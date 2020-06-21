@@ -88,6 +88,6 @@ namespace uICAL {
             counter->str(values.out());
             values.next();
         }
-        out << "["; values.str(out); out << "]";
+        out << "("; values.str(out); out << ")";
     }
 }

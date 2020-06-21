@@ -20,6 +20,7 @@ namespace uICAL {
     UICAL_PTR(Calendar)
     UICAL_PTR(CalendarIter)
     UICAL_PTR(CalendarEntry)
+    UICAL_PTR(Cascade)
     UICAL_PTR(Counter)
     UICAL_PTR(DateTime)
     UICAL_PTR(RRule)

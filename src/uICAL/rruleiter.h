@@ -24,14 +24,12 @@ namespace uICAL {
             using sync_f = std::function<void(counters_t::iterator it)>;
 
             bool start();
-            void setupCounters(const DateStamp& base);
-            bool initCounters(const DateStamp& base, const DateStamp& from);
-            bool nextDate();
+            bool expired(const DateTime& current) const;
             bool nextExclude();
             bool nextNow();
             void setCurrentNow();
-            bool resetCascade(counters_t::iterator it, sync_f sync);
-            bool expired(const DateTime& current) const;
+
+            void setupCounters(const DateStamp& base);
 
             const RRule_ptr rr;
 
@@ -39,7 +37,7 @@ namespace uICAL {
             DateTime range_begin;
             DateTime range_end;
 
-            counters_t counters;
+            Cascade_ptr cascade;
             int count;
 
             DateTime current_now;

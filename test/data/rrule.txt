@@ -509,6 +509,60 @@ RRULE:FREQ=MONTHLY;BYMONTHDAY=15,30;COUNT=5
  - 20070315T090000
  - 20070330T090000
 
+################################################################################
+# More scenarios:                                                              #
+################################################################################
+
+# +--------+-------+--------+---------+----------+------+------+--------+--------+--------+
+# |        |BYMONTH|BYWEEKNO|BYYEARDAY|BYMONTHDAY|BYDAY |BYHOUR|BYMINUTE|BYSECOND|BYSETPOS|
+# +--------+-------+--------+---------+----------+------+------+--------+--------+--------+
+# |SECONDLY|Limit  |N/A     |Limit    |Limit     |Limit |Limit |Limit   |Limit   |Limit   |
+# +--------+-------+--------+---------+----------+------+------+--------+--------+--------+
+
+DTSTART;TZID=America/New_York:20190917T090000
+RRULE:FREQ=SECONDLY;INTERVAL=19;COUNT=8
+ - 20190917T090000
+ - 20190917T090019
+ - 20190917T090038
+ - 20190917T090057
+ - 20190917T090116
+ - 20190917T090135
+ - 20190917T090154
+ - 20190917T090213
+
+# +--------+-------+--------+---------+----------+------+------+--------+--------+--------+
+# |        |BYMONTH|BYWEEKNO|BYYEARDAY|BYMONTHDAY|BYDAY |BYHOUR|BYMINUTE|BYSECOND|BYSETPOS|
+# +--------+-------+--------+---------+----------+------+------+--------+--------+--------+
+# |MINUTELY|Limit  |N/A     |Limit    |Limit     |Limit |Limit |Limit   |Expand  |Limit   |
+# +--------+-------+--------+---------+----------+------+------+--------+--------+--------+
+
+
+# +--------+-------+--------+---------+----------+------+------+--------+--------+--------+
+# |        |BYMONTH|BYWEEKNO|BYYEARDAY|BYMONTHDAY|BYDAY |BYHOUR|BYMINUTE|BYSECOND|BYSETPOS|
+# +--------+-------+--------+---------+----------+------+------+--------+--------+--------+
+# |HOURLY  |Limit  |N/A     |Limit    |Limit     |Limit |Limit |Expand  |Expand  |Limit   |
+# +--------+-------+--------+---------+----------+------+------+--------+--------+--------+
+
+
+# +--------+-------+--------+---------+----------+------+------+--------+--------+--------+
+# |        |BYMONTH|BYWEEKNO|BYYEARDAY|BYMONTHDAY|BYDAY |BYHOUR|BYMINUTE|BYSECOND|BYSETPOS|
+# +--------+-------+--------+---------+----------+------+------+--------+--------+--------+
+# |DAILY   |Limit  |N/A     |N/A      |Limit     |Limit |Expand|Expand  |Expand  |Limit   |
+# +--------+-------+--------+---------+----------+------+------+--------+--------+--------+
+
+DTSTART;TZID=America/New_York:19970902T090000
+RRULE:FREQ=DAILY;COUNT=4
+EXDATE;TZID=America/New_York:19970903T090000
+EXDATE;TZID=America/New_York:19970904T090000
+ - 19970902T090000
+ - 19970905T090000
+
+# +--------+-------+--------+---------+----------+------+------+--------+--------+--------+
+# |        |BYMONTH|BYWEEKNO|BYYEARDAY|BYMONTHDAY|BYDAY |BYHOUR|BYMINUTE|BYSECOND|BYSETPOS|
+# +--------+-------+--------+---------+----------+------+------+--------+--------+--------+
+# |WEEKLY  |Limit  |N/A     |N/A      |N/A       |Expand|Expand|Expand  |Expand  |Limit   |
+# +--------+-------+--------+---------+----------+------+------+--------+--------+--------+
+
 DTSTART;TZID=America/New_York:20190917T090000
 RRULE:FREQ=WEEKLY;WKST=MO;INTERVAL=1;BYDAY=TU,TH,SA
  - 20190917T090000
@@ -523,24 +577,6 @@ RRULE:FREQ=WEEKLY;WKST=MO;INTERVAL=1;BYDAY=TU,TH,SA
  - 20191008T090000
  - 20191010T090000
  - ...
-
-DTSTART;TZID=America/New_York:19970902T090000
-RRULE:FREQ=DAILY;COUNT=4
-EXDATE;TZID=America/New_York:19970903T090000
-EXDATE;TZID=America/New_York:19970904T090000
- - 19970902T090000
- - 19970905T090000
-
-DTSTART;TZID=America/New_York:20190917T090000
-RRULE:FREQ=SECONDLY;INTERVAL=19;COUNT=8
- - 20190917T090000
- - 20190917T090019
- - 20190917T090038
- - 20190917T090057
- - 20190917T090116
- - 20190917T090135
- - 20190917T090154
- - 20190917T090213
 
 DTSTART;TZID=America/New_York:20190917T090000
 RRULE:FREQ=WEEKLY;BYMONTH=9,11;COUNT=15
@@ -571,11 +607,29 @@ RRULE:FREQ=WEEKLY;BYMONTH=7,9;COUNT=7
  - 20200901T090000
 
 #DTSTART;TZID=America/New_York:20190917T090000
-#RRULE:FREQ=WEEKLY;BYMONTH=7,9;COUNT=15;INTERVAL=2
+#RRULE:FREQ=WEEKLY;INTERVAL=2;BYMONTH=7,9;COUNT=15
 # - 20190917T090000
 # - 20200707T090000
 # - 20200721T090000
 # - 20200901T090000
 # - 20200915T090000
+
+# +--------+-------+--------+---------+----------+------+------+--------+--------+--------+
+# |        |BYMONTH|BYWEEKNO|BYYEARDAY|BYMONTHDAY|BYDAY |BYHOUR|BYMINUTE|BYSECOND|BYSETPOS|
+# +--------+-------+--------+---------+----------+------+------+--------+--------+--------+
+# |MONTHLY |Limit  |N/A     |N/A      |Expand    |Note 1|Expand|Expand  |Expand  |Limit   |
+# +--------+-------+--------+---------+----------+------+------+--------+--------+--------+
+# Note 1: Limit if BYMONTHDAY is present; otherwise, special expand for MONTHLY.
+
+
+# +--------+-------+--------+---------+----------+------+------+--------+--------+--------+
+# |        |BYMONTH|BYWEEKNO|BYYEARDAY|BYMONTHDAY|BYDAY |BYHOUR|BYMINUTE|BYSECOND|BYSETPOS|
+# +--------+-------+--------+---------+----------+------+------+--------+--------+--------+
+# |YEARLY  |Expand |Expand  |Expand   |Expand    |Note 2|Expand|Expand  |Expand  |Limit   |
+# +--------+-------+--------+---------+----------+------+------+--------+--------+--------+
+# Note 2: Limit if BYYEARDAY or BYMONTHDAY is present; otherwise, special expand for WEEKLY
+#         if BYWEEKNO present; otherwise, special expand for MONTHLY if BYMONTH present;
+#         otherwise, special expand for YEARLY.
+
 
 # END

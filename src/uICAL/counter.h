@@ -173,7 +173,11 @@ namespace uICAL {
 
             virtual void str(ostream& out) const;
 
-            virtual bool syncLock(const DateStamp& from, const DateStamp& now) const { std::ignore = from; std::ignore = now; return true; }
+            virtual bool syncLock(const DateStamp& from, const DateStamp& now) const {
+                std::ignore = from;
+                std::ignore = now;
+                return true;
+            }
 
         protected:
             virtual void wrap() {};

@@ -20,9 +20,9 @@ namespace uICAL {
         return Counter_ptr((Counter*)new ByWeekDayCounter(values, p));
     }
 
-    ByWeekDayCounter::ByWeekDayCounter(const values_t& values, const RRule_ptr& p)
+    ByWeekDayCounter::ByWeekDayCounter(const values_t& values, const RRule_ptr& r)
     : CounterT(values)
-    , p(p)
+    , r(r)
     {
         for (RRule::Day_pair id : values) {
             int index;
@@ -59,30 +59,30 @@ namespace uICAL {
         this->wrap();
         this->cursor = 0;
 
-        if (this->p->byWeekNo.size()) {
+        if (this->r->byWeekNo.size()) {
             this->span = 7;
             this->base = this->base;
-            this->base.decDay(DateTime::daysUntil(this->p->wkst, this->base.dayOfWeek()));
+            this->base.decDay(DateTime::daysUntil(this->r->wkst, this->base.dayOfWeek()));
         }
-        else if (this->p->byMonth.size()) {
+        else if (this->r->byMonth.size()) {
             this->span = this->base.daysInMonth();
             this->base.day = 1;
         }
-        else if (this->p->freq == RRule::Freq::DAILY ||
-            this->p->freq == RRule::Freq::MONTHLY
+        else if (this->r->freq == RRule::Freq::DAILY ||
+            this->r->freq == RRule::Freq::MONTHLY
         ) {
             this->span = this->base.daysInMonth();
             this->base.day = 1;
         }
-        else if (this->p->freq == RRule::Freq::YEARLY) {
+        else if (this->r->freq == RRule::Freq::YEARLY) {
             this->span = this->base.daysInYear();
             this->base.day = 1;
             this->base.month = 1;
         }
-        else if (this->p->freq == RRule::Freq::WEEKLY) {
+        else if (this->r->freq == RRule::Freq::WEEKLY) {
             this->span = 7;
             this->base = this->base;
-            this->base.decDay(DateTime::daysUntil(this->p->wkst, this->base.dayOfWeek()));
+            this->base.decDay(DateTime::daysUntil(this->r->wkst, this->base.dayOfWeek()));
         }
         else {
             throw NotImplementedError("other not implemented");

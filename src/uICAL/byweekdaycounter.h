@@ -27,7 +27,7 @@ namespace uICAL {
             virtual const string name() const { return "ByWeekDay"; }
             virtual void wrap();
 
-            const RRule_ptr& p;
+            const RRule_ptr& r;
 
             RRule::Day_vector byIndexedDay;
             RRule::Day_vector::const_iterator itIndex;

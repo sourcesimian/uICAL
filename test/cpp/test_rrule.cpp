@@ -52,8 +52,6 @@ static void run_tests(const std::string dat_file, test_f test)
                 WARN("std::exception " << e.what());
             } catch (const std::string& e) {
                 WARN("std::string " << e.c_str());
-            } catch (...) {
-                WARN("Exception ... caught");
             }
             dtstart.clear();
             rrule.clear();
@@ -132,22 +130,21 @@ void test_basic(std::string dtstart, std::string rrule, std::string begin, std::
             }
         }
         if (fail) {
-            WARN("FAIL: " << start.as_str() << " " << rrule << "\n" <<
-                 "  ccc: " << occ->as_str() << "\n" <<
-                 "  exp: " << exp.str() << "\n" <<
-                 "  res: " << res.str()
+            FAIL("FAIL: " << start.as_str() << " " << rrule << "\n" <<
+                 " ccc: " << occ->as_str() << "\n" <<
+                 " exp: " << exp.str() << "\n" <<
+                 " res: " << res.str()
             );
-
-            REQUIRE(false);
         }
         else {
-            INFO("PASS: " << start.as_str() << " " << rrule);
+            INFO("PASS: " << start.as_str() << " " << rrule << "\n" <<
+                 " ccc: " << occ->as_str());
             REQUIRE(true);
         }
     }
     catch (uICAL::Error e) {
-        WARN("EXEP: " << start.as_str() << " " << rrule << "\n" <<
-             "  msg: " << e.message
+        FAIL("EXEP: " << start.as_str() << " " << rrule << "\n" <<
+             " msg: " << e.message
         );
     }
 }
