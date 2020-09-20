@@ -1,0 +1,56 @@
+# Syntax Coloring Map for uICAL
+#  `format: https://github.com/arduino/Arduino/wiki/Arduino-IDE-1.5:-Library-specification#keywords
+
+# Datatypes (KEYWORD1)
+Calendar			KEYWORD1
+Calendar_ptr		KEYWORD1
+CalendarIter		KEYWORD1
+CalendarIter_ptr	KEYWORD1
+CalendarEntry		KEYWORD1
+CalendarEntry_ptr	KEYWORD1
+Cascade				KEYWORD1
+Cascade_ptr			KEYWORD1
+Counter				KEYWORD1
+Counter_ptr			KEYWORD1
+DateTime			KEYWORD1
+DateTime_ptr		KEYWORD1
+RRule				KEYWORD1
+RRule_ptr			KEYWORD1
+RRuleIter			KEYWORD1
+RRuleIter_ptr		KEYWORD1
+TZ					KEYWORD1
+TZ_ptr				KEYWORD1
+TZMap				KEYWORD1
+TZMap_ptr			KEYWORD1
+VComponent			KEYWORD1
+VComponent_ptr		KEYWORD1
+VEvent				KEYWORD1
+VEvent_ptr			KEYWORD1
+VEventIter			KEYWORD1
+VEventIter_ptr		KEYWORD1
+VLine				KEYWORD1
+VLine_ptr			KEYWORD1
+VObject				KEYWORD1
+VObject_ptr			KEYWORD1
+
+# Methods and Functions (KEYWORD2)
+new_ptr			KEYWORD2
+
+# Instances (KEYWORD2)
+
+# Constants (LITERAL1)
+NONE			LITERAL1
+SECONDLY		LITERAL1
+MINUTELY		LITERAL1
+HOURLY			LITERAL1
+DAILY			LITERAL1
+WEEKLY			LITERAL1
+MONTHLY			LITERAL1
+YEARLY			LITERAL1
+MON				LITERAL1
+TUE				LITERAL1
+WED				LITERAL1
+THU				LITERAL1
+FRI				LITERAL1
+SAT				LITERAL1
+SUN				LITERAL1

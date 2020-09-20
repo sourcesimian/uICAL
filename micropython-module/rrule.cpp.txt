@@ -1,0 +1,38 @@
+#include "uICAL/error.h"
+#include "uICAL/cppstl.h"
+#include "uICAL/util.h"
+#include "uICAL/rruleiter.h"
+
+#include "rruleiter.h"
+
+
+using rrule_p = void *;
+using rrule_t = uICAL::RRuleIter *;
+
+
+extern "C"
+rrule_p RRule_new(char* rrule) {
+    rrule_t this = new uICAL::RRuleIter();
+
+    return (rrule_p)this;
+}
+
+extern "C"
+void RRule_del(rrule_p p) {
+    rrule_t this = (rrule_t)p;
+    delete rrule; 
+}
+
+
+extern "C"
+bool RRule_next(rrule_p p) {
+    rrule_t this = (rrule_t)p;
+    return this->next();
+}
+
+extern "C"
+void RRule_now(rrule_p p) {
+    rrule_t this = (rrule_t)p;
+    this->now();
+    return;
+}

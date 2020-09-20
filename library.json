@@ -1,0 +1,37 @@
+{
+  "name": "uICAL",
+  "keywords": "iCalendar, ICAL, recurrence, RRULE, scheduling, calendar",
+  "description": "Library for parsing iCalendar file format",
+  "repository":
+  {
+    "type": "git",
+    "url": "https://github.com/sourcesimian/uICAL.git"
+  },
+  "authors":
+  [
+    {
+      "name": "Source Simian",
+      "email": "sourcesimian@users.noreply.github.com",
+      "maintainer": true
+    }
+  ],
+  "version": "0.0.1",
+  "license": "MIT",
+  "export": {
+    "include":
+    [
+      "src/*"
+    ]
+  },
+  "frameworks": "*",
+  "platforms": "*",
+  "examples": [
+    "examples/*/*.cpp",
+    "examples/*/*.ino"
+  ],
+  "build":
+  {
+    "srcDir": "src",
+    "includeDir": "src"
+  }
+}
