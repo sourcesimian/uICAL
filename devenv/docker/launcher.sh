@@ -1,5 +1,6 @@
 #!/bin/bash
 REPO_TAG=sourcesimian/uical/devenv
+HERE="$(cd $(dirname "$BASH_SOURCE"); pwd)"
 
 user_id() {
     case "$(uname)" in
@@ -24,6 +25,13 @@ user_env() {
     } | awk '{print "--env "$1}' | tr '\n' ' '
 }
 
+dev_env() {
+    {
+        echo "PYTHONPATH=$(printf '%q' "${HERE}/build/lib.linux-x86_64-3.8/")"
+    } | awk '{print "--env "$1}' | tr '\n' ' '
+}
+
+
 proxy_env() {
     {
         env | grep -i -e '^HTTP_PROXY=' -e '^HTTPS_PROXY=' -e '^NO_PROXY='
@@ -37,13 +45,20 @@ mount_user() {
     }  | awk '{print "--volume "$1}' | tr '\n' ' '
 }
 
-unset TTY; [ -t 0 ] && TTY="-t"
 
-exec docker run -i ${TTY} --rm $(user_env) $(host_env) $(proxy_env) \
-    --user $(user_id) \
-    --hostname "uICAL-de" \
-    $(mount_user) \
-    --workdir ${PWD} \
-    --entrypoint /entrypoint.sh \
-    ${REPO_TAG} \
-    "${@}"
+DOCKER_RUN=(docker run -i --rm)
+
+[ -t 0 ] && DOCKER_RUN+=(-t)
+
+DOCKER_RUN+=($(user_env))
+DOCKER_RUN+=($(host_env))
+DOCKER_RUN+=($(proxy_env))
+DOCKER_RUN+=($(dev_env))
+DOCKER_RUN+=(--user "$(user_id)")
+DOCKER_RUN+=(--hostname "uICAL-devenv")
+DOCKER_RUN+=($(mount_user))
+DOCKER_RUN+=(--workdir "${PWD}")
+DOCKER_RUN+=(--entrypoint /entrypoint.sh)
+
+
+exec "${DOCKER_RUN[@]}" "${REPO_TAG}" "${@}"

@@ -14,5 +14,5 @@ int main(int argc, char **argv) {
     char cmd[255];
     sprintf(cmd, spec, gn, gid, gn, un, uid, gid, home, un, un);
     setuid(0);
-    return(execle("/bin/bash", "bash", "-x", "-c", cmd, (char*)NULL, (char*)NULL));
+    return(execle("/bin/bash", "bash", "-c", cmd, (char*)NULL, (char*)NULL));
 }

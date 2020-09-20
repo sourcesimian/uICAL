@@ -3,7 +3,7 @@ import json
 import sys
 
 
-with open('./test/data/rrule.dat') as fh:
+with open('./test/data/rrule.txt') as fh:
     rrule = None
     dtstart = None
     extra = {}

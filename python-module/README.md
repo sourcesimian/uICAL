@@ -1,14 +1,18 @@
 uICAL Python Module  <!-- omit in toc -->
 ===================
 
-- [Building](#building)
+- [Build and Testing](#build-and-testing)
+- [Explore](#explore)
 
-# Building
+# Build and Testing
 ```
-make test-python
+./de make test-python
 ```
 
-In your virtualenv:
+# Explore
 ```
-python3 setup.py build install
+./de ipython
+
+In [1]: import uICAL
+In [2]: ...
 ```

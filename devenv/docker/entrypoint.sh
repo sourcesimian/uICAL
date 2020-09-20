@@ -1,6 +1,6 @@
 #!/bin/bash
 set -e
-/usr/bin/setupuser ${USER} $(id -u) ${HOST_GROUP} $(id -g) ${HOME} </dev/null 2>/dev/null
+/usr/bin/setupuser ${USER} $(id -u) ${HOST_GROUP} $(id -g) ${HOME} </dev/null
 unset HOST_GROUP
 
 EXTRA_PATH=$(echo $HOST_PATH | tr ':' '\n' | grep "^$HOME" | sort -u | xargs echo | tr ' ' ':')

@@ -4,8 +4,8 @@ BASE_IMAGE=ubuntu:20.04
 REPO_TAG=sourcesimian/uical/devenv
 
 HERE=$(cd $(dirname "$0"); pwd)
-BUILD_DIR=${HERE}/../.build
-LAUNCHER=$(cd ${HERE}/..; pwd)/ce
+BUILD_DIR=${HERE}/../build/devenv
+LAUNCHER=$(cd ${HERE}/..; pwd)/de
 
 # Setup Build area
 rm -rf ${BUILD_DIR}
@@ -23,16 +23,16 @@ ENV TZ=America/New_York
 ENV DEBIAN_FRONTEND=noninteractive
 
 RUN apt-get update && \
-	apt-get install -y \
+    apt-get install -y \
         locales \
         curl \
-		git \
-		make \
-		python3 \
-		python3-distutils \
-		python3-dev \
-		g++ \
-		valgrind \
+        git \
+        make \
+        python3 \
+        python3-distutils \
+        python3-dev \
+        g++ \
+        valgrind \
 
 # Locale
 RUN locale-gen en_US.UTF-8 && update-locale LC_ALL=en_US.UTF-8 LANG=en_C.UTF-8

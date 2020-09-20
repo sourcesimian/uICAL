@@ -254,8 +254,10 @@ namespace uICAL {
 
             if (this->rr->byMonth.size()) {
                 std::vector<Counter_ptr> andCounters;
-                if (this->rr->interval > 1)
+                if (this->rr->interval > 1) {
+                    throw NotImplementedError("RRULE:FREQ=WEEKLY;INTERVAL>1;BYMONTH=... not implemented");
                     andCounters.push_back(WeekInc::init(this->rr->interval, this->rr->wkst));
+                }
                 andCounters.push_back(ByMonthCounter::init(this->rr->byMonth));
                 this->cascade->add(ByAndCounter::init(andCounters));
                 this->cascade->add(YearInc::init(1));

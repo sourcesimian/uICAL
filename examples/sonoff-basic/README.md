@@ -46,6 +46,8 @@ Disconnect the the mains before connecting the 4-way TTL jumper cable. Before co
 ## Flashing the Firmware
 Plug the FTDI FT232R USB to TTL into your USB port and find the path to the serial device in `/dev/`. Set the value of `upload_port = /dev/cu....` in `platformio.ini` to the serial device. Disconnect the USB once you have found it.
 
+> Note: I found that the USB-C port on My MacBook Pro could not deliver enough power, which resulted in intermittent behaviour. Try using a powered hub or external screen with USB.
+
 Connect the 4-way TTL jumper cable to the Sonoff board - make sure that:
 * the FTDI FT232R USB to TTL is in **3.3V mode**,
 * the 4 TTL jumper cables: `3.3V`, `TX`, `RX`, `GND` are correctly connected on both ends.

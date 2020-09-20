@@ -6,30 +6,19 @@ BIN		:= build/bin
 SRC		:= src
 INCLUDE	:= src
 
-.PHONY: coverage containerenv
-
-containerenv:
-	./containerenv/make-containerenv.sh
-
-
-virtualenv:
-	./new_virtualenv3.sh ./virtualenv
-	{ \
-		. ./virtualenv/bin/activate; \
-		pip3 install pytest; \
-	}
-
-
-test-python: virtualenv
-	{ \
-		. ./virtualenv/bin/activate; \
-		python3 ./setup.py build install; \
-		pytest ./test/python/test_*.py; \
-	}
+.PHONY: coverage
 
 
 test-cpp: $(BIN)/test
 	./$(BIN)/test
+
+
+test-python:
+	python3 ./setup.py build
+	pytest ./test/python/
+
+
+test-all: test-cpp test-python
 
 
 $(BIN)/test: $(SRC)/*.cpp $(INCLUDE)/uical/*.h test/cpp/*.cpp
@@ -40,12 +29,6 @@ $(BIN)/test: $(SRC)/*.cpp $(INCLUDE)/uical/*.h test/cpp/*.cpp
 $(BIN)/cov: $(SRC)/*.cpp $(INCLUDE)/uical/*.h test/cpp/*.cpp
 	mkdir -p $(BIN)
 	$(CXX) $(CXX_FLAGS) $(CXX_GCOV) -I$(INCLUDE)/ $(SRC)/*.cpp test/cpp/*.cpp -o $@
-
-
-clean:
-	rm -rf ./$(BIN)/*
-	rm -rf ./build/*
-	rm -rf ./virtualenv/lib/python3.7/site-packages/uICAL*
 
 
 coverage: $(BIN)/cov
@@ -61,3 +44,8 @@ coverage: $(BIN)/cov
 
 memory: $(BIN)/test
 	valgrind --leak-check=full -s ./$(BIN)/test
+
+
+clean:
+	rm -rf ./$(BIN)/*
+	rm -rf ./build/*
