@@ -194,6 +194,11 @@ void loop() {
                 }
                 LOG(String("WIFI_SETUP mode (") + ssid + ")");
                 WiFi.mode(WIFI_STA);
+
+                String network_name = config_ap.ssid_prefix + WiFi.macAddress();
+                network_name.replace(":", "");
+                wifi_station_set_hostname(network_name.c_str());
+
                 WiFi.begin(ssid.c_str(), g_config.getConfig("wifipass").c_str());
             }
             g_led.flash(300, 1700);
