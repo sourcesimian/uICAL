@@ -19,6 +19,7 @@ String wifi_ssid = "...";
 String wifi_pass = "...";
 String ical_url = "...";
 
+
 void setup() {
     Serial.begin(115200);
 
@@ -40,6 +41,7 @@ void setup() {
 
 }
 
+
 void stop() {
     Serial.println("END", ical_url);
     while(true) {
@@ -49,8 +51,6 @@ void stop() {
 
 
 void loop() {
-
-
     Serial.println("Fetching: %s", ical_url);
 
     std::unique_ptr<BearSSL::WiFiClientSecure> client(new BearSSL::WiFiClientSecure);

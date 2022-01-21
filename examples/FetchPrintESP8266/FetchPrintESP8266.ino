@@ -49,6 +49,7 @@ void setup() {
 
 }
 
+
 void stop() {
     Serial.println("END", ICAL_URL);
     while(true) {
@@ -58,8 +59,6 @@ void stop() {
 
 
 void loop() {
-
-
     Serial.println("Fetching: %s", ICAL_URL);
 
     std::unique_ptr<BearSSL::WiFiClientSecure> client(new BearSSL::WiFiClientSecure);
