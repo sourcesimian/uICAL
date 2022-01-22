@@ -9,8 +9,7 @@ void setup () {
     Serial.println("");
 }
 
-String ical(R"(
-BEGIN:VCALENDAR
+String ical(R"(BEGIN:VCALENDAR
 VERSION:2.0
 CALSCALE:GREGORIAN
 METHOD:PUBLISH
@@ -28,7 +27,7 @@ END:STANDARD
 END:VTIMEZONE
 BEGIN:VEVENT
 DTSTART;TZID=America/New_York:20190917T102000
-DTEND;TZID=America/New_York:20190917T102500
+DTEND;TZID=America/New_York:20190917T112203
 RRULE:FREQ=WEEKLY;WKST=MO;COUNT=13;INTERVAL=2;BYDAY=SA,TH,TU
 DTSTAMP:20191105T175555Z
 CREATED:20190819T210234Z
@@ -48,20 +47,24 @@ void loop() {
     Serial.println(ical);
 
     uICAL::istream_String istm(ical);  // Use uICAL::istream_Stream to adapt Stream objects
-    auto cal = uICAL::Calendar::load(istm);
+    try {
+        auto cal = uICAL::Calendar::load(istm);
 
-    uICAL::DateTime begin("20191016T102000Z");
-    uICAL::DateTime end("20191027T103000Z");
+        uICAL::DateTime begin("20190917T000000Z");
+        uICAL::DateTime end("20190922T000000Z");
 
-    Serial.println("# From: " + begin.as_str());
-    Serial.println("# To: " + end.as_str());
+        Serial.println("# From: " + begin.as_str());
+        Serial.println("# To: " + end.as_str());
 
-    auto calIt = uICAL::new_ptr<uICAL::CalendarIter>(cal, begin, end);
+        auto calIt = uICAL::new_ptr<uICAL::CalendarIter>(cal, begin, end);
 
-    Serial.println("# Events:");
-    while(calIt->next()) {
-        uICAL::CalendarEntry_ptr entry = calIt->current();
-        Serial.println(entry->as_str());
+        Serial.println("# Events:");
+        while(calIt->next()) {
+            uICAL::CalendarEntry_ptr entry = calIt->current();
+            Serial.println(entry->as_str());
+        }
+    } catch (uICAL::Error e) {
+        Serial.println("# Error:" + e.message);
     }
 
     Serial.println("# Done");
