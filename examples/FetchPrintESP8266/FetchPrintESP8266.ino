@@ -41,12 +41,11 @@ void setup() {
     g_ntpUDP.begin(NTP_PORT);
 
     Serial.print("Getting time from %s .", NTP_HOST);
-    if (g_ntpClient.getUnixTime() == 0) {
+    while (g_ntpClient.getUnixTime() == 0) {
         delay(500);
         Serial.print(".");
     }
     Serial.println("");
-
 }
 
 
@@ -89,7 +88,7 @@ void loop() {
     unsigned now = g_ntpClient.getUnixTime();
 
     uICAL::DateTime calBegin(now);
-    uICAL::DateTime calEnd(now + 86400);
+    uICAL::DateTime calEnd(now + (86400 * 7));
 
     uICAL::CalendarIter_ptr calIt = uICAL::new_ptr<uICAL::CalendarIter>(this->cal, calBegin, calEnd);
 

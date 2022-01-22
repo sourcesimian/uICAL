@@ -1,7 +1,7 @@
-#include <uICAL.h>
+#include <uICAL.h>            // Requires: uICAL library
 
 void setup () {
-    Serial.begin(19200);
+    Serial.begin(115200);
     for (int i = 0; i < 30; i++) {
         Serial.print('.');
         delay(100);
@@ -46,25 +46,26 @@ void loop() {
     Serial.println("# Parsing ICAL:");
     Serial.println(ical);
 
-    uICAL::istream_String istm(ical);  // Use uICAL::istream_Stream to adapt Stream objects
+    uICAL::Calendar_ptr cal = nullptr;
     try {
-        auto cal = uICAL::Calendar::load(istm);
-
-        uICAL::DateTime begin("20190917T000000Z");
-        uICAL::DateTime end("20190922T000000Z");
-
-        Serial.println("# From: " + begin.as_str());
-        Serial.println("# To: " + end.as_str());
-
-        auto calIt = uICAL::new_ptr<uICAL::CalendarIter>(cal, begin, end);
-
-        Serial.println("# Events:");
-        while(calIt->next()) {
-            uICAL::CalendarEntry_ptr entry = calIt->current();
-            Serial.println(entry->as_str());
-        }
+        uICAL::istream_String istm(ical);  // Use uICAL::istream_Stream to adapt Stream objects
+        cal = uICAL::Calendar::load(istm);
     } catch (uICAL::Error e) {
-        Serial.println("# Error:" + e.message);
+        Serial.println("# Error: " + e.message);
+        while(true) {}  // Wait forever
+    }
+    uICAL::DateTime begin("20190917T000000Z");
+    uICAL::DateTime end("20190922T000000Z");
+
+    Serial.println("# From: " + begin.as_str());
+    Serial.println("# To: " + end.as_str());
+
+    auto calIt = uICAL::new_ptr<uICAL::CalendarIter>(cal, begin, end);
+
+    Serial.println("# Events:");
+    while(calIt->next()) {
+        uICAL::CalendarEntry_ptr entry = calIt->current();
+        Serial.println(entry->as_str());
     }
 
     Serial.println("# Done");
