@@ -111,7 +111,7 @@ namespace uICAL {
                 index = 0;
             }
 
-            DateTime::Day day = this->parseDay(part.substr(part.length() - 2, string::npos));
+            DateTime::Day day = this->parseDay(part.substr(part.length() - 2, part.length()));
             array.push_back(Day_pair(index, day));
         });
         return array;
