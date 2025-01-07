@@ -14,24 +14,54 @@ namespace uICAL {
     : ical(ical)
     , currentLine(nullptr)
     , repeat(false)
+    , bufferedLine()
     {}
 
     void VLineStream::repeatLine() {
         this->repeat = true;
     }
 
+    bool VLineStream::isFoldedLine(const string& line) {
+        return !line.empty() && (line[0] == ' ' || line[0] == '\t');
+    }
+
     const VLine_ptr VLineStream::next() {
-        if (!this->repeat || this->currentLine == nullptr) {
-            string line;
-            if(line.readfrom(this->ical, '\n')) {
-                line.rtrim();
-                this->currentLine = new_ptr<VLine>(line);
-            }
-            else {
-                this->currentLine = nullptr;
-            }
+        if (this->repeat && this->currentLine != nullptr) {
+            this->repeat = false;
+            return this->currentLine;
         }
-        this->repeat = false;
+
+        string line;
+        string completeLine;
+        bool hasLine = false;
+
+        if (!this->bufferedLine.empty()) {
+            completeLine = this->bufferedLine;
+            this->bufferedLine.clear();
+            hasLine = true;
+        }
+        else if (line.readfrom(this->ical, '\n')) {
+            line.rtrim();
+            completeLine = line;
+            hasLine = true;
+        }
+
+        if (hasLine) {
+            string nextLine;
+            while (nextLine.readfrom(this->ical, '\n')) {
+                nextLine.rtrim();
+                if (!isFoldedLine(nextLine)) {
+                    this->bufferedLine = nextLine;
+                    break;
+                }
+                completeLine += nextLine.substr(1);
+            }
+
+            this->currentLine = new_ptr<VLine>(completeLine);
+        } else {
+            this->currentLine = nullptr;
+        }
+
         return this->currentLine;
     }
 }
