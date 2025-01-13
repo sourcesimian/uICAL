@@ -14,7 +14,6 @@ namespace uICAL {
     : ical(ical)
     , currentLine(nullptr)
     , repeat(false)
-    , bufferedLine()
     {}
 
     void VLineStream::repeatLine() {
@@ -35,26 +34,25 @@ namespace uICAL {
         string completeLine;
         bool hasLine = false;
 
-        if (!this->bufferedLine.empty()) {
-            completeLine = this->bufferedLine;
-            this->bufferedLine.clear();
-            hasLine = true;
-        }
-        else if (line.readfrom(this->ical, '\n')) {
+        if (line.readfrom(this->ical, '\n')) {
             line.rtrim();
             completeLine = line;
             hasLine = true;
         }
 
         if (hasLine) {
-            string nextLine;
-            while (nextLine.readfrom(this->ical, '\n')) {
-                nextLine.rtrim();
-                if (!isFoldedLine(nextLine)) {
-                    this->bufferedLine = nextLine;
+            while (this->ical.peek() != std::char_traits<char>::eof()) {
+                string nextLine;
+                char nextChar = this->ical.peek();
+
+                if (!std::isspace(nextChar)) {
                     break;
                 }
-                completeLine += nextLine.substr(1);
+
+                if (nextLine.readfrom(this->ical, '\n')) {
+                    nextLine.rtrim();
+                    completeLine += nextLine.substr(1);
+                }
             }
 
             this->currentLine = new_ptr<VLine>(completeLine);
