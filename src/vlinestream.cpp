@@ -20,10 +20,6 @@ namespace uICAL {
         this->repeat = true;
     }
 
-    bool VLineStream::isFoldedLine(const string& line) {
-        return !line.empty() && std::isspace(line[0]);
-    }
-
     const VLine_ptr VLineStream::next() {
         if (this->repeat && this->currentLine != nullptr) {
             this->repeat = false;

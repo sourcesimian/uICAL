@@ -12,11 +12,9 @@ namespace uICAL {
             void repeatLine();
 
         protected:
-            bool isFoldedLine(const string& line);
             istream& ical;
             VLine_ptr currentLine;
             bool repeat;
-            string bufferedLine;
     };
 }
 #endif
