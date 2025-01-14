@@ -102,3 +102,26 @@ def test_bad_range():
         while cal.next():
             pass
     assert str(ex.value) == "ValueError: Begin and end describe a negative range"
+
+def test_folding():
+    ical = open("test/data/ical_folding.txt").read()
+    cal = uICAL.Calendar(ical, begin="20191016T102000Z", end="20191017T103000-0500")
+
+    res = []
+    while cal.next():
+        res.append(cal.current())
+
+    assert res == [
+        {
+            'type': 'EVENT',
+            'summary': 'This is a short line that is folded.',
+            'start': (2019, 10, 17, 10, 20, 0, -300),
+            'duration': 300,
+        },
+        {
+            'type': 'EVENT',
+            'summary': 'This is a long line which needs to wrap as it\'s longer than 75 characters. https://icalendar.org/iCalendar-RFC-5545/3-1-content-lines.html states that lines longer than 75 characters should be folded.',
+            'start': (2019, 10, 17, 10, 30, 0, -300),
+            'duration': 600,
+        },
+    ]
