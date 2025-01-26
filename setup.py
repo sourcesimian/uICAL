@@ -32,7 +32,7 @@ uical = Extension(
 
 setup (
     name = 'uICAL',
-    version = '0.0.1',
+    version = '0.0.2',
     description = 'Light weight ICAL library',
     author = 'Source Simian',
     author_email = 'source.simian@gmail.com',
