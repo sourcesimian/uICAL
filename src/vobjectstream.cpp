@@ -31,8 +31,7 @@ namespace uICAL {
         VLine_ptr line = this->stm.next();
 
         if (!line) {
-            log_error("Parse error: %s", "Empty stream");
-            throw ParseError(string("Parse error, empty stream"));
+            return string::none();
         }
         if (line->name == "END") {
             log_trace("Final component: %s", line->as_str().c_str());

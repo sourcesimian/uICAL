@@ -80,7 +80,7 @@ namespace uICAL {
         }
 
         bool istream_Stream::readuntil(string& st, char delim) {
-            size_t len = 81;
+            size_t len = 100;
             char buf[len];
 
             size_t read = this->stm.readBytesUntil(delim, buf, len-1);
