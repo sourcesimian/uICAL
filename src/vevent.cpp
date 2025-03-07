@@ -17,11 +17,13 @@ namespace uICAL {
         VLine_ptr dtEnd = obj->getPropertyByName("DTEND");
         VLine_ptr rRule = obj->getPropertyByName("RRULE");
         VLine_ptr summary = obj->getPropertyByName("SUMMARY");
+        VLine_ptr uid = obj->getPropertyByName("UID");
 
         this->start = DateTime(dtStart->value + dtStart->getParam("TZID"), tzmap);
         this->end = DateTime(dtEnd->value + dtStart->getParam("TZID"), tzmap);
 
         this->summary = summary->value;
+        this->uid = uid->value;
 
         if (rRule == nullptr) {
             this->rrule = new_ptr<RRule>(string::none(), this->start);
@@ -32,6 +34,7 @@ namespace uICAL {
 
     void VEvent::str(ostream& out) const {
         out << "VEVENT: " << this->summary << uICAL::endl;
+        out << " - uid: " << this->uid << uICAL::endl;
         out << " - start: " << this->start << uICAL::endl;
         out << " - end: " << this->end << uICAL::endl;
         out << " - rrule: " << this->rrule << uICAL::endl;

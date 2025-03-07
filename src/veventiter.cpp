@@ -41,6 +41,7 @@ namespace uICAL {
     CalendarEntry_ptr VEventIter::entry() const {
         return new_ptr<CalendarEntry>(CalendarEntry::Type::EVENT,
                      this->ice->summary,
+                     this->ice->uid,
                      this->rrule->now(),
                      this->ice->end - this->ice->start);
     }

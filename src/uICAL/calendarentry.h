@@ -15,11 +15,12 @@ namespace uICAL {
                 NONE, EVENT,
             };
 
-            CalendarEntry(Type type, const string& summary, const DateTime& start);
-            CalendarEntry(Type type, const string& summary, const DateTime& start, const DatePeriod& span);
+            CalendarEntry(Type type, const string& summary, const string& uid, const DateTime& start);
+            CalendarEntry(Type type, const string& summary, const string& uid, const DateTime& start, const DatePeriod& span);
 
             Type type() const;
             const string summary() const;
+            const string uid() const;
             DateTime start() const;
             DateTime end() const;
 
@@ -30,6 +31,7 @@ namespace uICAL {
         protected:
             Type _type;
             string _summary;
+            string _uid;
             DateTime _start;
             DatePeriod _span;
     };
