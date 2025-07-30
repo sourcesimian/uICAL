@@ -182,6 +182,35 @@ TEST_CASE("RRule::test2", "[uICAL][RRule]") {
     REQUIRE_THROWS_WITH(rr.now(), "RecurrenceError: No more occurrences");
 }
 
+TEST_CASE("RRule::until", "[uICAL][RRule]") {
+    uICAL::string rrule("FREQ=DAILY;UNTIL=19970905T090000"); // UNTIL 3 days after dtstart - 4 events as it runs on day 0
+    uICAL::string dtstart("19970902T090000");
+    uICAL::string begin("19970902T090000");
+    uICAL::string end("29970902T090000");
+
+    auto rr = uICAL::RRuleIter(
+        uICAL::new_ptr<uICAL::RRule>(rrule, uICAL::DateTime(dtstart, uICAL::TZ::unaware())),
+        uICAL::DateTime(), uICAL::DateTime());
+
+    REQUIRE_THROWS_WITH(rr.now(), "RecurrenceError: Not yet initialised, call next() first");
+
+    REQUIRE(rr.next() == true);
+    REQUIRE(rr.now().as_str() == "19970902T090000");
+
+    REQUIRE(rr.next() == true);
+    REQUIRE(rr.now().as_str() == "19970903T090000");
+
+    REQUIRE(rr.next() == true);
+    REQUIRE(rr.now().as_str() == "19970904T090000");
+
+    REQUIRE(rr.next() == true);
+    REQUIRE(rr.now().as_str() == "19970905T090000");
+
+    REQUIRE(rr.next() == false);
+
+    REQUIRE_THROWS_WITH(rr.now(), "RecurrenceError: No more occurrences");
+}
+
 TEST_CASE("RRULE::str", "[uICAL][RRule]") {
     uICAL::string rule("FREQ=DAILY;COUNT=4");
     uICAL::string dtstart("19970902T090000");

@@ -33,7 +33,6 @@ namespace uICAL {
 
             const RRule_ptr rr;
 
-            DateTime until;
             DateTime range_begin;
             DateTime range_end;
 
