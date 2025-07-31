@@ -1,6 +1,6 @@
 #!/bin/bash
 set -e
-BASE_IMAGE=ubuntu:20.04
+BASE_IMAGE=ubuntu:24.04
 REPO_TAG=sourcesimian/uical/devenv
 
 HERE=$(cd $(dirname "$0"); pwd)
@@ -29,8 +29,8 @@ RUN apt-get update && \
         git \
         make \
         python3 \
-        python3-distutils \
         python3-dev \
+        python3-pip \
         g++ \
         valgrind \
 
@@ -42,9 +42,8 @@ COPY ./setupuser.c /
 RUN g++ -o /usr/bin/setupuser /setupuser.c && chmod 4511 /usr/bin/setupuser
 
 # Python
-RUN curl -kLo /get-pip.py https://bootstrap.pypa.io/get-pip.py
 COPY ./python3-requirements.txt /
-RUN python3 /get-pip.py && pip3 install -r /python3-requirements.txt
+RUN pip3 install --break-system-packages -r /python3-requirements.txt
 
 COPY ./usage.sh /
 ENTRYPOINT ./usage.sh
