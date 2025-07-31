@@ -31,7 +31,6 @@ namespace uICAL {
                 string() : String() {}
                 string(const String& b) : String(b) {}
                 string(const char* st) : String(st) {}
-                string(const StringSumHelper& ssh) : String(ssh) {}
 
                 string substr(size_t from) const { return string(String::substring(from)); }
                 string substr(size_t from, size_t len) const { return string(String::substring(from, from + len)); }
