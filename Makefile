@@ -14,7 +14,7 @@ test-cpp: $(BIN)/test
 
 
 test-python:
-	python3 ./setup.py build
+	pip install --break-system-packages -e .
 	pytest ./test/python/
 
 
