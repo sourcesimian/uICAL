@@ -3,6 +3,20 @@
 #     https://icalendar.org/iCalendar-RFC-5545/3-8-5-3-recurrence-rule.html    #
 ################################################################################
 
+# Test case structure:
+#     +--------------------+------------+------------------------------------------------------------------------------------------------------------------------+
+#     |       Syntax       | Occurances |                                                      Description                                                       |
+#     +--------------------+------------+------------------------------------------------------------------------------------------------------------------------+
+#     | DTSTART;{datetime} | 1          | Datetime of the first occurance. https://icalendar.org/iCalendar-RFC-5545/3-8-2-4-date-time-start.html                 |
+#     | RRULE;{rrule}      | 1          | Recurrance rule. https://icalendar.org/iCalendar-RFC-5545/3-8-5-3-recurrence-rule.html                                 |
+#     | EXDATE;{datetime}  | 0 or more  | A datetime that should not be a recurrance. https://icalendar.org/iCalendar-RFC-5545/3-8-5-1-exception-date-times.html |
+#     | - {datetime}       | 1 or more  | An expected datetime of a recurrance, note it must be prefixed with exactly " - "                                      |
+#                                              These datetimes will inherit the TZID of DTSTART
+#     | - ...              | 0 or 1     | Means that the set of expected recurrances is not exhaustive - which it otherwise is assumed to be.                    |
+#     | {empty line}       | 1 or more  | Denotes the end of the test case.                                                                                      |
+#     +--------------------+------------+------------------------------------------------------------------------------------------------------------------------+
+
+
 DTSTART;TZID=America/New_York:19970902T090000
 RRULE:FREQ=DAILY;COUNT=4
  - 19970902T090000
