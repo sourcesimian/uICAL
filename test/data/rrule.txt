@@ -3,6 +3,20 @@
 #     https://icalendar.org/iCalendar-RFC-5545/3-8-5-3-recurrence-rule.html    #
 ################################################################################
 
+# Test case structure:
+#     +--------------------+------------+------------------------------------------------------------------------------------------------------------------------+
+#     |       Syntax       | Occurances |                                                      Description                                                       |
+#     +--------------------+------------+------------------------------------------------------------------------------------------------------------------------+
+#     | DTSTART;{datetime} | 1          | Datetime of the first occurance. https://icalendar.org/iCalendar-RFC-5545/3-8-2-4-date-time-start.html                 |
+#     | RRULE;{rrule}      | 1          | Recurrance rule. https://icalendar.org/iCalendar-RFC-5545/3-8-5-3-recurrence-rule.html                                 |
+#     | EXDATE;{datetime}  | 0 or more  | A datetime that should not be a recurrance. https://icalendar.org/iCalendar-RFC-5545/3-8-5-1-exception-date-times.html |
+#     | - {datetime}       | 1 or more  | An expected datetime of a recurrance, note it must be prefixed with exactly " - "                                      |
+#                                              These datetimes will inherit the TZID of DTSTART
+#     | - ...              | 0 or 1     | Means that the set of expected recurrances is not exhaustive - which it otherwise is assumed to be.                    |
+#     | {empty line}       | 1 or more  | Denotes the end of the test case.                                                                                      |
+#     +--------------------+------------+------------------------------------------------------------------------------------------------------------------------+
+
+
 DTSTART;TZID=America/New_York:19970902T090000
 RRULE:FREQ=DAILY;COUNT=4
  - 19970902T090000
@@ -11,13 +25,12 @@ RRULE:FREQ=DAILY;COUNT=4
  - 19970905T090000
 
 DTSTART;TZID=America/New_York:19970902T090000
-RRULE:FREQ=DAILY;UNTIL=19970907T090000
+RRULE:FREQ=DAILY;UNTIL=19970907T090000Z
  - 19970902T090000
  - 19970903T090000
  - 19970904T090000
  - 19970905T090000
  - 19970906T090000
- - 19970907T090000
 
 DTSTART;TZID=America/New_York:19970902T090000
 RRULE:FREQ=DAILY;INTERVAL=2
@@ -439,7 +452,7 @@ DTSTART;TZID=America/New_York:19970902T090000
 RRULE:FREQ=HOURLY;INTERVAL=3;UNTIL=19970902T170000Z
  - 19970902T090000
  - 19970902T120000
- - 19970902T150000
+# - 19970902T150000 # This case exists on icalendar.org, but consider this occurance in UTC, 19970902T180000Z and it's past the UNTIL field
 
 DTSTART;TZID=America/New_York:19970902T090000
 RRULE:FREQ=MINUTELY;INTERVAL=15;COUNT=6
@@ -556,6 +569,8 @@ EXDATE;TZID=America/New_York:19970903T090000
 EXDATE;TZID=America/New_York:19970904T090000
  - 19970902T090000
  - 19970905T090000
+ - 19970906T090000
+ - 19970907T090000
 
 # +--------+-------+--------+---------+----------+------+------+--------+--------+--------+
 # |        |BYMONTH|BYWEEKNO|BYYEARDAY|BYMONTHDAY|BYDAY |BYHOUR|BYMINUTE|BYSECOND|BYSETPOS|

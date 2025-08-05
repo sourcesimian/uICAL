@@ -35,7 +35,7 @@ namespace uICAL {
             return false;
         }
 
-        if (this->range_begin.valid() && this->until.valid() && this->until < this->range_begin) {
+        if (this->range_begin.valid() && this->rr->until.valid() && this->rr->until < this->range_begin) {
             return false;
         }
 
@@ -113,7 +113,7 @@ namespace uICAL {
     }
 
     bool RRuleIter::expired(const DateTime& current) const {
-        if (this->until.valid() && current > this->until) {
+        if (this->rr->until.valid() && current > this->rr->until) {
             return true;
         }
         if (this->range_end.valid() && current > this->range_end) {

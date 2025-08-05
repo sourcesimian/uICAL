@@ -93,7 +93,7 @@ namespace uICAL {
 
     void DateTime::assert_awareness(const DateTime& other) const {
         if (this->tz->is_aware() != other.tz->is_aware()) {
-            throw TZAwarenessConflictError(this->as_str() + this->tz->as_str() + " <> " + other.as_str() + other.tz->as_str());
+            throw TZAwarenessConflictError(this->as_str() + " <> " + other.as_str());
         }
     }
 
