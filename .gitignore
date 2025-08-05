@@ -42,7 +42,12 @@ virtualenv/
 *.out
 *.app
 
-.vscode/
+# Vscode config
+.vscode/*
+!.vscode/launch.json
 *.code-workspace
+
+# Generated python module metadata
+uICAL.egg-info
 
 TODO.txt
