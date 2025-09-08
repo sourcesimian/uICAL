@@ -37,13 +37,13 @@ void main () {
     uICAL::istream_stl istm(fstm);
     auto cal = uICAL::Calendar::load(istm);
     
-    uICAL::DateTime begin("20191016T102000Z"),
-    uICAL::DateTime end("20191017T103000Z");
+    uICAL::DateTime begin("20190901T102000Z");
+    uICAL::DateTime end("20190931T103000Z");
     
     auto calIt = uICAL::new_ptr<uICAL::CalendarIter>(cal, begin, end);
     
     while(calIt->next()) {
-        std::cout << calIt->current() << std:endl;
+        std::cout << calIt->current() << std::endl;
     }
 }
 ```
