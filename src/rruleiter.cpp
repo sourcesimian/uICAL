@@ -18,6 +18,7 @@ namespace uICAL {
     RRuleIter::RRuleIter(const RRule_ptr rr, const DateTime& begin, const DateTime& end)
     : rr(rr)
     , cascade(new_ptr<Cascade>())
+    , until(rr->until)
     {
         if (begin.valid() && end.valid() && begin > end) {
             throw ValueError("Begin and end describe a negative range");
@@ -127,7 +128,7 @@ namespace uICAL {
             return false;
         }
 
-        if (this->rr->excludes.size()) {
+        if (!this->rr->excludes.empty()) {
             for (;;) {
                 if (!this->rr->excluded(this->now())) {
                     break;
