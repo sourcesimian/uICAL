@@ -126,34 +126,46 @@ namespace uICAL {
         if (!CounterT::reset(base)) {
             return false;
         }
-        // Per RFC 5545: Invalid dates must be ignored.
-        // After reset, check if initial value is valid for this month.
-        // If not, skip to a valid value or signal exhaustion.
+        // Check if initial value is valid for this month.
         int daysInMonth = (int)this->base.daysInMonth();
-        while (*this->it > daysInMonth || (*this->it < 0 && (-*this->it) > daysInMonth)) {
-            if (!CounterT::next()) {
-                return false;  // No valid days in this month
+        if (getInvalidDateMode() == InvalidDateMode::SKIP) {
+            // RFC 5545 SKIP: Skip to next valid value or signal exhaustion
+            while (*this->it > daysInMonth || (*this->it < 0 && (-*this->it) > daysInMonth)) {
+                if (!CounterT::next()) {
+                    return false;  // No valid days in this month
+                }
             }
         }
+        // BACKWARD mode: value() will clamp to valid range, no skipping needed
         return true;
     }
 
     DateStamp ByMonthDayCounter::value() const {
         DateStamp now = this->base;
+        int daysInMonth = (int)now.daysInMonth();
         if (*this->it > 0) {
-            now.day = *this->it;
+            if (getInvalidDateMode() == InvalidDateMode::BACKWARD && *this->it > daysInMonth) {
+                // Clamp to last day of month (e.g., Feb 29->28 in non-leap year)
+                now.day = daysInMonth;
+            } else {
+                now.day = *this->it;
+            }
         }
         else {
-            now.day = now.daysInMonth() + *this->it + 1;
+            int day = daysInMonth + *this->it + 1;
+            if (getInvalidDateMode() == InvalidDateMode::BACKWARD && day < 1) {
+                now.day = 1;  // Clamp to first day
+            } else {
+                now.day = day;
+            }
         }
         return now;
     }
 
     bool ByMonthDayCounter::next() {
         bool ret = CounterT::next();
-        if (ret) {
-            // Per RFC 5545: Invalid dates (e.g., Feb 30) must be ignored.
-            // Skip day values that don't exist in the current month.
+        if (ret && getInvalidDateMode() == InvalidDateMode::SKIP) {
+            // RFC 5545 SKIP: Skip day values that don't exist in the current month
             int daysInMonth = (int)this->base.daysInMonth();
             while (*this->it > daysInMonth || (*this->it < 0 && (-*this->it) > daysInMonth)) {
                 ret = CounterT::next();
@@ -162,6 +174,7 @@ namespace uICAL {
                 }
             }
         }
+        // BACKWARD mode: value() will clamp, no skipping needed
         return ret;
     }
 
@@ -235,34 +248,45 @@ namespace uICAL {
         if (!CounterT::reset(_base)) {
             return false;
         }
-        // Per RFC 5545: Invalid dates must be ignored.
-        // After reset, check if initial value is valid for this year.
-        // If not, skip to a valid value or signal exhaustion (e.g., day 366 in non-leap year).
+        // Check if initial value is valid for this year.
         int daysInYear = (int)this->base.daysInYear();
-        while (*this->it > daysInYear || (*this->it < 0 && (-*this->it) > daysInYear)) {
-            if (!CounterT::next()) {
-                return false;  // No valid days in this year
+        if (getInvalidDateMode() == InvalidDateMode::SKIP) {
+            // RFC 5545 SKIP: Skip to next valid value or signal exhaustion
+            while (*this->it > daysInYear || (*this->it < 0 && (-*this->it) > daysInYear)) {
+                if (!CounterT::next()) {
+                    return false;  // No valid days in this year
+                }
             }
         }
+        // BACKWARD mode: value() will clamp to valid range, no skipping needed
         return true;
     }
 
     DateStamp ByYearDayCounter::value() const {
         DateStamp now = this->base;
+        int daysInYear = (int)now.daysInYear();
         if (*this->it > 0) {
-            now.incDay(*this->it - 1);
+            int dayOffset = *this->it - 1;
+            if (getInvalidDateMode() == InvalidDateMode::BACKWARD && *this->it > daysInYear) {
+                // Clamp to last day of year (e.g., day 366->365 in non-leap year)
+                dayOffset = daysInYear - 1;
+            }
+            now.incDay(dayOffset);
         }
         else {
-            now.incDay(now.daysInYear() + *this->it + 1);
+            int dayOffset = daysInYear + *this->it + 1;
+            if (getInvalidDateMode() == InvalidDateMode::BACKWARD && dayOffset < 0) {
+                dayOffset = 0;  // Clamp to first day
+            }
+            now.incDay(dayOffset);
         }
         return now;
     }
 
     bool ByYearDayCounter::next() {
         bool ret = CounterT::next();
-        if (ret) {
-            // Per RFC 5545: Invalid dates (e.g., day 366 in non-leap year) must be ignored.
-            // Skip day values that don't exist in the current year.
+        if (ret && getInvalidDateMode() == InvalidDateMode::SKIP) {
+            // RFC 5545 SKIP: Skip day values that don't exist in the current year
             int daysInYear = (int)this->base.daysInYear();
             while (*this->it > daysInYear || (*this->it < 0 && (-*this->it) > daysInYear)) {
                 ret = CounterT::next();
@@ -271,6 +295,7 @@ namespace uICAL {
                 }
             }
         }
+        // BACKWARD mode: value() will clamp, no skipping needed
         return ret;
     }
 

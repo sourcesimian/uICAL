@@ -7,6 +7,17 @@
 
 namespace uICAL {
 
+    // Global invalid date handling mode (default: SKIP for RFC 5545 compliance)
+    static InvalidDateMode g_invalidDateMode = InvalidDateMode::SKIP;
+
+    InvalidDateMode getInvalidDateMode() {
+        return g_invalidDateMode;
+    }
+
+    void setInvalidDateMode(InvalidDateMode mode) {
+        g_invalidDateMode = mode;
+    }
+
     string Base::as_str() const {
         ostream stm;
         this->str(stm);
