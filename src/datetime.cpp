@@ -40,6 +40,14 @@ namespace uICAL {
     }
 
     void DateTime::construct(const string& datetime, const TZMap_ptr& tzmap) {
+        // Handle date-only format (YYYYMMDD) for all-day events per RFC 5545
+        if (datetime.length() == 8) {
+            DateStamp ds(datetime + "T000000");
+            this->tz = new_ptr<TZ>("Z");  // Use UTC for TZ awareness compatibility
+            this->construct(ds, tz);
+            return;
+        }
+
         if (datetime.length() < 15)
             throw ValueError(string("Bad datetime: \"") + datetime + "\"");
 
