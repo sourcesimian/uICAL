@@ -658,4 +658,33 @@ RRULE:FREQ=WEEKLY;BYDAY=TU,TH;UNTIL=20170430T000000
 DTSTART;TZID=America/New_York:20170414T000000
 RRULE:FREQ=WEEKLY;WKST=MO;UNTIL=20170417T000000;INTERVAL=1;BYDAY=TU,TH
 
+
+################################################################################
+# Tests for basic MONTHLY/YEARLY preserving DTSTART's day/month                #
+# These tests verify fix for missing day counter in basic recurrences          #
+################################################################################
+
+# Basic MONTHLY: Should recur on same day each month
+# Without fix: Returns wrong dates or fewer results
+DTSTART;TZID=America/New_York:19970902T090000
+RRULE:FREQ=MONTHLY;COUNT=3
+ - 19970902T090000
+ - 19971002T090000
+ - 19971102T090000
+
+# Basic YEARLY: Should recur on same day and month each year
+DTSTART;TZID=America/New_York:19970902T090000
+RRULE:FREQ=YEARLY;COUNT=3
+ - 19970902T090000
+ - 19980902T090000
+ - 19990902T090000
+
+# YEARLY with BYMONTHDAY but no BYMONTH: Uses DTSTART's month per RFC 5545
+# "if BYMONTH rule part were missing, the month would be retrieved from DTSTART"
+DTSTART;TZID=America/New_York:19970902T090000
+RRULE:FREQ=YEARLY;COUNT=3;BYMONTHDAY=1,3
+ - 19970903T090000
+ - 19980901T090000
+ - 19980903T090000
+
 # END

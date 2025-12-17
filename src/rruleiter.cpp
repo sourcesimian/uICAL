@@ -296,6 +296,10 @@ namespace uICAL {
                 if (this->rr->byMonthDay.size()) {
                     this->cascade->add(ByMonthDayCounter::init(this->rr->byMonthDay));
                 }
+                else {
+                    // When no BYDAY or BYMONTHDAY specified, use DTSTART's day
+                    this->cascade->add(ByMonthDayCounter::init(base.day));
+                }
             }
 
             if (this->rr->byMonth.size()) {
@@ -350,15 +354,23 @@ namespace uICAL {
                 if (this->rr->byYearDay.size()) {
                     this->cascade->add(ByYearDayCounter::init(this->rr->byYearDay));
                 }
-                if (this->rr->byMonthDay.size()) {
+                else if (this->rr->byMonthDay.size()) {
+                    // BYMONTHDAY without BYMONTH: use DTSTART's month per RFC 5545
                     this->cascade->add(ByMonthDayCounter::init(this->rr->byMonthDay));
+                    this->cascade->add(ByMonthCounter::init(base.month));
                 }
-                if (this->rr->byWeekNo.size()) {
+                else if (this->rr->byWeekNo.size()) {
                     this->cascade->add(ByWeekNoCounter::init(this->rr->byWeekNo));
                 }
-                if (this->rr->byMonth.size()) {
+                else if (this->rr->byMonth.size()) {
+                    // BYMONTH: use DTSTART's day
                     this->cascade->add(ByMonthDayCounter::init(base.day));
                     this->cascade->add(ByMonthCounter::init(this->rr->byMonth));
+                }
+                else {
+                    // Basic YEARLY with no BY* parts: use DTSTART's day and month
+                    this->cascade->add(ByMonthDayCounter::init(base.day));
+                    this->cascade->add(ByMonthCounter::init(base.month));
                 }
             }
 
