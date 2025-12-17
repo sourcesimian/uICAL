@@ -658,4 +658,55 @@ RRULE:FREQ=WEEKLY;BYDAY=TU,TH;UNTIL=20170430T000000
 DTSTART;TZID=America/New_York:20170414T000000
 RRULE:FREQ=WEEKLY;WKST=MO;UNTIL=20170417T000000;INTERVAL=1;BYDAY=TU,TH
 
+
+################################################################################
+# Tests for invalid date handling per RFC 5545 Section 3.3.10:                 #
+# "Recurrence instances falling on invalid dates...are ignored"                #
+################################################################################
+
+# BYMONTHDAY=31 should skip months without 31 days (Feb, Apr, Jun, Sep, Nov)
+# Starting Jan 31 2015: Jan 31, (Feb skip), Mar 31, (Apr skip), May 31
+DTSTART;TZID=America/New_York:20150131T090000
+RRULE:FREQ=MONTHLY;BYMONTHDAY=31;COUNT=5
+ - 20150131T090000
+ - 20150331T090000
+ - 20150531T090000
+ - 20150731T090000
+ - 20150831T090000
+
+# BYMONTHDAY=30 should skip February (only 28/29 days)
+DTSTART;TZID=America/New_York:20150130T090000
+RRULE:FREQ=MONTHLY;BYMONTHDAY=30;COUNT=5
+ - 20150130T090000
+ - 20150330T090000
+ - 20150430T090000
+ - 20150530T090000
+ - 20150630T090000
+
+# BYMONTHDAY=29 should skip Feb in non-leap year (2015)
+DTSTART;TZID=America/New_York:20150129T090000
+RRULE:FREQ=MONTHLY;BYMONTHDAY=29;COUNT=5
+ - 20150129T090000
+ - 20150329T090000
+ - 20150429T090000
+ - 20150529T090000
+ - 20150629T090000
+
+# BYMONTHDAY=29 should include Feb in leap year (2016)
+DTSTART;TZID=America/New_York:20160129T090000
+RRULE:FREQ=MONTHLY;BYMONTHDAY=29;COUNT=5
+ - 20160129T090000
+ - 20160229T090000
+ - 20160329T090000
+ - 20160429T090000
+ - 20160529T090000
+
+# BYYEARDAY=366 should only produce dates in leap years
+# 2015 not leap, 2016 leap, 2017-2019 not leap, 2020 leap
+DTSTART;TZID=America/New_York:20150101T090000
+RRULE:FREQ=YEARLY;BYYEARDAY=366;COUNT=3
+ - 20161231T090000
+ - 20201231T090000
+ - 20241231T090000
+
 # END
