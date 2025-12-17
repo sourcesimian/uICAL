@@ -11,3 +11,19 @@
 TEST_CASE("DateTime::str", "[uICAL][DateTime]") {
     REQUIRE_THROWS_WITH(uICAL::DateTime("20200605T06493"), "ValueError: Bad datetime: \"20200605T06493\"");
 }
+
+TEST_CASE("DateTime::date-only format", "[uICAL][DateTime]") {
+    // RFC 5545 allows DATE values without time component for all-day events:
+    //   DTSTART;VALUE=DATE:20251217
+    uICAL::DateTime dt("20251217");
+    REQUIRE(dt.as_str() == "20251217T000000Z");
+
+    // Verify date components
+    uICAL::DateStamp ds = dt.datestamp();
+    REQUIRE(ds.year == 2025);
+    REQUIRE(ds.month == 12);
+    REQUIRE(ds.day == 17);
+    REQUIRE(ds.hour == 0);
+    REQUIRE(ds.minute == 0);
+    REQUIRE(ds.second == 0);
+}
