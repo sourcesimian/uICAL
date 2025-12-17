@@ -123,7 +123,19 @@ namespace uICAL {
     }
 
     bool ByMonthDayCounter::reset(const DateStamp& base) {
-        return CounterT::reset(base);
+        if (!CounterT::reset(base)) {
+            return false;
+        }
+        // Per RFC 5545: Invalid dates must be ignored.
+        // After reset, check if initial value is valid for this month.
+        // If not, skip to a valid value or signal exhaustion.
+        int daysInMonth = (int)this->base.daysInMonth();
+        while (*this->it > daysInMonth || (*this->it < 0 && (-*this->it) > daysInMonth)) {
+            if (!CounterT::next()) {
+                return false;  // No valid days in this month
+            }
+        }
+        return true;
     }
 
     DateStamp ByMonthDayCounter::value() const {
@@ -140,10 +152,12 @@ namespace uICAL {
     bool ByMonthDayCounter::next() {
         bool ret = CounterT::next();
         if (ret) {
-            // TODO
-            if (*this->it > 28 || *this->it < -28) {
-                if (*this->it > (int)this->base.daysInMonth()) {
-                    this->wrap();
+            // Per RFC 5545: Invalid dates (e.g., Feb 30) must be ignored.
+            // Skip day values that don't exist in the current month.
+            int daysInMonth = (int)this->base.daysInMonth();
+            while (*this->it > daysInMonth || (*this->it < 0 && (-*this->it) > daysInMonth)) {
+                ret = CounterT::next();
+                if (!ret) {
                     return false;
                 }
             }
@@ -218,7 +232,19 @@ namespace uICAL {
         DateStamp _base = base;
         _base.day = 1;
         _base.month = 1;
-        return CounterT::reset(_base);
+        if (!CounterT::reset(_base)) {
+            return false;
+        }
+        // Per RFC 5545: Invalid dates must be ignored.
+        // After reset, check if initial value is valid for this year.
+        // If not, skip to a valid value or signal exhaustion (e.g., day 366 in non-leap year).
+        int daysInYear = (int)this->base.daysInYear();
+        while (*this->it > daysInYear || (*this->it < 0 && (-*this->it) > daysInYear)) {
+            if (!CounterT::next()) {
+                return false;  // No valid days in this year
+            }
+        }
+        return true;
     }
 
     DateStamp ByYearDayCounter::value() const {
@@ -235,10 +261,12 @@ namespace uICAL {
     bool ByYearDayCounter::next() {
         bool ret = CounterT::next();
         if (ret) {
-            // TODO
-            if (*this->it > 365 || *this->it < -365) {
-                if (*this->it > (int)this->base.daysInMonth()) {
-                    this->wrap();
+            // Per RFC 5545: Invalid dates (e.g., day 366 in non-leap year) must be ignored.
+            // Skip day values that don't exist in the current year.
+            int daysInYear = (int)this->base.daysInYear();
+            while (*this->it > daysInYear || (*this->it < 0 && (-*this->it) > daysInYear)) {
+                ret = CounterT::next();
+                if (!ret) {
                     return false;
                 }
             }
@@ -247,7 +275,7 @@ namespace uICAL {
     }
 
     bool ByYearDayCounter::syncLock(const DateStamp& from, const DateStamp& now) const {
-        return from.dayOfYear() == now.dayOfYear();
+        return from.dayOfYear() <= now.dayOfYear();
     }
 
     const string ByYearDayCounter::name() const { return "ByYearDay"; }
