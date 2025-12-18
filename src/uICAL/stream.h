@@ -42,7 +42,7 @@ namespace uICAL {
             virtual char peek() const = 0;
             virtual char get() = 0;
 
-            virtual bool readuntil(string& st, char delim) = 0;
+            virtual bool readuntil(string& st, char delim, size_t maxLen = 0) = 0;
         protected:
     };
 
@@ -55,7 +55,7 @@ namespace uICAL {
                 char peek() const;
                 char get();
 
-                bool readuntil(string& st, char delim);
+                bool readuntil(string& st, char delim, size_t maxLen = 0);
 
             protected:
                 Stream& stm;
@@ -68,7 +68,7 @@ namespace uICAL {
                 char peek() const;
                 char get();
 
-                bool readuntil(string& st, char delim);
+                bool readuntil(string& st, char delim, size_t maxLen = 0);
 
             protected:
                 const String& st;
@@ -84,7 +84,7 @@ namespace uICAL {
                 char peek() const;
                 char get();
 
-                bool readuntil(string& st, char delim);
+                bool readuntil(string& st, char delim, size_t maxLen = 0);
 
             protected:
                 std::istream& istm;
