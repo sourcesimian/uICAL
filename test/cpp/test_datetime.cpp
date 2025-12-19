@@ -15,8 +15,10 @@ TEST_CASE("DateTime::str", "[uICAL][DateTime]") {
 TEST_CASE("DateTime::date-only format", "[uICAL][DateTime]") {
     // RFC 5545 allows DATE values without time component for all-day events:
     //   DTSTART;VALUE=DATE:20251217
+    // Date-only values are "floating" per RFC 5545 - they represent the same
+    // calendar date regardless of timezone, so no 'Z' suffix.
     uICAL::DateTime dt("20251217");
-    REQUIRE(dt.as_str() == "20251217T000000Z");
+    REQUIRE(dt.as_str() == "20251217T000000");
 
     // Verify date components
     uICAL::DateStamp ds = dt.datestamp();
