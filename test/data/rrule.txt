@@ -632,4 +632,30 @@ RRULE:FREQ=WEEKLY;BYMONTH=7,9;COUNT=7
 #         otherwise, special expand for YEARLY.
 
 
+################################################################################
+# Tests for DTSTART-BYDAY mismatch (when DTSTART doesn't fall on a BYDAY)      #
+# These tests verify fix for ByWeekDayCounter seeking issue                    #
+################################################################################
+
+# WEEKLY: DTSTART on Friday (19970905), BYDAY is TU,TH - first occurrence should be next TU
+# Without fix: "ParseError: Can not seek ByWeekDay"
+DTSTART;TZID=America/New_York:19970905T090000
+RRULE:FREQ=WEEKLY;COUNT=3;BYDAY=TU,TH
+ - 19970909T090000
+ - 19970911T090000
+ - 19970916T090000
+
+# WEEKLY: All-day event style - DTSTART Friday April 14 2017, BYDAY=TU,TH
+# Common pattern from Google Calendar exports
+DTSTART;TZID=America/New_York:20170414T000000
+RRULE:FREQ=WEEKLY;BYDAY=TU,TH;UNTIL=20170430T000000
+ - 20170418T000000
+ - 20170420T000000
+ - 20170425T000000
+ - 20170427T000000
+
+# WEEKLY: DTSTART on Friday, UNTIL before any valid TU/TH - should return empty
+DTSTART;TZID=America/New_York:20170414T000000
+RRULE:FREQ=WEEKLY;WKST=MO;UNTIL=20170417T000000;INTERVAL=1;BYDAY=TU,TH
+
 # END

@@ -62,15 +62,41 @@ namespace uICAL {
             return false;
         }
 
-        return this->resetCascade(it, [&](counters_t::iterator it) {
+        // Flag to track if any counter exhausted its span while seeking past begin.
+        // This happens when DTSTART doesn't fall on a valid recurrence day (e.g.,
+        // DTSTART is Friday but BYDAY=TU,TH).
+        bool spanExhausted = false;
+
+        bool result = this->resetCascade(it, [&](counters_t::iterator it) {
             while (!(*it)->syncLock(begin, (*it)->value())) {
                 if (!(*it)->next()) {
-                    ostream out;
-                    out << "Can not seek " << (*it)->name() << " (" << "base: " << base << " from: " << begin << ")";
-                    throw ParseError(out);
+                    spanExhausted = true;
+                    return;  // Don't throw; let cascade handle advancement
                 }
             }
         });
+
+        if (!result) {
+            return false;
+        }
+
+        // If a counter exhausted its span, advance the cascade to find the first
+        // valid occurrence >= begin. This handles cases like WEEKLY with BYDAY=TU,TH
+        // where DTSTART falls on Friday - we need to advance to the next week.
+        if (spanExhausted) {
+            const int maxIterations = 1000;  // Safety limit
+            for (int i = 0; i < maxIterations; ++i) {
+                if (!this->next()) {
+                    return false;
+                }
+                if (begin <= this->value()) {
+                    return true;
+                }
+            }
+            return false;
+        }
+
+        return true;
     }
 
     bool Cascade::resetCascade(counters_t::iterator it, sync_f sync) {
