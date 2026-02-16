@@ -40,6 +40,16 @@ namespace uICAL {
     }
 
     void DateTime::construct(const string& datetime, const TZMap_ptr& tzmap) {
+        // Handle date-only format (YYYYMMDD) for all-day events per RFC 5545
+        // Date-only values are "floating" - they represent the same calendar date
+        // regardless of timezone, so we use unaware timezone to avoid date shifts.
+        if (datetime.length() == 8) {
+            DateStamp ds(datetime + "T000000");
+            this->tz = TZ::unaware();
+            this->construct(ds, tz);
+            return;
+        }
+
         if (datetime.length() < 15)
             throw ValueError(string("Bad datetime: \"") + datetime + "\"");
 
