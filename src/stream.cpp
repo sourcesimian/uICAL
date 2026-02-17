@@ -79,17 +79,35 @@ namespace uICAL {
             return ch;
         }
 
-        bool istream_Stream::readuntil(string& st, char delim) {
-            size_t len = 81;
-            char buf[len];
+        bool istream_Stream::readuntil(string& st, char delim, size_t maxLen) {
+            // Loop to handle lines longer than the internal buffer.
+            // Use maxLen to cap accumulated length (0 = no limit).
+            static const size_t CHUNK_SIZE = 81;
+            char buf[CHUNK_SIZE];
+            st = "";
 
-            size_t read = this->stm.readBytesUntil(delim, buf, len-1);
-            if (read > 0) {
-                buf[read] = 0;
-                st = buf;
-                return true;
+            while (maxLen == 0 || st.length() < maxLen) {
+                size_t bytesRead = this->stm.readBytesUntil(delim, buf, CHUNK_SIZE - 1);
+                if (bytesRead == 0) {
+                    // Timeout or EOF with no data
+                    return !st.isEmpty();
+                }
+
+                buf[bytesRead] = 0;
+                st += buf;
+
+                // If we read less than buffer size, we hit the delimiter
+                if (bytesRead < CHUNK_SIZE - 1) {
+                    return true;
+                }
+                // Buffer was full - continue reading until delimiter or max length
             }
-            return false;
+            // Hit max length - consume remaining chars until delimiter
+            while (true) {
+                int c = this->stm.read();
+                if (c < 0 || c == delim) break;
+            }
+            return true;
         }
 
         istream_String::istream_String(const String& st)
@@ -105,7 +123,7 @@ namespace uICAL {
             return this->st.charAt(this->pos++);
         }
 
-        bool istream_String::readuntil(string& st, char delim) {
+        bool istream_String::readuntil(string& st, char delim, size_t maxLen) {
             if (this->pos >= this->st.length()) {
                 return false;
             }
@@ -118,6 +136,10 @@ namespace uICAL {
             else {
                 st = this->st.substring(this->pos, index);
                 this->pos = index + 1;
+            }
+            // Truncate if maxLen specified
+            if (maxLen > 0 && st.length() > maxLen) {
+                st = st.substr(0, maxLen);
             }
             return true;
         }
@@ -136,8 +158,12 @@ namespace uICAL {
             return this->istm.get();
         }
 
-        bool istream_stl::readuntil(string& st, char delim) {
+        bool istream_stl::readuntil(string& st, char delim, size_t maxLen) {
             if (std::getline(this->istm, st, delim)) {
+                // Truncate if maxLen specified
+                if (maxLen > 0 && st.length() > maxLen) {
+                    st = st.substr(0, maxLen);
+                }
                 return true;
             }
             return false;

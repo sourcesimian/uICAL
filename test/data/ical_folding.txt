@@ -46,4 +46,20 @@ SUMMARY:This is a
  ort line that is folded.
 TRANSP:OPAQUE
 END:VEVENT
+BEGIN:VEVENT
+DTSTART;TZID=America/New_York:20220122T100000
+DTEND;TZID=America/New_York:20220129T180000
+DTSTAMP:20251218T092105Z
+UID:test-multiline-escaped-description@test.com
+CREATED:20211229T204309Z
+DESCRIPTION:519 /Pers * 2.5 Pers = 1297\,50€ im FamZi incl HP \n(133€ * 7=9
+ 31€\; 30*7=210€ Frühstück Appartement) \n40€/Tag/Kind * 2 Kinder *5 Tage =
+ 400€ Skikurs\nca 240€ Skiverleih \n228€/Pers * 2 Pers = 456€ Liftkarte (51€
+ /d)
+LAST-MODIFIED:20220116T084708Z
+SEQUENCE:1
+STATUS:CONFIRMED
+SUMMARY:Ski Trip with escaped chars and UTF-8 (€)
+TRANSP:OPAQUE
+END:VEVENT
 END:VCALENDAR
