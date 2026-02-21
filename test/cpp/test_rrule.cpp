@@ -1,6 +1,7 @@
 #include "../catch.hpp"
 
 #include <iostream>
+#include <iomanip>
 #include <string>
 #include <vector>
 #include <sstream>
@@ -10,18 +11,43 @@
 
 #include "uICAL.h"
 
-using test_f = std::function<void(std::string, std::string, std::string, std::vector<std::string>, std::vector<std::string>)>;
+using test_f = std::function<void(std::string, std::string, std::string, std::vector<std::string>, std::vector<std::string>, uICAL::TZMap_ptr, std::string)>;
+
+static uICAL::TZMap_ptr load_tzmap(const std::string tzmap_ical_file) {
+    std::ifstream input(tzmap_ical_file);
+    uICAL::istream_stl ical(input);
+
+    uICAL::TZMap_ptr tzmap = uICAL::new_ptr<uICAL::TZMap>();
+    auto vcalendar = uICAL::Calendar::load(ical, tzmap);
+
+    return tzmap;
+}
+
+// Example: "DTSTART;TZID=America/New_York:19970901T090000" => "America/New_York"
+static std::string get_tzid_substr(const std::string& field) {
+    size_t tzidPos = field.find("TZID=") + sizeof("TZID=") - 1; // -1 to account for null termination
+    if (tzidPos == std::string::npos) {
+        return std::string("");
+    };
+
+    size_t tzidLength = field.find(':') - tzidPos;
+    return field.substr(tzidPos, tzidLength);
+}
 
 static void run_tests(const std::string dat_file, test_f test)
 {
     std::ifstream input(dat_file);
 
     std::string dtstart;
+    uICAL::DateTime_ptr dtstartdt;
+
     std::string rrule;
     std::vector<std::string> excludes;
     std::vector<std::string> expected;
+    uICAL::TZMap_ptr tzmap = load_tzmap("test/data/ical_timezones.txt");
 
     int i = 1;
+    std::string test_case_location = dat_file + ":" + std::to_string(i+1);
     for (std::string line; std::getline(input, line); )
     {
         if (line.find('#') == 0) {
@@ -36,15 +62,23 @@ static void run_tests(const std::string dat_file, test_f test)
         else if (line.find("EXDATE") == 0) {
             excludes.push_back(line);
         }
-        else if (line.find(" - ") == 0) {
+        else if (line.find(" - ...") == 0) {
             expected.push_back(line.substr(3));
+        }
+        else if (line.find(" - ") == 0) {
+            if(line.length() < sizeof(" - 20000131T140000")) {
+                expected.push_back(line.substr(3) + tzmap->getName(get_tzid_substr(dtstart)));
+            }
+            else {
+                expected.push_back(line.substr(3));
+            }
         }
         else if (dtstart.size() &&
                  rrule.size() &&
                  expected.size() &&
                  (line.find(" ") == 0 || line.length() == 0)) {
             try {
-                test(dtstart, rrule, expected[0], excludes, expected);
+                test(dtstart, rrule, expected[0], excludes, expected, tzmap, test_case_location);
             }
             catch (uICAL::Error e) {
                 WARN("uICAL::Error " << e.message.c_str());
@@ -56,11 +90,13 @@ static void run_tests(const std::string dat_file, test_f test)
             dtstart.clear();
             rrule.clear();
             expected.clear();
+            test_case_location = dat_file + ":" + std::to_string(i+1);
         }
         else if (line.find(" ") == 0 || line.length() == 0) {
             dtstart.clear();
             rrule.clear();
             expected.clear();
+            test_case_location = dat_file + ":" + std::to_string(i+1);
         }
         else {
             FAIL("! bad line (" << i <<"): \"" << line << "\"");
@@ -71,79 +107,103 @@ static void run_tests(const std::string dat_file, test_f test)
 
 }
 
-void test_basic(std::string dtstart, std::string rrule, std::string begin, std::vector<std::string> excludes, std::vector<std::string> expected) {
+std::ostringstream print_expected_and_result_in_columns(std::vector<std::string> expected, std::vector<std::string> results, uint indentation=4, uint columnWidth=30) {
+    std::ostringstream outStream;
+
+    outStream << std::setw(indentation) << "" << std::setw(columnWidth) << "expected" << std::setw(columnWidth) << "results" << std::endl;
+
+    for(size_t i=0; i < expected.size() || i < results.size(); i++) {
+
+        auto left  = (i < expected.size()) ? expected[i] : "";
+        auto right = (i < results.size()) ? results[i] : "";
+
+        outStream << 
+            std::setw(indentation) << (left == right ? " " : " > ") <<
+            std::setw(columnWidth) << left <<
+            std::setw(columnWidth) << right <<
+            std::endl;
+    }
+
+    return outStream;
+}
+
+void test_basic(std::string dtstart, std::string rrule, std::string begin, std::vector<std::string> excludes, std::vector<std::string> expected, const uICAL::TZMap_ptr& tzmap, std::string test_case_location) {
+    // Setup
     uICAL::VLine_ptr ldtstart = uICAL::new_ptr<uICAL::VLine>(dtstart);
     uICAL::VLine_ptr lrrule = uICAL::new_ptr<uICAL::VLine>(rrule);
 
-    uICAL::DateTime start = uICAL::DateTime(ldtstart->value);
+    uICAL::DateTime start = uICAL::DateTime(ldtstart->value + ldtstart->getParam("TZID"), tzmap);
 
-    std::string res;
     try {
-        uICAL::DateTime rrBegin;
+        uICAL::DateTime rrBegin; // dtstart
         if (!begin.empty()) {
-            rrBegin = uICAL::DateTime(begin);
+            rrBegin = uICAL::DateTime(begin, tzmap);
         }
 
         uICAL::RRule_ptr rr = uICAL::new_ptr<uICAL::RRule>(lrrule->value, start);
         for (std::string exclude : excludes) {
             uICAL::VLine_ptr excl = uICAL::new_ptr<uICAL::VLine>(exclude);
-            rr->exclude(uICAL::DateTime(excl->value));
+            rr->exclude(uICAL::DateTime(excl->value + excl->getParam("TZID"), tzmap));
         }
 
-        uICAL::RRuleIter_ptr occ = uICAL::new_ptr<uICAL::RRuleIter>(rr, rrBegin, uICAL::DateTime());
+        uICAL::RRuleIter_ptr occ = uICAL::new_ptr<uICAL::RRuleIter>(rr, rrBegin, uICAL::DateTime());   
 
         std::vector<std::string> results;
         for (auto eit = expected.begin(); eit != expected.end(); ++eit) {
-            if (!occ->next()) {
+            if(*eit == "...") {
                 break;
             }
-            std::ostringstream res;
-            uICAL::DateTime now = occ->now();
-            res << now.as_str();
-            results.push_back(res.str());
+
+            if (!occ->next())
+                break;
+
+            results.push_back(occ->now().as_str());
         }
 
-        std::ostringstream exp, res;
+        if(occ->next()) { // Must always be checked, independent of whether expected contains "..."
+            results.push_back("...");
+        }
 
-        bool fail = false;
+        // Check
         auto eit = expected.begin();
         auto rit = results.begin();
-        for (; eit != expected.end(); ++eit, ++rit) {
-            if (rit == results.end()) {
-                fail = true;
+        for (; eit != expected.end() || rit != results.end(); ++eit, ++rit) {
+
+            if(eit == expected.end()) {
+                FAIL("TEST CASE: " << test_case_location << "\n" <<
+                    " FAIL: " << start.as_str() << " " << rrule << "\n" <<
+                    " .ccc: " << occ->as_str() << "\n" <<
+                    " Result has more occurances than expected" << "\n" <<
+                    print_expected_and_result_in_columns(expected, results).str()
+                );
             }
-            if ((*eit) == (*rit)) {
-                exp << (*eit) << " ";
-                res << "               " << " ";
+
+            if(rit == results.end()) {
+                FAIL("TEST CASE: " << test_case_location << "\n" <<
+                    " FAIL: " << start.as_str() << " " << rrule << "\n" <<
+                    " .ccc: " << occ->as_str() << "\n" <<
+                    " Result has fewer occurances than expected" << "\n" <<
+                    print_expected_and_result_in_columns(expected, results).str()
+                );
             }
-            else {
-                if ((*eit) == "...") {
-                    break;
-                }
-                std::string diff;
-                for (unsigned i = 0; i < (*eit).length(); ++i) {
-                    diff.push_back((*eit)[i] == (*rit)[i] ? ' ' : (*rit)[i]);
-                }
-                exp << (*eit) << " ";
-                res << diff << " ";
-                fail = true;
+
+            if (*eit != *rit) { 
+                FAIL("TEST CASE: " << test_case_location << "\n" <<
+                    " FAIL: " << start.as_str() << " " << rrule << "\n" <<
+                    " .ccc: " << occ->as_str() << "\n" <<
+                    " Result differs from expected" << "\n" <<
+                    print_expected_and_result_in_columns(expected, results).str()
+                );
             }
         }
-        if (fail) {
-            FAIL("FAIL: " << start.as_str() << " " << rrule << "\n" <<
-                 " ccc: " << occ->as_str() << "\n" <<
-                 " exp: " << exp.str() << "\n" <<
-                 " res: " << res.str()
-            );
-        }
-        else {
-            INFO("PASS: " << start.as_str() << " " << rrule << "\n" <<
-                 " ccc: " << occ->as_str());
-            REQUIRE(true);
-        }
+
+        INFO("PASS: " << start.as_str() << " " << rrule << "\n" <<
+                " ccc: " << occ->as_str());
+        REQUIRE(true);
     }
     catch (uICAL::Error e) {
-        FAIL("EXEP: " << start.as_str() << " " << rrule << "\n" <<
+        FAIL("TEST CASE: " << test_case_location << "\n" <<
+             " EXEP: " << start.as_str() << " " << rrule << "\n" <<
              " msg: " << e.message
         );
     }
@@ -155,6 +215,35 @@ TEST_CASE("RRule::rrule_txt", "[uICAL][RRule]") {
 
 TEST_CASE("RRule::test2", "[uICAL][RRule]") {
     uICAL::string rrule("FREQ=DAILY;COUNT=4");
+    uICAL::string dtstart("19970902T090000");
+    uICAL::string begin("19970902T090000");
+    uICAL::string end("29970902T090000");
+
+    auto rr = uICAL::RRuleIter(
+        uICAL::new_ptr<uICAL::RRule>(rrule, uICAL::DateTime(dtstart, uICAL::TZ::unaware())),
+        uICAL::DateTime(), uICAL::DateTime());
+
+    REQUIRE_THROWS_WITH(rr.now(), "RecurrenceError: Not yet initialised, call next() first");
+
+    REQUIRE(rr.next() == true);
+    REQUIRE(rr.now().as_str() == "19970902T090000");
+
+    REQUIRE(rr.next() == true);
+    REQUIRE(rr.now().as_str() == "19970903T090000");
+
+    REQUIRE(rr.next() == true);
+    REQUIRE(rr.now().as_str() == "19970904T090000");
+
+    REQUIRE(rr.next() == true);
+    REQUIRE(rr.now().as_str() == "19970905T090000");
+
+    REQUIRE(rr.next() == false);
+
+    REQUIRE_THROWS_WITH(rr.now(), "RecurrenceError: No more occurrences");
+}
+
+TEST_CASE("RRule::until", "[uICAL][RRule]") {
+    uICAL::string rrule("FREQ=DAILY;UNTIL=19970905T090000"); // UNTIL 3 days after dtstart - 4 events as it runs on day 0
     uICAL::string dtstart("19970902T090000");
     uICAL::string begin("19970902T090000");
     uICAL::string end("29970902T090000");

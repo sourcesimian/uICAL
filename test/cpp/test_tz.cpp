@@ -7,7 +7,7 @@
 #include <list>
 
 TEST_CASE("TZ::test1", "[uICAL][TZ]") {
-    std::ifstream input(std::string("test/data/ical2.txt"));
+    std::ifstream input(std::string("test/data/ical_timezones.txt"));
     uICAL::istream_stl ical(input);
 
     uICAL::TZMap_ptr tzmap = uICAL::new_ptr<uICAL::TZMap>();

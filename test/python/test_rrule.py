@@ -7,12 +7,18 @@ def names(argvalue):
         return argvalue[6:]
     return '-'
 
-def gen_params(filename):
+def gen_params(filename, timezones_ical_filename):
+    from helpers import get_tzid_datetime_offset;
+
+    with open(timezones_ical_filename) as timezones_ical_fh:
+        tz_ical_str = timezones_ical_fh.read()
+
     tests = []
     with open(filename) as fh:
         rrule = None
         dtstart = None
-        extra = []
+        dtstart_offset = None
+        exdates = []
         expected = []
         comments = []
 
@@ -20,14 +26,31 @@ def gen_params(filename):
             line = line.rstrip()
             if line.startswith('#'):
                 comments.append(line)
+
             elif line.startswith('RRULE'):
-                rrule = line
+                rrule = line.split(":",1)[1]
+
             elif line.startswith('DTSTART'):
-                dtstart = line
+                dtstart = line.split(";",1)[1]
+                dtstart_offset = get_tzid_datetime_offset(tz_ical_str, dtstart)
+                dtstart = dtstart[-15:] + dtstart_offset
+
             elif line.startswith(' - '):
-                expected.append(line[3:])
-            elif line:
-                extra.append(line)
+                expected_date = line[3:]
+                if expected_date == "...":
+                    expected.append(expected_date)
+                else:
+                    expected.append(expected_date + dtstart_offset)
+
+            elif line.startswith('EXDATE'):
+                exdate = line.split(";",1)[1]
+
+                exdate_offset = get_tzid_datetime_offset(tz_ical_str, exdate)
+                exdate = exdate[-15:] + exdate_offset
+                
+                exdates.append(exdate)
+
+
             elif not line and rrule and dtstart and expected:
                 # for c in comments:
                 #     print(c)
@@ -35,59 +58,57 @@ def gen_params(filename):
                     [
                         rrule,
                         dtstart,
-                        extra,
-                        expected
+                        exdates,
+                        expected,
+                        dtstart_offset
                     ]
                 )
                 print(rrule)
                 rrule = None
                 dtstart = None
-                extra = []
+                dtstart_offset = None
+                exdates = []
                 expected = []
                 comments = []
 
+            elif not line == "":
+                raise ValueError("Unhandled line: " + line)
+
     return (
-        ('rrule', 'dtstart', 'exdates', 'expected'),
+        ('rrule', 'dtstart', 'exdates', 'expected', 'dtstart_offset'),
         tests,
         False,
         names,
     )
 
-params = gen_params('./test/data/rrule.txt')
+params = gen_params('./test/data/rrule.txt', './test/data/ical_timezones.txt')
 
-def list_rrule_no_tz(rrule, dtstart, begin, end, exdates, maxres):
+def list_rrule(rrule, dtstart, begin, end, exdates, maxres, dtstart_offset):
     import uICAL
-    rule = rrule.split(':', 1)[1]
-    start = dtstart.split(':', 1)[1]
 
-    excludes = [ex.split(':', 1)[1] for ex in exdates]
-
-    rr = uICAL.RRule(rule, start, begin=begin, end=end, exclude=excludes)
+    rr = uICAL.RRule(rrule, dtstart, begin=begin, end=end, exclude=exdates)
 
     results = []
     while rr.next():
-        results.append("%04d%02d%02dT%02d%02d%02d" % rr.now())
+        results.append("%04d%02d%02dT%02d%02d%02d" % rr.now() + dtstart_offset)
         if len(results) == maxres:
             break
-    return results
 
-    # from itertools import count
-    # for n, r, e in zip(count(), results, expected):
-    #     assert r == e, "Event index=%s" % n
+    if rr.next():
+        results[-1] = "..."
+
+    return results
 
 
 @pytest.mark.parametrize(*params)
-def test_rrule_no_tz(rrule, dtstart, exdates, expected):
-    results = list_rrule_no_tz(rrule, dtstart, None, None, exdates, len(expected))
+def test_rrule(rrule, dtstart, exdates, expected, dtstart_offset):
+    results = list_rrule(rrule, dtstart, None, None, exdates, len(expected), dtstart_offset)
 
-    if len(results) == len(expected):
-        if expected[-1] == "...":
-            results[-1] = "..."
     assert results == expected
 
 
 @pytest.mark.parametrize(*params)
-def test_rrule_stepping_begin(rrule, dtstart, exdates, expected):
+def test_rrule_stepping_begin(rrule, dtstart, exdates, expected, dtstart_offset):
     expected_all = expected
 
     if "COUNT" in rrule:
@@ -98,11 +119,7 @@ def test_rrule_stepping_begin(rrule, dtstart, exdates, expected):
         if begin == "...":
             break
         expected = expected_all[i:]
-        results = list_rrule_no_tz(rrule, dtstart, begin, None, exdates, len(expected))
-
-        if len(results) == len(expected):
-            if expected[-1] == "...":
-                results[-1] = "..."
+        results = list_rrule(rrule, dtstart, begin, None, exdates, len(expected), dtstart_offset)
         
         assert results == expected, "Rolling index=%d" % i
         
