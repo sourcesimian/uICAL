@@ -11,6 +11,8 @@ Coincedentally during the writing of uICAL the [iCalendar.org](https://icalendar
 
 If you are looking for a main stream implementation of iCalendar then you are probably looking for [Libical](https://libical.github.io/libical/).
 
+# Table of Contents
+
 - [Examples](#examples)
   - [Get All Events Between Two Times (C++ STL)](#get-all-events-between-two-times-c-stl)
   - [Event Filtering (Arduino)](#event-filtering-arduino)

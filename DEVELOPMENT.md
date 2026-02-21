@@ -47,10 +47,9 @@ Launch configurations for debugging are included in `.vscode/launch.json`.
     - Vscode should prompt you when it first detects the environment.
     - Alternatively, select it manually through the vscode command palette (`Shift+Ctrl+P`) and type `>Python: Select Interpreter`.
 
-3. Ensure that the tests can be run through commandline:
+3. Ensure that all the tests pass:
 
-    - **C++:** `make test-cpp`
-    - **Python:** `PYTHONPATH=. pytest`
+    - **Run:**. `./de make clean test-all`
 
 4. Launch through vscode
     - Open the **Run and Debug** tab on the left, select the configuration in the top, and click the green button.
