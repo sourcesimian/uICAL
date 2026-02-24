@@ -1,8 +1,8 @@
 /*############################################################################
-# Copyright (c) 2020 Source Simian  :  https://github.com/sourcesimian/uICAL #
+# Copyright (c) 2025 Source Simian  :  https://github.com/sourcesimian/uICAL #
 ############################################################################*/
-#ifndef python_rrule_h
-#define python_rrule_h
+#ifndef python_tzmap_h
+#define python_tzmap_h
 
 #define PY_SSIZE_T_CLEAN
 #include <Python.h>
@@ -10,11 +10,12 @@
 namespace uical_python {
     typedef struct {
         PyObject_HEAD
-        uICAL::RRuleIter_ptr rrule;
-    } RRuleObject;
+        uICAL::TZMap_ptr tzmap;
+    } TZMapObject;
 
-    extern PyTypeObject RRuleType;
+    extern PyTypeObject TZMapType;
 
-    bool PyInit_RRule(PyObject* module);
+    bool PyInit_TZMap(PyObject* module);
 }
+
 #endif

@@ -1,13 +1,13 @@
 // This example is derived from the README.md example 'Get All Events Between Two Times (C++ STL)'.
 // When using the ica1l.txt in this repository it returns the 'start' and 'summary' properties for 10 resulting recuring events iterated from within the coded date range.
-// If error at runtime ensure file ical1.txt can be found and is valid.
+// If error at runtime ensure file ical_events.txt can be found and is valid.
 
 // #include <fstream> // could uncomment if prefering this Standard library
 
 #include <uICAL.h>
 
 int main() {
-    std::ifstream fstm(std::string("test/data/ical1.txt"));
+    std::ifstream fstm(std::string("test/data/ical_events.txt"));
 
     uICAL::istream_stl istm(fstm);
     auto cal = uICAL::Calendar::load(istm);

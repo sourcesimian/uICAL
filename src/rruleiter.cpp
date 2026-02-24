@@ -24,10 +24,14 @@ namespace uICAL {
         }
 
         this->count = 0;
-        if (begin.valid())
+        if (begin.valid()) {
             this->range_begin = begin;
-        if (end.valid())
+            this->range_begin.ensureAware(rr->dtstart);
+        }
+        if (end.valid()) {
             this->range_end = end;
+            this->range_end.ensureAware(rr->dtstart);
+        }
     }
 
     bool RRuleIter::start() {
@@ -35,7 +39,7 @@ namespace uICAL {
             return false;
         }
 
-        if (this->range_begin.valid() && this->until.valid() && this->until < this->range_begin) {
+        if (this->range_begin.valid() && this->rr->until.valid() && this->rr->until < this->range_begin) {
             return false;
         }
 
@@ -113,7 +117,7 @@ namespace uICAL {
     }
 
     bool RRuleIter::expired(const DateTime& current) const {
-        if (this->until.valid() && current > this->until) {
+        if (this->rr->until.valid() && current > this->rr->until) {
             return true;
         }
         if (this->range_end.valid() && current > this->range_end) {
@@ -131,6 +135,12 @@ namespace uICAL {
             for (;;) {
                 if (!this->rr->excluded(this->now())) {
                     break;
+                }
+                if (this->count > 0) {
+                    this->count --;
+                }
+                if (this->count == 0) {
+                    return false;
                 }
                 if (!this->nextNow()) {
                     return false;

@@ -34,7 +34,7 @@ Here we load the calendar and then iterate all the events between the two times 
 #include <uICAL.h>
 
 void main () {
-    std::ifstream fstm(std::string("test/data/ical1.txt"));
+    std::ifstream fstm(std::string("test/data/ical_events.txt"));
     
     uICAL::istream_stl istm(fstm);
     auto cal = uICAL::Calendar::load(istm);

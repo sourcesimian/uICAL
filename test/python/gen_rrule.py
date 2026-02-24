@@ -25,7 +25,7 @@ for arg in sys.argv[1:]:
     if key == 'DTSTART':
         dtstart = value
 
-rr = uICAL.RRule(rrule, dtstart)
+rr = uICAL.RRule(rrule, uICAL.DateTime(dtstart))
 
 next = rr.next() 
 print()
@@ -34,7 +34,8 @@ print()
 print('DTSTART:%s' % dtstart)
 print('RRULE:%s' % rrule)
 while next:
-    print(" - %04d%02d%02dT%02d%02d%02d" % rr.now())
+    dt = rr.now()
+    print(" - %s" % str(dt))
     next = rr.next() 
 
 

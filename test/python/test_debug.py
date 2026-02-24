@@ -1,18 +1,22 @@
 import pytest 
+import test_rrule
+import uICAL
 
 def names(argvalue):
     if isinstance(argvalue, (list,)):
         return '-'
-    if argvalue.startswith("RRULE"):
-        return argvalue[6:]
+    if isinstance(argvalue, uICAL.VLine):
+        return argvalue.value
+    if isinstance(argvalue, uICAL.DateTime):
+        return '-'
     return '-'
 
 params = (
     ('rrule', 'dtstart', 'exdates', 'expected'),
     [
         [
-            "RRULE:FREQ=MONTHLY;BYMONTHDAY=15,30;COUNT=5",
-            "DTSTART;TZID=America/New_York:20070115T090000",
+            uICAL.VLine("RRULE:FREQ=MONTHLY;BYMONTHDAY=15,30;COUNT=5"),
+            uICAL.VLine("DTSTART;TZID=America/New_York:20070115T090000"),
             [],
             [
                 "20070115T090000",
@@ -27,23 +31,6 @@ params = (
     names
 )
 
-def list_rrule_no_tz(rrule, dtstart, begin, end, exdates, maxres):
-    import uICAL
-    rule = rrule.split(':', 1)[1]
-    start = dtstart.split(':', 1)[1]
-
-    excludes = [ex.split(':', 1)[1] for ex in exdates]
-
-    rr = uICAL.RRule(rule, start, begin=begin, end=end, exclude=excludes)
-
-    results = []
-    while rr.next():
-        results.append("%04d%02d%02dT%02d%02d%02d" % rr.now())
-        if len(results) == maxres:
-            break
-    return results
-
-
 @pytest.mark.parametrize(*params)
 def test_rrule_stepping_begin(rrule, dtstart, exdates, expected):
     expected_all = expected
@@ -51,7 +38,7 @@ def test_rrule_stepping_begin(rrule, dtstart, exdates, expected):
     for i in range(1, len(expected_all)):
         expected = expected_all[i:]
         begin = expected_all[i]
-        results = list_rrule_no_tz(rrule, dtstart, begin, None, exdates, len(expected))
+        results = test_rrule.list_rrule_times(rrule, uICAL.DateTime(dtstart.value), begin, None, exdates, len(expected))
 
         if len(results) == len(expected):
             if expected[-1] == "...":

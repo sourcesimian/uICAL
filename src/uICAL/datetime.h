@@ -17,6 +17,7 @@ namespace uICAL {
             DateTime();
             DateTime(const string& datetime);
             DateTime(const string& datetime, const TZMap_ptr& tzmap);
+            DateTime(const string& datetime, const string& tzid, const TZMap_ptr& tzmap);
             DateTime(const DateStamp& datestamp, const TZ_ptr& tz);
             DateTime(seconds_t epochSeconds);
             DateTime(seconds_t epochSeconds, const TZ_ptr& tz);
@@ -37,6 +38,8 @@ namespace uICAL {
             static unsigned daysUntil(DateTime::Day today, int index, DateTime::Day then, unsigned span);
             static DateTime::Day dayOfWeekAfter(DateTime::Day today, unsigned days);
 
+            void ensureAware(const DateTime& dt);
+
             DateTime& operator = (const DateTime& dt);
             DatePeriod operator + (const DateTime& dt) const;
             DatePeriod operator - (const DateTime& dt) const;
@@ -53,7 +56,7 @@ namespace uICAL {
         protected:
             void construct(const string& datetime, const TZMap_ptr& tzmap);
             void construct(const DateStamp& ds, const TZ_ptr& tz);
-            void assert_awareness(const DateTime& other) const;
+            void assert_awareness(const DateTime& other, const string& msg) const;
 
             EpochTime epochtime;
     };

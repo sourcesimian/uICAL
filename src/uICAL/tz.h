@@ -16,7 +16,6 @@ namespace uICAL {
             static TZ_ptr unaware();
 
             TZ();
-            TZ(bool aware);
             TZ(int offsetMins);
             TZ(const string& tz);
             TZ(const string& tz, const TZMap_ptr& tzmap);

@@ -1,20 +1,23 @@
 /*############################################################################
-# Copyright (c) 2020 Source Simian  :  https://github.com/sourcesimian/uICAL #
+# Copyright (c) 2025 Source Simian  :  https://github.com/sourcesimian/uICAL #
 ############################################################################*/
-#ifndef python_rrule_h
-#define python_rrule_h
+#ifndef python_vline_h
+#define python_vline_h
 
 #define PY_SSIZE_T_CLEAN
 #include <Python.h>
 
+#include "uICAL/vline.h"
+
 namespace uical_python {
     typedef struct {
         PyObject_HEAD
-        uICAL::RRuleIter_ptr rrule;
-    } RRuleObject;
+        uICAL::VLine_ptr vline;
+    } VLineObject;
 
-    extern PyTypeObject RRuleType;
+    extern PyTypeObject VLineType;
 
-    bool PyInit_RRule(PyObject* module);
+    bool PyInit_VLine(PyObject* module);
 }
+
 #endif

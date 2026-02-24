@@ -29,6 +29,12 @@ namespace uICAL {
         this->construct(datetime, tzmap);
     }
 
+    DateTime::DateTime(const string& datetime, const string& tzid, const TZMap_ptr& tzmap) {
+        DateStamp ds = DateStamp(datetime);
+        TZ_ptr tz = new_ptr<TZ>(tzid, tzmap);
+        this->construct(ds, tz);
+    }
+
     DateTime::DateTime(seconds_t epochSeconds) {
         this->epochtime = EpochTime(epochSeconds);
         this->tz = new_ptr<TZ>("Z");
@@ -101,19 +107,19 @@ namespace uICAL {
         return *this;
     }
 
-    void DateTime::assert_awareness(const DateTime& other) const {
+    void DateTime::assert_awareness(const DateTime& other, const string& msg) const {
         if (this->tz->is_aware() != other.tz->is_aware()) {
-            throw TZAwarenessConflictError(this->as_str() + this->tz->as_str() + " <> " + other.as_str() + other.tz->as_str());
+            throw TZAwarenessConflictError(this->as_str() + " <> " + other.as_str() + " '" + msg + "'");
         }
     }
 
     DatePeriod DateTime::operator - (const DateTime& other) const {
-        this->assert_awareness(other);
+        this->assert_awareness(other, "-");
         return DatePeriod(this->epochtime.epochSeconds - other.epochtime.epochSeconds);
     }
 
     DatePeriod DateTime::operator + (const DateTime& other) const {
-        this->assert_awareness(other);
+        this->assert_awareness(other, "+");
         return DatePeriod(this->epochtime.epochSeconds + other.epochtime.epochSeconds);
     }
 
@@ -126,22 +132,22 @@ namespace uICAL {
     }
 
     bool DateTime::operator > (const DateTime& other) const {
-        this->assert_awareness(other);
+        this->assert_awareness(other, ">");
         return this->epochtime > other.epochtime;
     }
 
     bool DateTime::operator < (const DateTime& other) const {
-        this->assert_awareness(other);
+        this->assert_awareness(other, "<");
         return this->epochtime < other.epochtime;
     }
 
     bool DateTime::operator <= (const DateTime& other) const {
-        this->assert_awareness(other);
+        this->assert_awareness(other, "<=");
         return this->epochtime <= other.epochtime;
     }
 
     bool DateTime::operator == (const DateTime& other) const {
-        this->assert_awareness(other);
+        this->assert_awareness(other, "==");
         return this->epochtime == other.epochtime;
     }
 
@@ -179,6 +185,22 @@ namespace uICAL {
 
     DateTime::Day DateTime::dayOfWeekAfter(DateTime::Day today, unsigned days) {
         return DateTime::Day( ((int)today + days - 1) % 7 + 1 );
+    }
+
+    void DateTime::ensureAware(const DateTime& dt) {
+        if (!dt.tz->is_aware() && this->tz->is_aware()) {
+            throw TZAwarenessConflictError("DateTime TZ unaware/aware usage");
+        }
+
+        if (dt.tz->is_aware() && !this->tz->is_aware()) {
+            // Reinterpret current wall-clock in the other's timezone to keep the same local time
+            DateStamp ds = this->datestamp();
+            this->epochtime = EpochTime(
+                ds.year, ds.month, ds.day, ds.hour, ds.minute, ds.second,
+                dt.tz
+            );
+            this->tz = dt.tz;
+        }
     }
 
     ostream& operator << (ostream& out, const DateTime::Day& day) {

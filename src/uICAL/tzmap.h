@@ -14,6 +14,7 @@ namespace uICAL {
             TZMap();
 
             void add(const VObject_ptr& timezone);
+            void add(const string& id, const string& name, const string& tz);
 
             string findId(const string& nameOrId) const;
 
@@ -23,7 +24,6 @@ namespace uICAL {
             void str(ostream& out) const;
 
         protected:
-            void add(const string& id, const string& name, const string& tz);
             int parseOffset(const string& offset) const;
 
             typedef struct {

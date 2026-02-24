@@ -14,6 +14,9 @@
 
 #include "error.h"
 #include "calendar.h"
+#include "datetime.h"
+#include "tzmap.h"
+#include "vline.h"
 #include "rrule.h"
 
 namespace uical_python {
@@ -40,6 +43,21 @@ PyInit_uICAL(void)
     }
 
     if (!uical_python::PyInit_Calendar(m)) {
+        //PY_DECREF(m);  TODO error: use of undeclared identifier 'PY_DECREF'
+        return NULL;
+    }
+
+    if (!uical_python::PyInit_TZMap(m)) {
+        //PY_DECREF(m);
+        return NULL;
+    }
+
+    if (!uical_python::PyInit_DateTime(m)) {
+        //PY_DECREF(m);
+        return NULL;
+    }
+
+    if (!uical_python::PyInit_VLine(m)) {
         //PY_DECREF(m);  TODO error: use of undeclared identifier 'PY_DECREF'
         return NULL;
     }

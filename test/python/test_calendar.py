@@ -4,7 +4,7 @@ import uICAL
 
 
 def test_basic_ical1():
-    ical = open("test/data/ical1.txt").read()
+    ical = open("test/data/ical_events.txt").read()
     cal = uICAL.Calendar(ical, begin="20191016T102000Z", end="20191017T103000-0500")
 
     res = []
@@ -35,7 +35,7 @@ def test_basic_ical1():
 
 
 def test_basic_range():
-    ical = open("test/data/ical1.txt").read()
+    ical = open("test/data/ical_events.txt").read()
 
     # Miss on begin: (2019, 10, 17, 10, 0, 0, -300) 1200s
     cal = uICAL.Calendar(ical, begin="20191017T095500-0500", end="20191017T095959-0500")
@@ -95,7 +95,7 @@ def test_basic_range():
 
 def test_bad_range():
     # Negative Range
-    ical = open("test/data/ical1.txt").read()
+    ical = open("test/data/ical_events.txt").read()
 
     with pytest.raises(uICAL.error) as ex:
         cal = uICAL.Calendar(ical, begin="20191017T104000-0500", end="20191017T103000-0500")

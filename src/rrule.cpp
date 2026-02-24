@@ -7,6 +7,8 @@
 #include "uICAL/util.h"
 #include "uICAL/logging.h"
 #include "uICAL/rrule.h"
+#include "uICAL/tz.h"
+#include "uICAL/datestamp.h"
 
 namespace uICAL {
     RRule::RRule(const string& rrule, const DateTime& dtstart)
@@ -129,7 +131,10 @@ namespace uICAL {
     }
 
     DateTime RRule::parseDate(const string& value) const {
-        return DateTime(value);
+        DateTime dt = DateTime(value);
+        dt.ensureAware(this->dtstart);
+
+        return dt;
     }
 
     const char* RRule::dayAsString(DateTime::Day day) const {
@@ -171,7 +176,9 @@ namespace uICAL {
     }
 
     void RRule::exclude(const DateTime& exclude) {
-        this->excludes.push_back(exclude);
+        DateTime dt = exclude;
+        dt.ensureAware(this->dtstart);
+        this->excludes.push_back(dt);
     }
 
     bool RRule::excluded(const DateTime& now) const {

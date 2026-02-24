@@ -8,6 +8,7 @@
 #include "uICAL/datestamp.h"
 #include "uICAL/rrule.h"
 #include "uICAL/rruleiter.h"
+#include "uICAL/tz.h"
 
 #include <sstream>
 
@@ -17,6 +18,7 @@
 
 #include "error.h"
 #include "rrule.h"
+#include "datetime.h"
 
 namespace uical_python {
     static void
@@ -47,10 +49,10 @@ namespace uical_python {
     {
         try {
             static char const *kwlist[] = {"rrule", "dtstart", "begin", "end", "exclude", NULL};
-            char *rrule = NULL, *dtstart = NULL;
-            PyObject *begin = NULL, *end = NULL, *exclude = NULL;
+            char *rrule = NULL;
+            PyObject *dtstart = NULL, *begin = NULL, *end = NULL, *exclude = NULL;
 
-            if (!PyArg_ParseTupleAndKeywords(args, kwds, "ss|OOO:__init__", (char**)kwlist,
+            if (!PyArg_ParseTupleAndKeywords(args, kwds, "sO|OOO:__init__", (char**)kwlist,
                                             &rrule, &dtstart,
                                             &begin, &end, &exclude))
                 return -1;
@@ -65,29 +67,44 @@ namespace uical_python {
                 return -1;
             }
 
-            uICAL::DateTime dt = uICAL::DateTime(std::string(dtstart));
-            uICAL::RRule_ptr rr = uICAL::new_ptr<uICAL::RRule>(std::string(rrule), dt);
-            
-            uICAL::DateTime rrBegin;
+            uICAL::DateTime_ptr dtstart_dt = DateTime_from_py(dtstart, "dtstart");
+            if (!dtstart_dt) return -1;
+
+            uICAL::DateTime rrBegin; // default constructed
             uICAL::DateTime rrEnd;
-            if (begin && PyUnicode_Check(begin)) {
-                rrBegin = uICAL::DateTime(std::string(PyUnicode_AsUTF8(begin)));
-            }
-            if (end && PyUnicode_Check(end)) {
-                rrEnd = uICAL::DateTime(std::string(PyUnicode_AsUTF8(end)));
+
+            if (begin && begin != Py_None) {
+                uICAL::DateTime_ptr begin_dt = DateTime_from_py(begin, "begin");
+                if (!begin_dt) return -1;
+                rrBegin = *begin_dt;
             }
 
+            if (end && end != Py_None) {
+                uICAL::DateTime_ptr end_dt = DateTime_from_py(end, "end");
+                if (!end_dt) return -1;
+                rrEnd = *end_dt;
+            }
+
+            uICAL::RRule_ptr rr = uICAL::new_ptr<uICAL::RRule>(std::string(rrule), *dtstart_dt);
             self->rrule = uICAL::new_ptr<uICAL::RRuleIter>(rr, rrBegin, rrEnd);
 
-            if (exclude) {
-                if (PyList_Check(exclude)) {
-                    for (int i = 0; i < PyList_Size(exclude); ++i) {
-                        PyObject *item = PyList_GetItem(exclude, i);
-                        rr->exclude(uICAL::DateTime(std::string(PyUnicode_AsUTF8(item))));
+            if (exclude && exclude != Py_None) {
+                if (PyList_Check(exclude) || PyTuple_Check(exclude)) {
+                    PyObject* seq = exclude;
+                    Py_ssize_t size = PySequence_Size(seq);
+                    for (Py_ssize_t i = 0; i < size; ++i) {
+                        PyObject *item = PySequence_GetItem(seq, i);
+                        if (!item) return -1;
+                        uICAL::DateTime_ptr ex_dt = DateTime_from_py(item, "exclude");
+                        Py_DECREF(item);
+                        if (!ex_dt) return -1;
+                        rr->exclude(*ex_dt);
                     }
                 }
                 else {
-                    rr->exclude(uICAL::DateTime(std::string(PyUnicode_AsUTF8(exclude))));
+                    uICAL::DateTime_ptr ex_dt = DateTime_from_py(exclude, "exclude");
+                    if (!ex_dt) return -1;
+                    rr->exclude(*ex_dt);
                 }
             }
 
@@ -119,19 +136,12 @@ namespace uical_python {
     RRule_now(RRuleObject *self, PyObject *Py_UNUSED(ignored))
     {
         try {
-            std::ostringstream res;
-            // res << self->rrule->now();
-            // return PyUnicode_FromString(res.str().c_str());
-            PyObject* ret = PyTuple_New(6);
-
-            uICAL::DateStamp now = self->rrule->now().datestamp();
-            PyTuple_SetItem(ret, 0, PyLong_FromLong(now.year));
-            PyTuple_SetItem(ret, 1, PyLong_FromLong(now.month));
-            PyTuple_SetItem(ret, 2, PyLong_FromLong(now.day));
-            PyTuple_SetItem(ret, 3, PyLong_FromLong(now.hour));
-            PyTuple_SetItem(ret, 4, PyLong_FromLong(now.minute));
-            PyTuple_SetItem(ret, 5, PyLong_FromLong(now.second));
-            return ret;
+            uICAL::DateTime dt = self->rrule->now();
+            DateTimeObject* dto = reinterpret_cast<DateTimeObject*>(
+                DateTimeType.tp_alloc(&DateTimeType, 0));
+            if (!dto) return NULL;
+            dto->dt = uICAL::new_ptr<uICAL::DateTime>(dt);
+            return reinterpret_cast<PyObject*>(dto);
         } catch (uICAL::Error ex) {
             PyErr_SetString(UicalError, ex.message.c_str());
             return 0;
@@ -162,7 +172,7 @@ namespace uical_python {
     };
 
 
-    static PyTypeObject RRuleType = {
+    PyTypeObject RRuleType = {
         PyVarObject_HEAD_INIT(NULL, 0)
         .tp_name = "uical.RRule",
         .tp_basicsize = sizeof(RRuleObject),

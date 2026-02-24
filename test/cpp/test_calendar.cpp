@@ -97,7 +97,7 @@ protected:
 };
 
 TEST_CASE("Calendar::basic", "[uICAL][Calendar]") {
-    std::ifstream input(std::string("test/data/ical1.txt"));
+    std::ifstream input(std::string("test/data/ical_events.txt"));
     uICAL::istream_stl ical(input);
 
     uICAL::TZMap_ptr tzmap = uICAL::new_ptr<uICAL::TZMap>();
@@ -140,7 +140,7 @@ TEST_CASE("Calendar::basic", "[uICAL][Calendar]") {
 
 
 TEST_CASE("Calendar::finite", "[uICAL][Calendar]") {
-    std::ifstream input(std::string("test/data/ical1.txt"));
+    std::ifstream input(std::string("test/data/ical_events.txt"));
     uICAL::istream_stl ical(input);
 
     uICAL::TZMap_ptr tzmap = uICAL::new_ptr<uICAL::TZMap>();

@@ -10,25 +10,28 @@
 #include "uICAL/tzmap.h"
 
 namespace uICAL {
-    static TZ_ptr UNDEF = new_ptr<TZ>();
-    static TZ_ptr UNAWARE = new_ptr<TZ>(false);
 
     TZ_ptr TZ::undef() {
+        static TZ_ptr UNDEF = [](){
+            TZ_ptr tz = new_ptr<TZ>();
+            return tz;
+        }();
         return UNDEF;
     }
 
     TZ_ptr TZ::unaware() {
+        static TZ_ptr UNAWARE = [](){
+            TZ_ptr tz = new_ptr<TZ>();
+            tz->offsetMins = 0;
+            tz->aware = false;
+            return tz;
+        }();
         return UNAWARE;
     }
 
     TZ::TZ() {
         this->offsetMins = -1;
         this->aware = false;
-    }
-
-    TZ::TZ(bool aware) {
-        this->offsetMins = 0;
-        this->aware = aware;
     }
 
     TZ::TZ(int offsetMins) {

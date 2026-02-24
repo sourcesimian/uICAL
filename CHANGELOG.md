@@ -2,6 +2,23 @@
 
 ---
 
+## [0.0.5] - 2026-02-24
+
+### Added
+- Timezone aware coersion of unaware datetime parameters from DTSTART
+- Python binding capability expanded to support improved testing
+
+### Changed
+- RRULE tests aligned with icalendar.org examples (explicit UTC UNTIL, corrected expectations)
+- RRULE tests now load TZIDs from `ical_timezone.txt`
+- Tests are now timezone aware, and more strictly verify expected bounds of RRULE generation
+
+### Fixed
+- UNTIL fixed and handling corrected for timezone-aware recurrences.
+- COUNT with EXDATEs now emits the correct number of occurrences.
+
+---
+
 ## [0.0.4] - 2026-02-21
 
 ### Added

@@ -12,7 +12,6 @@ namespace uICAL {
             VLine(const string& line);
 
             string name;
-            std::map<string, string> params;
             string value;
             string getParam(const string& key);
 
@@ -20,6 +19,8 @@ namespace uICAL {
 
         private:
             void readParams(const string& str);
+
+            std::map<string, string> params;
     };
 }
 #endif
