@@ -5,9 +5,9 @@ uICAL  <!-- omit in toc -->
 
 This project implements the [iCalendar RFC-5545](https://icalendar.org/RFC-Specifications/iCalendar-RFC-5545/) standard in pure C++ to the C++ 11 standard and minimal STL. It is targeted at small embedded, Arduino and IoT devices with limited resources and no operating system. uICAL can however be used in any project which is C++ 11 compliant.
 
-At the time of writing I could not find a suitable iCalendar parser implementation for my use case, thus I set out to write uICAL. Fortunately, I underestimated the difficuilty in correctly implementing the ICAL specification, particularly the complexity of the [Recurrence (RRULE) property](https://icalendar.org/iCalendar-RFC-5545/3-8-5-3-recurrence-rule.html), or I would never have started. The code now satisfies all the RRULE test cases I've found so far, and runs quite sucessfully in an [ESP8266](https://github.com/sourcesimian/uICAL/blob/master/examples/sonoff-basic/README.md) microcontroller.
+At the time of writing I could not find a suitable iCalendar parser implementation for my use case, thus I set out to write uICAL. Fortunately, I underestimated the difficulty in correctly implementing the ICAL specification, particularly the complexity of the [Recurrence (RRULE) property](https://icalendar.org/iCalendar-RFC-5545/3-8-5-3-recurrence-rule.html), or I would never have started. The code now satisfies all the RRULE test cases I've found so far, and runs quite successfully in an [ESP8266](https://github.com/sourcesimian/uICAL/blob/master/examples/sonoff-basic/README.md) microcontroller.
 
-Coincedentally during the writing of uICAL the [iCalendar.org](https://icalendar.org) made this [IoT](https://icalendar.org/iot.html) calendar reading service available which is a neat way of off-loading the task from an under resourced IoT device.
+Coincidentally during the writing of uICAL the [iCalendar.org](https://icalendar.org) made this [IoT](https://icalendar.org/iot.html) calendar reading service available which is a neat way of off-loading the task from an under resourced IoT device.
 
 If you are looking for a main stream implementation of iCalendar then you are probably looking for [Libical](https://libical.github.io/libical/).
 
