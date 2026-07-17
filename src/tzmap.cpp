@@ -13,13 +13,27 @@ namespace uICAL {
     }
 
     void TZMap::add(const VObject_ptr& timezone) {
-        string tzId = timezone->getPropertyByName("TZID")->value;
+        VLine_ptr tzIdLine = timezone->getPropertyByName("TZID");
+        if (!tzIdLine) {
+            return;
+        }
+        string tzId = tzIdLine->value;
 
         auto standards = timezone->listObjects("STANDARD");
         for (auto standard : standards) {
 
-            string offset = standard->getPropertyByName("TZOFFSETFROM")->value;
-            string name = standard->getPropertyByName("TZNAME")->value;
+            VLine_ptr offsetLine = standard->getPropertyByName("TZOFFSETFROM");
+            if (!offsetLine) {
+                continue;
+            }
+            string offset = offsetLine->value;
+
+            // TZNAME is optional per RFC 5545. Some exporters (e.g. Outlook)
+            // omit it, so fall back to using the offset itself as the
+            // display name, e.g. "-0600", rather than dereferencing a null
+            // property.
+            VLine_ptr nameLine = standard->getPropertyByName("TZNAME");
+            string name = nameLine ? nameLine->value : offset;
 
             this->add(tzId, name, offset);
         }

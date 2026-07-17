@@ -63,3 +63,18 @@ TEST_CASE("TZ::test1", "[uICAL][TZ]") {
         REQUIRE(next() == "END");
     }
 }
+
+TEST_CASE("TZ::missing_tzname", "[uICAL][TZ]") {
+    // Some exporters (e.g. Outlook) emit a VTIMEZONE/STANDARD block without
+    // a TZNAME property. TZMap::add() must not crash on this, and should
+    // fall back to using the offset as the display name.
+    std::ifstream input(std::string("test/data/ical_timezone_no_tzname.txt"));
+    uICAL::istream_stl ical(input);
+
+    uICAL::TZMap_ptr tzmap = uICAL::new_ptr<uICAL::TZMap>();
+    auto vcalendar = uICAL::Calendar::load(ical, tzmap);
+    REQUIRE(vcalendar->as_str() == "CALENDAR\n");
+
+    REQUIRE(tzmap->getName("America/Chicago") == "-0600");
+    REQUIRE(tzmap->getOffset("America/Chicago") == -360);
+}
