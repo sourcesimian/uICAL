@@ -4,12 +4,12 @@
 #include <time.h>
 #include <uICAL.h>
 
-const char* WIFI_SSID = "...";
-const char* WIFI_PASS = "...";
+// WiFi credentials
 
 // Public holidays in the USA (provided by Google) as an example
 const char* ICAL_URL = "https://calendar.google.com/calendar/ical/en.usa.official%23holiday%40group.v.calendar.google.com/public/basic.ics";
 
+// NTP settings
 const char* NTP_HOST = "pool.ntp.org";
 const long GMT_OFFSET_SEC = 0;      // UTC+0
 const int DAYLIGHT_OFFSET_SEC = 0;
@@ -49,7 +49,7 @@ void halt() {
 void setup() {
     Serial.begin(115200);
     delay(1000);
-    Serial.println("Hello");
+    Serial.println("Running setup...");
 
     connectWiFi();
     waitForTime();
@@ -73,6 +73,8 @@ void loop() {
         https.end();
         halt();
     }
+
+    Serial.printf("Calendar data returns:\n%s\n", https.getString().c_str());
 
     uICAL::Calendar_ptr cal = nullptr;
     try {
