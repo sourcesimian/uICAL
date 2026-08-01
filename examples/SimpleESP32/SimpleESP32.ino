@@ -5,6 +5,8 @@
 #include <uICAL.h>
 
 // WiFi credentials
+const char* WIFI_SSID = "...";
+const char* WIFI_PASS = "...";
 
 // Public holidays in the USA (provided by Google) as an example
 const char* ICAL_URL = "https://calendar.google.com/calendar/ical/en.usa.official%23holiday%40group.v.calendar.google.com/public/basic.ics";
