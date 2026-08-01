@@ -76,8 +76,6 @@ void loop() {
         halt();
     }
 
-    Serial.printf("Calendar data returns:\n%s\n", https.getString().c_str());
-
     uICAL::Calendar_ptr cal = nullptr;
     try {
         uICAL::istream_Stream istm(https.getStream());
