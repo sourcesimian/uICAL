@@ -2,6 +2,14 @@
 
 ---
 
+## [0.0.6] - 2026-08-05
+
+Fixed
+
+- Prevented a null pointer dereference when parsing VTIMEZONE entries that omit TZNAME, as produced by some Outlook calendar exports. The timezone offset is now used as the fallback display name. Contributed by @94xhn in #37.
+
+---
+
 ## [0.0.5] - 2026-02-24
 
 ### Added
